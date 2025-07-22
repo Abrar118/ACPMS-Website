@@ -4,6 +4,8 @@ import "./globals.css";
 import { ReactQueryClientProvider } from "@/components/ReactQueryClientProvider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
+import Navbar from "@/components/shared/Navbar";
+import { getCurrentUser } from "@/lib/auth-server";
 
 const poppins = Poppins({
     subsets: ["latin"],
@@ -13,14 +15,17 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
     title: "ACPSCM",
-    description: "Adamjee Cantonment Public School Cluub of Mathematics",
+    description: "Adamjee Cantonment Public School Club of Mathematics",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    // Get current user data server-side
+    const { user, profile } = await getCurrentUser();
+
     return (
         <ReactQueryClientProvider>
             <html lang="en">
@@ -33,6 +38,7 @@ export default function RootLayout({
                         enableSystem
                         disableTransitionOnChange
                     >
+                        <Navbar user={user} profile={profile} />
                         <main className="bg-background flex flex-col min-h-screen">
                             {children}
                         </main>
