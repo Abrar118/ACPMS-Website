@@ -46,80 +46,6 @@ export interface UpdateUserProfileData {
     // Note: email is excluded as it should not be updated through the profile form
 }
 
-// Get user's registered events (upcoming)
-export async function getUserRegisteredEvents(
-    client: TypedSupabaseClient,
-    userId: string
-): Promise<QueryResponseType<EventRegistrationWithEvent[] | null>> {
-    try {
-        const today = new Date().toISOString().split("T")[0];
-
-        const { data, error } = await client
-            .from("event_registrations")
-            .select(
-                `
-                *,
-                event:events (
-                    id,
-                    title,
-                    description,
-                    event_date,
-                    location,
-                    poster_url,
-                    event_type:event_type (
-                        event_type_name
-                    )
-                )
-            `
-            )
-            .eq("user_id", userId)
-            .gte("event.event_date", today)
-            .order("event.event_date", { ascending: true });
-
-        if (error) throw error;
-        return QueryResponse.success<EventRegistrationWithEvent[]>(data);
-    } catch (error: any) {
-        return QueryResponse.error(error.message);
-    }
-}
-
-// Get user's past registered events
-export async function getUserPastEvents(
-    client: TypedSupabaseClient,
-    userId: string
-): Promise<QueryResponseType<EventRegistrationWithEvent[] | null>> {
-    try {
-        const today = new Date().toISOString().split("T")[0];
-
-        const { data, error } = await client
-            .from("event_registrations")
-            .select(
-                `
-                *,
-                event:events (
-                    id,
-                    title,
-                    description,
-                    event_date,
-                    location,
-                    poster_url,
-                    event_type:event_type (
-                        event_type_name
-                    )
-                )
-            `
-            )
-            .eq("user_id", userId)
-            .lt("event.event_date", today)
-            .order("event.event_date", { ascending: false });
-
-        if (error) throw error;
-        return QueryResponse.success<EventRegistrationWithEvent[]>(data);
-    } catch (error: any) {
-        return QueryResponse.error(error.message);
-    }
-}
-
 // React Query compatible functions
 export function getUserRegisteredEventsQuery(
     client: TypedSupabaseClient,
@@ -147,7 +73,7 @@ export function getUserRegisteredEventsQuery(
         )
         .eq("user_id", userId)
         .gte("event.event_date", today)
-        .order("event.event_date", { ascending: true });
+        .order("event(event_date)", { ascending: true });
 }
 
 export function getUserPastEventsQuery(
@@ -176,7 +102,7 @@ export function getUserPastEventsQuery(
         )
         .eq("user_id", userId)
         .lt("event.event_date", today)
-        .order("event.event_date", { ascending: false });
+        .order("event(event_date)", { ascending: false });
 }
 
 // Update user profile

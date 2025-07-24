@@ -50,6 +50,7 @@ export async function login(authData: AuthData): Promise<AuthResult> {
 
         if (!existingUser.data) {
             const response = await createUser(supabase, {
+                id: userData.user?.id,
                 email: authData.email,
                 name: authData.name || "",
                 ssc_batch: authData.ssc_batch || "",
@@ -59,7 +60,7 @@ export async function login(authData: AuthData): Promise<AuthResult> {
                 await supabase.auth.signOut();
                 return {
                     success: false,
-                    error: "Failed to create user profile",
+                    error: response.error || "Failed to create user profile",
                 };
             }
         }

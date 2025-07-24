@@ -13,6 +13,7 @@ import { CalendarDays, MapPin, Award, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import type { EventRegistrationWithEvent } from "@/queries/profile";
+import {printIfDev} from "@/lib/utils";
 
 interface PastEventsProps {
     events: EventRegistrationWithEvent[];
@@ -34,6 +35,8 @@ export default function PastEvents({
         });
     };
 
+    console.log("Events:", events);
+
     if (isLoading) {
         return (
             <div className="space-y-4">
@@ -53,6 +56,7 @@ export default function PastEvents({
     }
 
     if (error) {
+        printIfDev(error)
         return (
             <div className="text-center py-8">
                 <p className="text-destructive">Failed to load past events</p>

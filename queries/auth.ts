@@ -17,6 +17,7 @@ export interface UserProfile {
 }
 
 export interface CreateUserData {
+    id: string;
     email: string;
     name: string;
     ssc_batch: string;
