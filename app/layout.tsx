@@ -4,7 +4,7 @@ import "./globals.css";
 import { ReactQueryClientProvider } from "@/components/ReactQueryClientProvider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
-import Navbar from "@/components/shared/Navbar";
+import { ConditionalNavbar } from "@/components/ConditionalNavbar";
 import { getCurrentUser } from "@/lib/auth-server";
 
 const poppins = Poppins({
@@ -38,7 +38,7 @@ export default async function RootLayout({
                         enableSystem
                         disableTransitionOnChange
                     >
-                        <Navbar user={user} profile={profile} />
+                        <ConditionalNavbar user={user} profile={profile} />
                         <main className="bg-background flex flex-col min-h-screen">
                             {children}
                         </main>

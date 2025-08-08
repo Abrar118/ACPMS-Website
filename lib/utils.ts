@@ -5,9 +5,9 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-export const printIfDev = (message: string) => {
+export const printIfDev = (message: string, ...args: any[]) => {
     if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
-        console.warn(message);
+        console.warn(message, ...args);
     }
 };
 

@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Menu, User, LogOut, Settings, UserPlus } from "lucide-react";
+import { Menu, User, LogOut, Settings, UserPlus, Shield } from "lucide-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -54,7 +54,7 @@ export default function Navbar({ user, profile }: NavbarProps) {
         try {
             setIsLoading(true);
             const result = await logout();
-            
+
             if (result.success) {
                 toast.success("Logged out successfully");
                 router.push("/");
@@ -83,10 +83,11 @@ export default function Navbar({ user, profile }: NavbarProps) {
 
     return (
         <nav
-            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
+            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+                isScrolled
                     ? "bg-background/50 backdrop-blur-md border-b shadow-md"
                     : "bg-background/70 backdrop-blur-sm border-b"
-                }`}
+            }`}
         >
             <div className="max-w-6xl mx-auto px-4">
                 <div className="flex items-center justify-between h-16">
@@ -155,22 +156,22 @@ export default function Navbar({ user, profile }: NavbarProps) {
                                                 <AvatarFallback className="bg-primary/10 text-primary font-semibold">
                                                     {profile?.name
                                                         ? profile.name
-                                                            .split(" ")
-                                                            .map(
-                                                                (
-                                                                    word: string
-                                                                ) =>
-                                                                    word.charAt(
-                                                                        0
-                                                                    )
-                                                            )
-                                                            .join("")
-                                                            .slice(0, 2)
-                                                            .toUpperCase()
+                                                              .split(" ")
+                                                              .map(
+                                                                  (
+                                                                      word: string
+                                                                  ) =>
+                                                                      word.charAt(
+                                                                          0
+                                                                      )
+                                                              )
+                                                              .join("")
+                                                              .slice(0, 2)
+                                                              .toUpperCase()
                                                         : user?.email
-                                                            ?.charAt(0)
-                                                            .toUpperCase() ||
-                                                        "U"}
+                                                              ?.charAt(0)
+                                                              .toUpperCase() ||
+                                                          "U"}
                                                 </AvatarFallback>
                                             </Avatar>
                                         </Button>
@@ -209,6 +210,17 @@ export default function Navbar({ user, profile }: NavbarProps) {
                                                 <span>Settings</span>
                                             </Link>
                                         </DropdownMenuItem>
+                                        {profile?.role === "admin" && (
+                                            <>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuItem asChild>
+                                                    <Link href="/admin">
+                                                        <Shield className="mr-2 h-4 w-4" />
+                                                        <span>Admin Panel</span>
+                                                    </Link>
+                                                </DropdownMenuItem>
+                                            </>
+                                        )}
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem
                                             onClick={handleLogout}
@@ -266,22 +278,22 @@ export default function Navbar({ user, profile }: NavbarProps) {
                                                 <AvatarFallback className="bg-primary/10 text-primary font-semibold">
                                                     {profile?.name
                                                         ? profile.name
-                                                            .split(" ")
-                                                            .map(
-                                                                (
-                                                                    word: string
-                                                                ) =>
-                                                                    word.charAt(
-                                                                        0
-                                                                    )
-                                                            )
-                                                            .join("")
-                                                            .slice(0, 2)
-                                                            .toUpperCase()
+                                                              .split(" ")
+                                                              .map(
+                                                                  (
+                                                                      word: string
+                                                                  ) =>
+                                                                      word.charAt(
+                                                                          0
+                                                                      )
+                                                              )
+                                                              .join("")
+                                                              .slice(0, 2)
+                                                              .toUpperCase()
                                                         : user?.email
-                                                            ?.charAt(0)
-                                                            .toUpperCase() ||
-                                                        "U"}
+                                                              ?.charAt(0)
+                                                              .toUpperCase() ||
+                                                          "U"}
                                                 </AvatarFallback>
                                             </Avatar>
                                             <div>
