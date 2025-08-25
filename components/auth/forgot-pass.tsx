@@ -93,7 +93,7 @@ const ForgotPassword = ({
             >
                 <Form {...form}>
                     <form
-                        onSubmit={form.handleSubmit(onSubmit)}
+                        // onSubmit={form.handleSubmit(onSubmit)}
                         className="space-y-6"
                     >
                         <div className="space-y-2">
@@ -127,7 +127,7 @@ const ForgotPassword = ({
                         <Button
                             type="submit"
                             className="w-full"
-                            disabled={loading}
+                            disabled
                         >
                             {loading ? (
                                 "Sending..."

@@ -128,7 +128,7 @@ const RegisterForm = () => {
             >
                 <Form {...form}>
                     <form
-                        onSubmit={form.handleSubmit(onSubmit)}
+                        // onSubmit={form.handleSubmit(onSubmit)}
                         className="space-y-6"
                     >
                         <FormField
@@ -281,7 +281,7 @@ const RegisterForm = () => {
                         <Button
                             type="submit"
                             className="w-full"
-                            disabled={loading}
+                            disabled
                         >
                             {loading ? (
                                 "Creating account..."

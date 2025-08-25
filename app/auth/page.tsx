@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSearchParams } from "next/navigation";
 import LeftSideLogin from "@/components/auth/left-side";
@@ -12,7 +12,7 @@ import ForgotPassword from "@/components/auth/forgot-pass";
 import { AnimatePresence } from "framer-motion";
 import Image from "next/image";
 
-export default function AuthPage() {
+function AuthPageContent() {
     const selectedTab = useSearchParams().get("tab") || "login";
     const [activeTab, setActiveTab] = useState(selectedTab);
 
@@ -71,5 +71,13 @@ export default function AuthPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function AuthPage() {
+    return (
+        <Suspense fallback={<div className="flex min-h-screen w-full items-center justify-center">Loading...</div>}>
+            <AuthPageContent />
+        </Suspense>
     );
 }
