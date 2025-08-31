@@ -248,8 +248,8 @@ export default function ResourcesClient({
                         {resource.description}
                       </CardDescription>
                     </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center justify-between mb-4">
+                    <CardContent className="flex flex-col flex-1">
+                      <div className="flex items-center justify-between mb-4 mt-auto">
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <div className="flex items-center gap-1">
                             <Eye className="w-4 h-4" />
