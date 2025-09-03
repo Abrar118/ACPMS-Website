@@ -2,6 +2,7 @@ import { QueryResponse, QueryResponseType } from "@/utils/query-response";
 import { TypedSupabaseClient } from "@/utils/types";
 import { PostgrestError } from "@supabase/postgrest-js";
 import { Database } from "@/database.types";
+import { EResourceStatus } from "@/components/shared/enums";
 
 type Json = Database["public"]["Tables"]["events"]["Row"]["additional_info"];
 
@@ -229,8 +230,8 @@ export async function getHighlights(client: TypedSupabaseClient) {
     const { data: resource, error: resourceError } = await client
         .from('resources')
         .select('*')
-        .eq('is_verified', true)
-        .eq('visibility', 'public')
+        .eq('status', EResourceStatus.Published)
+        .eq('is_archived', false)
         .order('view_count', { ascending: false })
         .limit(1)
         .single();

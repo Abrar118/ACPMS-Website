@@ -7,10 +7,10 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+    PostgrestVersion: "13.0.4"
   }
   public: {
     Tables: {
@@ -233,16 +233,17 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           description: string | null
-          external_url: string | null
-          file_url: string | null
           id: string
-          is_verified: boolean | null
-          resource_type: string | null
+          is_archived: boolean
+          is_featured: boolean
+          levels: string[] | null
+          resource_type: string
+          resource_url: string | null
+          status: string
           tags: string[] | null
           title: string
           updated_at: string | null
           view_count: number | null
-          visibility: string | null
         }
         Insert: {
           author?: string | null
@@ -250,16 +251,17 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           description?: string | null
-          external_url?: string | null
-          file_url?: string | null
           id?: string
-          is_verified?: boolean | null
-          resource_type?: string | null
+          is_archived?: boolean
+          is_featured?: boolean
+          levels?: string[] | null
+          resource_type: string
+          resource_url?: string | null
+          status?: string
           tags?: string[] | null
           title: string
           updated_at?: string | null
           view_count?: number | null
-          visibility?: string | null
         }
         Update: {
           author?: string | null
@@ -267,16 +269,17 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           description?: string | null
-          external_url?: string | null
-          file_url?: string | null
           id?: string
-          is_verified?: boolean | null
-          resource_type?: string | null
+          is_archived?: boolean
+          is_featured?: boolean
+          levels?: string[] | null
+          resource_type?: string
+          resource_url?: string | null
+          status?: string
           tags?: string[] | null
           title?: string
           updated_at?: string | null
           view_count?: number | null
-          visibility?: string | null
         }
         Relationships: [
           {
