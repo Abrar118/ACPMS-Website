@@ -97,27 +97,27 @@ const managementItems = [
         icon: Calendar,
       },
       {
-        title: "Create Event",
-        url: "/admin/events/create",
-        icon: Calendar,
-      },
+        title: "Participants",
+        url: "/admin/participants",
+        icon: Users,
+      }
     ],
   },
-  {
-    title: "Magazines",
-    items: [
-      {
-        title: "All Magazines",
-        url: "/admin/magazines",
-        icon: BookOpen,
-      },
-      {
-        title: "Add Magazine",
-        url: "/admin/magazines/create",
-        icon: BookOpen,
-      },
-    ],
-  },
+  // {
+  //   title: "Magazines",
+  //   items: [
+  //     {
+  //       title: "All Magazines",
+  //       url: "/admin/magazines",
+  //       icon: BookOpen,
+  //     },
+  //     {
+  //       title: "Add Magazine",
+  //       url: "/admin/magazines/create",
+  //       icon: BookOpen,
+  //     },
+  //   ],
+  // },
   {
     title: "Resources",
     items: [
