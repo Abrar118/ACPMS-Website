@@ -12,11 +12,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
-import {
-  deleteEventAction,
-  toggleEventStatusAction,
-} from "@/actions/events";
+import { deleteEventAction, toggleEventStatusAction } from "@/actions/events";
 import type { EventRow } from "@/queries/events";
+import { UpdateEventDescriptionForm } from "./eventDescriptionForm/UpdateEventDescriptionForm";
 // import { DeleteEventDialog } from "./DeleteEventDialog";
 
 interface EventActionsProps {
@@ -25,6 +23,8 @@ interface EventActionsProps {
 
 export function EventActions({ event }: EventActionsProps) {
   const [isPending, startTransition] = useTransition();
+  const [eventDescriptionFormOpen, setEventDescriptionFormOpen] =
+    useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const handleStatusToggle = () => {
@@ -76,14 +76,18 @@ export function EventActions({ event }: EventActionsProps) {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
-          <DropdownMenuItem onClick={() => navigator.clipboard.writeText(event.id)}>
-            Copy event ID
+          <DropdownMenuSeparator />
+
+          <DropdownMenuItem onClick={() => setEventDescriptionFormOpen(true)}>
+            Update Description
           </DropdownMenuItem>
+
+          <DropdownMenuSeparator />
 
           {event.poster_url && (
             <DropdownMenuItem onClick={handleViewEvent}>
-              <ExternalLink className="mr-2 h-4 w-4" />
               View Poster
+              <ExternalLink className="mr-2 h-4 w-4" />
             </DropdownMenuItem>
           )}
 
@@ -93,16 +97,23 @@ export function EventActions({ event }: EventActionsProps) {
             {event.is_published ? "Unpublish" : "Publish"}
           </DropdownMenuItem>
 
-          <DropdownMenuSeparator />
+          {/* <DropdownMenuSeparator />
 
           <DropdownMenuItem
             onClick={handleDelete}
             className="text-destructive focus:text-destructive"
           >
             Delete Event
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <UpdateEventDescriptionForm
+        state={eventDescriptionFormOpen}
+        setState={setEventDescriptionFormOpen}
+        richText={event.description}
+        eventId={event.id}
+      />
 
       {/* <DeleteEventDialog
         isOpen={isDeleteDialogOpen}

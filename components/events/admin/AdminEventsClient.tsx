@@ -76,9 +76,6 @@ function EventRow({ event }: { event: EventRow }) {
       <TableCell className="font-medium max-w-[200px]">
         <div className="max-w-[300px] text-ellipsis overflow-hidden">
           <div className="font-medium">{event.title}</div>
-          <div className="text-sm text-muted-foreground">
-            {typeof event.description === 'string' ? event.description : 'No description'}
-          </div>
         </div>
       </TableCell>
       <TableCell>

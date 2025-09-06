@@ -4,7 +4,7 @@ import { PostgrestError } from "@supabase/postgrest-js";
 import { Database } from "@/database.types";
 import { EResourceStatus } from "@/components/shared/enums";
 
-type Json = Database["public"]["Tables"]["events"]["Row"]["description"];
+export type Json = Database["public"]["Tables"]["events"]["Row"]["description"];
 
 // Event types based on your database schema
 export interface EventType {
@@ -23,7 +23,7 @@ export interface Event {
     registration_deadline: string | null;
     is_published: boolean;
     event_mode: string;
-    event_type: string | null; // This is the foreign key ID
+    event_type: string | null;
     created_at: string | null;
     updated_at: string | null;
     created_by: string | null;
@@ -38,7 +38,7 @@ export type EventWithType = Omit<Event, 'event_type'> & {
 
 export interface CreateEventData {
     title: string;
-    description?: string;
+    description?: Json;
     event_date?: string;
     end_date?: string;
     venue?: string;
