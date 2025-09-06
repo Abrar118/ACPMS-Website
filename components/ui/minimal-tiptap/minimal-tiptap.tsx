@@ -20,6 +20,7 @@ export interface MinimalTiptapProps
   onChange?: (value: Content) => void
   className?: string
   editorContentClassName?: string
+  hideToolbar?: boolean
 }
 
 const Toolbar = ({ editor }: { editor: Editor }) => (
@@ -70,6 +71,7 @@ export const MinimalTiptapEditor = ({
   onChange,
   className,
   editorContentClassName,
+  hideToolbar,
   ...props
 }: MinimalTiptapProps) => {
   const editor = useMinimalTiptapEditor({
@@ -92,7 +94,7 @@ export const MinimalTiptapEditor = ({
         className
       )}
     >
-      <Toolbar editor={editor} />
+      {hideToolbar ? null : <Toolbar editor={editor} />}
       <EditorContent
         editor={editor}
         className={cn("minimal-tiptap-editor", editorContentClassName)}

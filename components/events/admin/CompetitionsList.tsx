@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -10,21 +10,19 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from '@dnd-kit/core';
+} from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import {
-  useSortable,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+} from "@dnd-kit/sortable";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -32,81 +30,31 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
-import { 
-  MoreHorizontal, 
-  Edit, 
-  Trash2, 
+import {
+  MoreHorizontal,
+  Edit,
+  Trash2,
   DollarSign,
   Calendar,
   FileText,
   Lock,
   Unlock,
-  GripVertical
+  GripVertical,
 } from "lucide-react";
 import { toast } from "sonner";
 import { type CompetitionRow } from "@/queries/competitions";
-import { 
+import {
   toggleCompetitionStatusAction,
   deleteCompetitionAction,
-  updateCompetitionOrderAction
+  updateCompetitionOrderAction,
 } from "@/actions/competitions";
 import EditCompetitionDialog from "./EditCompetitionDialog";
-import { generateHTML } from "@tiptap/html";
-import StarterKit from "@tiptap/starter-kit";
-import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
-import { common, createLowlight } from "lowlight";
-import Color from "@tiptap/extension-color";
-import { TextStyle } from "@tiptap/extension-text-style";
-import Image from "@tiptap/extension-image";
-import Typography from "@tiptap/extension-typography";
-import HorizontalRule from "@tiptap/extension-horizontal-rule";
+import { JSONContent } from "@tiptap/react";
+import { MinimalTiptapEditor } from "@/components/ui/minimal-tiptap";
 
 interface CompetitionsListProps {
   competitions: CompetitionRow[];
   eventId: string;
-}
-
-export const tiptapExtensions = [
-  StarterKit.configure({
-    codeBlock: false,
-  }),
-  CodeBlockLowlight.configure({
-    lowlight: createLowlight(common),
-  }),
-  Color.configure({ types: ["textStyle"] }),
-  TextStyle,
-  Image,
-  Typography,
-  HorizontalRule,
-];
-
-function formatRichTextToPlainText(richText: any): string {
-  if (!richText) return "No description";
-  
-  try {
-    if (typeof richText === 'string') {
-      return richText;
-    }
-    
-    if (typeof richText === 'object' && richText.type === 'doc') {
-      let text = '';
-      
-      function extractText(node: any): void {
-        if (node.type === 'text') {
-          text += node.text;
-        } else if (node.content) {
-          node.content.forEach(extractText);
-        }
-      }
-      
-      richText.content?.forEach(extractText);
-      return text || "No description";
-    }
-    
-    return JSON.stringify(richText);
-  } catch {
-    return "No description";
-  }
 }
 
 function SortableCompetitionCard({
@@ -150,16 +98,18 @@ function SortableCompetitionCard({
   };
 
   return (
-    <Card 
-      ref={setNodeRef} 
-      style={style} 
-      className={`p-4 ${isDragMode ? 'cursor-grab active:cursor-grabbing' : ''} ${isDragging ? 'shadow-lg' : ''}`}
+    <Card
+      ref={setNodeRef}
+      style={style}
+      className={`p-4 ${
+        isDragMode ? "cursor-grab active:cursor-grabbing" : ""
+      } ${isDragging ? "shadow-lg" : ""}`}
     >
       <div className="flex items-start justify-between">
         {/* Drag Handle */}
         {isDragMode && (
-          <div 
-            {...attributes} 
+          <div
+            {...attributes}
             {...listeners}
             className="mr-3 mt-1 cursor-grab active:cursor-grabbing"
           >
@@ -184,19 +134,15 @@ function SortableCompetitionCard({
 
           {/* Description */}
           {competition.description && (
-            <div className="flex items-start gap-2">
-              <FileText className="h-4 w-4 text-muted-foreground mt-0.5" />
-              {/* <p className="text-sm text-muted-foreground line-clamp-2">
-                {formatRichTextToPlainText(competition.description)}
-              </p> */}
-              <div 
-                className="prose dark:prose-invert max-w-none"
-                dangerouslySetInnerHTML={{
-                  __html:
-                    typeof competition.description === "object" && competition.description !== null && "type" in competition.description
-                      ? generateHTML(competition.description as any, tiptapExtensions)
-                      : ""
-                }}
+            <div className="mt-4">
+              <MinimalTiptapEditor
+                value={competition.description as JSONContent}
+                className="w-full border-0 p-0 m-0"
+                output="json"
+                autofocus={false}
+                editable={false}
+                editorClassName="focus:outline-hidden"
+                hideToolbar={true}
               />
             </div>
           )}
@@ -205,7 +151,9 @@ function SortableCompetitionCard({
           <div className="flex items-center gap-2">
             <Switch
               checked={competition.is_published}
-              onCheckedChange={(checked) => onToggleStatus(competition.id, checked)}
+              onCheckedChange={(checked) =>
+                onToggleStatus(competition.id, checked)
+              }
               disabled={isPending || isDragMode}
             />
             <span className="text-sm text-muted-foreground">
@@ -228,7 +176,7 @@ function SortableCompetitionCard({
                 Edit Competition
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => onDelete(competition.id)}
                 className="text-destructive focus:text-destructive"
               >
@@ -243,103 +191,13 @@ function SortableCompetitionCard({
   );
 }
 
-function CompetitionCard({
-  competition,
-  onToggleStatus,
-  onEdit,
-  onDelete,
-  isPending,
-}: {
-  competition: CompetitionRow;
-  onToggleStatus: (competitionId: string, isPublished: boolean) => void;
-  onEdit: (competition: CompetitionRow) => void;
-  onDelete: (competitionId: string) => void;
-  isPending: boolean;
-}) {
-  const getStatusBadge = (isPublished: boolean) => {
-    return isPublished ? (
-      <Badge variant="default" className="bg-green-500">
-        Published
-      </Badge>
-    ) : (
-      <Badge variant="secondary">Unpublished</Badge>
-    );
-  };
-
-  return (
-    <Card className="p-4">
-      <div className="flex items-start justify-between">
-        <div className="flex-1 space-y-3">
-          {/* Competition Info */}
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-lg">{competition.title}</h3>
-            <div className="flex items-center gap-2">
-              {getStatusBadge(competition.is_published)}
-              {competition.fee > 0 && (
-                <Badge variant="outline" className="flex items-center gap-1">
-                  <DollarSign className="h-3 w-3" />
-                  {competition.fee}
-                </Badge>
-              )}
-            </div>
-          </div>
-
-          {/* Description */}
-          {competition.description && (
-            <div className="flex items-start gap-2">
-              <FileText className="h-4 w-4 text-muted-foreground mt-0.5" />
-              <p className="text-sm text-muted-foreground line-clamp-2">
-                {formatRichTextToPlainText(competition.description)}
-              </p>
-            </div>
-          )}
-
-          {/* Publish Toggle */}
-          <div className="flex items-center gap-2">
-            <Switch
-              checked={competition.is_published}
-              onCheckedChange={(checked) => onToggleStatus(competition.id, checked)}
-              disabled={isPending}
-            />
-            <span className="text-sm text-muted-foreground">
-              {competition.is_published ? "Published" : "Unpublished"}
-            </span>
-          </div>
-        </div>
-
-        {/* Actions Menu */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" disabled={isPending}>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onEdit(competition)}>
-              <Edit className="mr-2 h-4 w-4" />
-              Edit Competition
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              onClick={() => onDelete(competition.id)}
-              className="text-destructive focus:text-destructive"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Delete Competition
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    </Card>
-  );
-}
-
-export default function CompetitionsList({ 
-  competitions, 
-  eventId 
+export default function CompetitionsList({
+  competitions,
+  eventId,
 }: CompetitionsListProps) {
   const [isPending, startTransition] = useTransition();
-  const [editingCompetition, setEditingCompetition] = useState<CompetitionRow | null>(null);
+  const [editingCompetition, setEditingCompetition] =
+    useState<CompetitionRow | null>(null);
   const [isDragMode, setIsDragMode] = useState(false);
   const [orderedCompetitions, setOrderedCompetitions] = useState(
     competitions.sort((a, b) => a.display_order - b.display_order)
@@ -348,7 +206,9 @@ export default function CompetitionsList({
 
   // Update ordered competitions when props change
   useEffect(() => {
-    setOrderedCompetitions(competitions.sort((a, b) => a.display_order - b.display_order));
+    setOrderedCompetitions(
+      competitions.sort((a, b) => a.display_order - b.display_order)
+    );
   }, [competitions]);
 
   const sensors = useSensors(
@@ -393,7 +253,9 @@ export default function CompetitionsList({
 
   const handleCancelReorder = () => {
     // Reset to original order
-    setOrderedCompetitions(competitions.sort((a, b) => a.display_order - b.display_order));
+    setOrderedCompetitions(
+      competitions.sort((a, b) => a.display_order - b.display_order)
+    );
     setIsDragMode(false);
   };
 
@@ -437,7 +299,9 @@ export default function CompetitionsList({
     return (
       <div className="text-center py-12">
         <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-muted-foreground">No competitions yet</h3>
+        <h3 className="text-lg font-medium text-muted-foreground">
+          No competitions yet
+        </h3>
         <p className="text-sm text-muted-foreground mt-2">
           Add your first competition to get started.
         </p>
@@ -451,10 +315,11 @@ export default function CompetitionsList({
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">
-            {competitions.length} competition{competitions.length !== 1 ? 's' : ''}
+            {competitions.length} competition
+            {competitions.length !== 1 ? "s" : ""}
           </span>
         </div>
-        
+
         <div className="flex items-center gap-2">
           {!isDragMode ? (
             <Button
@@ -476,11 +341,7 @@ export default function CompetitionsList({
               >
                 Cancel
               </Button>
-              <Button
-                size="sm"
-                onClick={handleSaveOrder}
-                disabled={isPending}
-              >
+              <Button size="sm" onClick={handleSaveOrder} disabled={isPending}>
                 <Lock className="mr-2 h-4 w-4" />
                 Save Order
               </Button>
@@ -496,7 +357,10 @@ export default function CompetitionsList({
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
         >
-          <SortableContext items={orderedCompetitions} strategy={verticalListSortingStrategy}>
+          <SortableContext
+            items={orderedCompetitions}
+            strategy={verticalListSortingStrategy}
+          >
             <div className="space-y-4">
               {orderedCompetitions.map((competition) => (
                 <SortableCompetitionCard
