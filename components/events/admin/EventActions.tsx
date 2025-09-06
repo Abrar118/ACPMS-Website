@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, ExternalLink } from "lucide-react";
+import { MoreHorizontal, ExternalLink, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { deleteEventAction, toggleEventStatusAction } from "@/actions/events";
 import type { EventRow } from "@/queries/events";
@@ -58,6 +58,10 @@ export function EventActions({ event }: EventActionsProps) {
     });
   };
 
+  const handleViewEventDetails = () => {
+    window.location.href = `/admin/events/${event.id}`;
+  };
+
   const handleViewEvent = () => {
     if (event.poster_url) {
       window.open(event.poster_url, "_blank");
@@ -75,6 +79,11 @@ export function EventActions({ event }: EventActionsProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
+
+          <DropdownMenuItem onClick={handleViewEventDetails}>
+            <Eye className="mr-2 h-4 w-4" />
+            View Event Details
+          </DropdownMenuItem>
 
           <DropdownMenuSeparator />
 

@@ -416,3 +416,24 @@ export async function toggleEventStatus(
         return QueryResponse.error(error.message);
     }
 }
+
+/**
+ * Get a single event by ID (for admin purposes)
+ */
+export async function getEventById(
+    client: TypedSupabaseClient,
+    eventId: string
+): Promise<QueryResponseType<EventRow | null>> {
+    try {
+        const { data, error } = await client
+            .from("events")
+            .select("*")
+            .eq("id", eventId)
+            .single();
+
+        if (error) throw error;
+        return QueryResponse.success<EventRow>(data);
+    } catch (error: any) {
+        return QueryResponse.error(error.message || "Failed to fetch event");
+    }
+}

@@ -75,7 +75,12 @@ function EventRow({ event }: { event: EventRow }) {
     <TableRow>
       <TableCell className="font-medium max-w-[200px]">
         <div className="max-w-[300px] text-ellipsis overflow-hidden">
-          <div className="font-medium">{event.title}</div>
+          <a 
+            href={`/admin/events/${event.id}`}
+            className="font-medium hover:text-primary hover:underline cursor-pointer"
+          >
+            {event.title}
+          </a>
         </div>
       </TableCell>
       <TableCell>
