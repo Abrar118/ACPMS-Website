@@ -236,6 +236,57 @@ export type Database = {
           },
         ]
       }
+      members: {
+        Row: {
+          bio: string | null
+          created_at: string
+          designation: string
+          email: string | null
+          facebook_id_link: string | null
+          id: string
+          image_url: string | null
+          instagram_id_link: string | null
+          linkedin_id_link: string | null
+          name: string
+          phone: string | null
+          position: string | null
+          session: string | null
+          updated_at: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          designation: string
+          email?: string | null
+          facebook_id_link?: string | null
+          id?: string
+          image_url?: string | null
+          instagram_id_link?: string | null
+          linkedin_id_link?: string | null
+          name: string
+          phone?: string | null
+          position?: string | null
+          session?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          designation?: string
+          email?: string | null
+          facebook_id_link?: string | null
+          id?: string
+          image_url?: string | null
+          instagram_id_link?: string | null
+          linkedin_id_link?: string | null
+          name?: string
+          phone?: string | null
+          position?: string | null
+          session?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       participants: {
         Row: {
           class: number
