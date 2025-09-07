@@ -72,8 +72,8 @@ export default function Navbar({ user, profile }: NavbarProps) {
 
     const navigationItems = [
         { href: "/", label: "Home" },
-        { href: "/events", label: "Events", badge: "New" },
-        { href: "/magazine", label: "Magazine" },
+        { href: "/events", label: "Events" },
+        // { href: "/magazine", label: "Magazine" },
         { href: "/resources", label: "Resources" },
         { href: "/about", label: "About" },
         ...(profile?.role === "admin" || profile?.role === "executive"
@@ -117,14 +117,14 @@ export default function Navbar({ user, profile }: NavbarProps) {
                                 >
                                     {item.label}
                                 </Link>
-                                {item.badge && (
+                                {/* {item.badge && (
                                     <Badge
                                         variant="destructive"
                                         className="absolute -top-2 -right-3 text-xs px-1"
                                     >
                                         {item.badge}
                                     </Badge>
-                                )}
+                                )} */}
                             </div>
                         ))}
                     </div>

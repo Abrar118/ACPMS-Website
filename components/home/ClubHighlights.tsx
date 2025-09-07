@@ -14,9 +14,10 @@ import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import useSupabaseBrowser from "@/utils/supabase/supabase-browser";
 import { getHighlights } from "@/queries/events";
-import { Calendar, BookOpen, FileText } from "lucide-react";
+import { Calendar, BookOpen, FileText, Clock, MapPin } from "lucide-react";
 import dynamic from "next/dynamic";
 import { EResourceType } from "../shared/enums";
+import { format, isAfter, parseISO } from "date-fns";
 
 export default function ClubHighlights() {
   const supabase = useSupabaseBrowser();
@@ -41,6 +42,10 @@ export default function ClubHighlights() {
       year: "numeric",
     });
   };
+
+  const formatTime = (dateString: string) => {
+    return format(parseISO(dateString), "p");
+  };  
 
   if (isLoading) {
     return (
@@ -125,12 +130,47 @@ export default function ClubHighlights() {
                     : "Date TBD"}
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4 leading-relaxed line-clamp-3">
+              <CardContent className="flex-1 flex flex-col">
+                {/* <p className="text-muted-foreground mb-4 leading-relaxed line-clamp-3">
                   {highlights.event.description ||
                     "Join us for this exciting event!"}
-                </p>
-                <Button size="sm" className="w-full">
+                </p> */}
+                <div className="space-y-2 text-sm text-muted-foreground">
+                  {highlights.event.event_date && (
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4" />
+                      <span>{formatDate(highlights.event.event_date)}</span>
+                      {highlights.event.event_date && (
+                        <>
+                          <Clock className="w-4 h-4 ml-2" />
+                          <span>{formatTime(highlights.event.event_date)}</span>
+                        </>
+                      )}
+                    </div>
+                  )}
+                  {highlights.event.venue && (
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      <span className="line-clamp-1">
+                        {highlights.event.venue}
+                      </span>
+                    </div>
+                  )}
+                  {highlights.event.registration_deadline &&
+                    isAfter(
+                      parseISO(highlights.event.event_date || ""),
+                      new Date()
+                    ) && (
+                      <div className="flex items-center gap-2 text-orange-600 dark:text-orange-400">
+                        <Clock className="w-4 h-4" />
+                        <span className="text-xs">
+                          Registration closes:{" "}
+                          {formatDate(highlights.event.registration_deadline)}
+                        </span>
+                      </div>
+                    )}
+                </div>
+                <Button size="sm" className="w-full mt-auto">
                   Learn More
                 </Button>
               </CardContent>

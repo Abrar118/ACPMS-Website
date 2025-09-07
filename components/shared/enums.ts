@@ -22,3 +22,19 @@ export enum EResourceLevel {
   Intermediate = "Intermediate",
   Advanced = "Advanced",
 }
+
+export enum EEventType {
+  Workshop = "Workshop",
+  Seminar = "Seminar",
+  Session = "Session",
+  Fest = "Fest",
+  InterCanttOlympiad = "Inter Cantonment Olympiad",
+  Meet = "Meet",
+  Other = "Other",
+}
+
+export enum EEventMode {
+  Online = "Online",
+  InPerson = "In Person",
+  Hybrid = "Hybrid",
+}

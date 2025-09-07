@@ -4,7 +4,7 @@ import { PostgrestError } from "@supabase/postgrest-js";
 import { Database } from "@/database.types";
 import { EResourceStatus } from "@/components/shared/enums";
 
-type Json = Database["public"]["Tables"]["events"]["Row"]["additional_info"];
+export type Json = Database["public"]["Tables"]["events"]["Row"]["description"];
 
 // Event types based on your database schema
 export interface EventType {
@@ -16,19 +16,18 @@ export interface EventType {
 export interface Event {
     id: string;
     title: string;
-    description: string | null;
+    description: Json | null;
     event_date: string | null;
     end_date: string | null;
-    location: string | null;
+    venue: string | null;
     registration_deadline: string | null;
-    is_published: number;
-    is_online: number;
-    event_type: string | null; // This is the foreign key ID
+    is_published: boolean;
+    event_mode: string;
+    event_type: string | null;
     created_at: string | null;
     updated_at: string | null;
     created_by: string | null;
     poster_url: string | null;
-    additional_info: Json | null;
     tags: string[] | null;
 }
 
@@ -39,15 +38,14 @@ export type EventWithType = Omit<Event, 'event_type'> & {
 
 export interface CreateEventData {
     title: string;
-    description?: string;
+    description?: Json;
     event_date?: string;
     end_date?: string;
-    location?: string;
+    venue?: string;
     registration_deadline?: string;
     event_type?: string;
-    is_online?: number;
+    event_mode?: string;
     poster_url?: string;
-    additional_info?: Json;
     tags?: string[];
 }
 
@@ -55,15 +53,8 @@ export interface CreateEventData {
 export function getEventsQuery(client: TypedSupabaseClient) {
     return client
         .from("events")
-        .select(`
-            *,
-            event_type (
-                id,
-                event_code,
-                event_type_name
-            )
-        `)
-        .eq("is_published", 1)
+        .select("*")
+        .eq("is_published", true)
         .order("event_date", { ascending: true });
 }
 
@@ -73,15 +64,8 @@ export function getEventsByTypeQuery(
 ) {
     return client
         .from("events")
-        .select(`
-            *,
-            event_type (
-                id,
-                event_code,
-                event_type_name
-            )
-        `)
-        .eq("is_published", 1)
+        .select("*")
+        .eq("is_published", true)
         .eq("event_type", eventType)
         .order("event_date", { ascending: true });
 }
@@ -91,15 +75,8 @@ export function getUpcomingEventsQuery(client: TypedSupabaseClient) {
 
     return client
         .from("events")
-        .select(`
-            *,
-            event_type (
-                id,
-                event_code,
-                event_type_name
-            )
-        `)
-        .eq("is_published", 1)
+        .select("*")
+        .eq("is_published", true)
         .gte("event_date", today)
         .order("event_date", { ascending: true });
 }
@@ -116,15 +93,8 @@ export function getUpcomingEventsWithPaginationQuery(
 
     return client
         .from("events")
-        .select(`
-            *,
-            event_type (
-                id,
-                event_code,
-                event_type_name
-            )
-        `)
-        .eq("is_published", 1)
+        .select("*")
+        .eq("is_published", true)
         .gte("event_date", today)
         .order("event_date", { ascending: true })
         .range(from, to);
@@ -135,15 +105,8 @@ export function getPastEventsQuery(client: TypedSupabaseClient) {
 
     return client
         .from("events")
-        .select(`
-            *,
-            event_type (
-                id,
-                event_code,
-                event_type_name
-            )
-        `)
-        .eq("is_published", 1)
+        .select("*")
+        .eq("is_published", true)
         .lt("event_date", today)
         .order("event_date", { ascending: false })
         .limit(6);
@@ -161,15 +124,8 @@ export function getPastEventsWithPaginationQuery(
 
     return client
         .from("events")
-        .select(`
-            *,
-            event_type (
-                id,
-                event_code,
-                event_type_name
-            )
-        `)
-        .eq("is_published", 1)
+        .select("*")
+        .eq("is_published", true)
         .lt("event_date", today)
         .order("event_date", { ascending: false })
         .range(from, to);
@@ -181,38 +137,25 @@ export function getEventByIdQuery(
 ) {
     return client
         .from("events")
-        .select(`
-            *,
-            event_type (
-                id,
-                event_code,
-                event_type_name
-            )
-        `)
+        .select("*")
         .eq("id", eventId)
-        .eq("is_published", 1)
+        .eq("is_published", true)
         .single();
 }
 
 export function getAllEventsQuery(client: TypedSupabaseClient) {
     return client
         .from("events")
-        .select(`
-            *,
-            event_type (
-                id,
-                event_code,
-                event_type_name
-            )
-        `)
+        .select("*")
         .order("event_date", { ascending: false });
 }
 
+// Since event_type is just a string field, we don't have a separate table
+// Instead, we'll use the enum values from the shared enums
 export function getEventTypesQuery(client: TypedSupabaseClient) {
-    return client
-        .from("event_type")
-        .select("*")
-        .order("event_type_name", { ascending: true });
+    // This is a dummy query that returns event type enum values
+    // Since we don't have an event_type table, we'll handle this in the component
+    return null;
 }
 
 // Highlights function for landing page
@@ -221,7 +164,7 @@ export async function getHighlights(client: TypedSupabaseClient) {
     const { data: event, error: eventError } = await client
         .from('events')
         .select('*')
-        .eq('is_published', 1)
+        .eq('is_published', true)
         .order('created_at', { ascending: false })
         .limit(1)
         .single();
@@ -272,7 +215,7 @@ export function getUpcomingEventsCountQuery(client: TypedSupabaseClient) {
     return client
         .from("events")
         .select("id", { count: "exact", head: true })
-        .eq("is_published", 1)
+        .eq("is_published", true)
         .gte("event_date", today);
 }
 
@@ -282,6 +225,182 @@ export function getPastEventsCountQuery(client: TypedSupabaseClient) {
     return client
         .from("events")
         .select("id", { count: "exact", head: true })
-        .eq("is_published", 1)
+        .eq("is_published", true)
         .lt("event_date", today);
+}
+
+// Admin Functions for Event Management
+export type EventRow = Database["public"]["Tables"]["events"]["Row"];
+
+export async function createOneEvent(
+    client: TypedSupabaseClient,
+    userId: string,
+    eventData: CreateEventData
+): Promise<QueryResponseType<EventRow | null>> {
+    try {
+        const insertData: Database["public"]["Tables"]["events"]["Insert"] = {
+            title: eventData.title,
+            description: eventData.description || null,
+            event_date: eventData.event_date || null,
+            end_date: eventData.end_date || null,
+            venue: eventData.venue || null,
+            registration_deadline: eventData.registration_deadline || null,
+            event_type: eventData.event_type || null,
+            event_mode: eventData.event_mode || "In Person",
+            poster_url: eventData.poster_url || null,
+            tags: eventData.tags || null,
+            created_by: userId,
+            is_published: false,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+        };
+
+        const { data, error } = await client
+            .from("events")
+            .insert(insertData)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return QueryResponse.success<EventRow>(data);
+    } catch (error: any) {
+        return QueryResponse.error(error.message);
+    }
+}
+
+export async function getAllEventsAdmin(
+    client: TypedSupabaseClient
+): Promise<QueryResponseType<EventRow[] | null>> {
+    try {
+        const { data, error } = await client
+            .from("events")
+            .select("*")
+            .order("created_at", { ascending: false });
+
+        if (error) throw error;
+        return QueryResponse.success<EventRow[]>(data);
+    } catch (error: any) {
+        return QueryResponse.error(error.message);
+    }
+}
+
+export async function updateEvent(
+    client: TypedSupabaseClient,
+    eventId: string,
+    updateData: Partial<CreateEventData>
+): Promise<QueryResponseType<EventRow | null>> {
+    try {
+        const transformedData: Database["public"]["Tables"]["events"]["Update"] = {
+            ...(updateData.title && { title: updateData.title }),
+            ...(updateData.description !== undefined && {
+                description: updateData.description || null,
+            }),
+            ...(updateData.event_date && { event_date: updateData.event_date }),
+            ...(updateData.end_date && { end_date: updateData.end_date }),
+            ...(updateData.venue && { venue: updateData.venue }),
+            ...(updateData.registration_deadline && {
+                registration_deadline: updateData.registration_deadline,
+            }),
+            ...(updateData.event_type && { event_type: updateData.event_type }),
+            ...(updateData.event_mode && { event_mode: updateData.event_mode }),
+            ...(updateData.poster_url && { poster_url: updateData.poster_url }),
+            ...(updateData.tags !== undefined && { tags: updateData.tags || null }),
+            updated_at: new Date().toISOString(),
+        };
+
+        const { data, error } = await client
+            .from("events")
+            .update(transformedData)
+            .eq("id", eventId)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return QueryResponse.success<EventRow>(data);
+    } catch (error: any) {
+        return QueryResponse.error(error.message);
+    }
+}
+
+export async function deleteEvent(
+    client: TypedSupabaseClient,
+    eventId: string
+): Promise<QueryResponseType<null>> {
+    try {
+        const { error } = await client
+            .from("events")
+            .delete()
+            .eq("id", eventId);
+
+        if (error) throw error;
+        return QueryResponse.success<null>(null);
+    } catch (error: any) {
+        return QueryResponse.error(error.message);
+    }
+}
+
+export async function toggleEventStatus(
+    client: TypedSupabaseClient,
+    eventId: string,
+    isPublished: boolean
+): Promise<QueryResponseType<EventRow | null>> {
+    try {
+        const { data, error } = await client
+            .from("events")
+            .update({
+                is_published: isPublished,
+                updated_at: new Date().toISOString(),
+            })
+            .eq("id", eventId)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return QueryResponse.success<EventRow>(data);
+    } catch (error: any) {
+        return QueryResponse.error(error.message);
+    }
+}
+
+/**
+ * Get a single event by ID (for admin purposes)
+ */
+export async function getEventById(
+    client: TypedSupabaseClient,
+    eventId: string
+): Promise<QueryResponseType<EventRow | null>> {
+    try {
+        const { data, error } = await client
+            .from("events")
+            .select("*")
+            .eq("id", eventId)
+            .single();
+
+        if (error) throw error;
+        return QueryResponse.success<EventRow>(data);
+    } catch (error: any) {
+        return QueryResponse.error(error.message || "Failed to fetch event");
+    }
+}
+
+/**
+ * Get a single published event by ID (for public viewing)
+ */
+export async function getPublishedEventById(
+    client: TypedSupabaseClient,
+    eventId: string
+): Promise<QueryResponseType<EventRow | null>> {
+    try {
+        const { data, error } = await client
+            .from("events")
+            .select("*")
+            .eq("id", eventId)
+            .eq("is_published", true)
+            .single();
+
+        if (error) throw error;
+        return QueryResponse.success<EventRow>(data);
+    } catch (error: any) {
+        return QueryResponse.error(error.message || "Failed to fetch event");
+    }
 }
