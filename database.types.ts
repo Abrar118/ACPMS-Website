@@ -62,7 +62,7 @@ export type Database = {
         Row: {
           competition_id: string
           created_at: string
-          id: number
+          id: string
           participant_id: string
           status: string
           updated_at: string
@@ -70,7 +70,7 @@ export type Database = {
         Insert: {
           competition_id: string
           created_at?: string
-          id?: number
+          id?: string
           participant_id: string
           status: string
           updated_at?: string
@@ -78,7 +78,7 @@ export type Database = {
         Update: {
           competition_id?: string
           created_at?: string
-          id?: number
+          id?: string
           participant_id?: string
           status?: string
           updated_at?: string

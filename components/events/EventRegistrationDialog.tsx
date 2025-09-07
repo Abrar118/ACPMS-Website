@@ -1,301 +1,450 @@
 "use client";
 
 import { useState } from "react";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Calendar, MapPin, Clock, Users, UserPlus, X } from "lucide-react";
-import Image from "next/image";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { toast } from "sonner";
-
-interface Event {
-    id: string;
-    title: string;
-    description: string;
-    event_date: string;
-    event_time: string;
-    location: string;
-    max_participants?: number;
-    poster_url?: string;
-    event_type?: {
-        event_type_name: string;
-    };
-}
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { eventRegistrationSchema } from "@/lib/validations";
+import { registerForEventAction } from "@/actions/registration";
+import type { Event } from "@/queries/events";
+import type { CompetitionRow } from "@/queries/competitions";
+import { Loader2, DollarSign } from "lucide-react";
 
 interface EventRegistrationDialogProps {
-    event: Event | null;
-    isOpen: boolean;
-    onOpenChange: (open: boolean) => void;
+  event: Event;
+  competitions: CompetitionRow[];
+  children: React.ReactNode;
 }
 
+type FormData = z.infer<typeof eventRegistrationSchema>;
+
+// Helper function to get class options based on level
+const getClassOptions = (level: string) => {
+  switch (level) {
+    case "School":
+      return Array.from({ length: 10 }, (_, i) => ({
+        value: i + 1,
+        label: `Class ${i + 1}`,
+      }));
+    case "College":
+      return [
+        { value: 11, label: "1st Year" },
+        { value: 12, label: "2nd Year" },
+      ];
+    case "University":
+      return [
+        { value: 21, label: "1st Year" },
+        { value: 22, label: "2nd Year" },
+        { value: 23, label: "3rd Year" },
+        { value: 24, label: "4th Year" },
+      ];
+    default:
+      return [];
+  }
+};
+
 export default function EventRegistrationDialog({
-    event,
-    isOpen,
-    onOpenChange,
+  event,
+  competitions,
+  children,
 }: EventRegistrationDialogProps) {
-    const [formData, setFormData] = useState({
-        name: "",
-        email: "",
-        institution: "",
-        requirements: "",
-    });
-    const [isSubmitting, setIsSubmitting] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleInputChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
-    };
+  const form = useForm<FormData>({
+    resolver: zodResolver(eventRegistrationSchema),
+    defaultValues: {
+      name: "",
+      institution: "",
+      level: undefined,
+      class: 1,
+      id_at_institution: "",
+      email: "",
+      phone: "",
+      note: "",
+      competitions: [],
+      transaction_id: "",
+      payment_provider: undefined,
+    },
+  });
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsSubmitting(true);
+  const selectedLevel = form.watch("level");
+  const selectedCompetitions = form.watch("competitions");
+  
+  // Calculate total fee for selected competitions
+  const totalFee = selectedCompetitions.reduce((total, competitionId) => {
+    const competition = competitions.find(c => c.id === competitionId);
+    return total + (competition?.fee || 0);
+  }, 0);
 
-        try {
-            // Simulate API call - replace with actual registration logic
-            await new Promise((resolve) => setTimeout(resolve, 2000));
+  // Check if payment information is required
+  const isPaymentRequired = totalFee > 0;
 
-            toast.success("Registration submitted successfully!");
+  const onSubmit = async (data: FormData) => {
+    try {
+      // Validate payment information if required
+      if (isPaymentRequired && (!data.transaction_id || !data.payment_provider)) {
+        toast.error("Payment information is required for paid competitions");
+        return;
+      }
 
-            // Reset form
-            setFormData({
-                name: "",
-                email: "",
-                institution: "",
-                requirements: "",
-            });
+      setIsSubmitting(true);
 
-            onOpenChange(false);
-        } catch (error) {
-            toast.error("Failed to submit registration. Please try again.");
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
+      const result = await registerForEventAction(event.id, {
+        ...data,
+        note: data.note || "",
+      });
 
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString("en-US", {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-        });
-    };
+      if (result.success) {
+        toast.success(result.message || "Registration successful!");
+        setOpen(false);
+        form.reset();
+      } else {
+        toast.error(result.error || "Registration failed");
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-    const formatTime = (timeString: string) => {
-        return new Date(`2000-01-01T${timeString}`).toLocaleTimeString(
-            "en-US",
-            {
-                hour: "numeric",
-                minute: "2-digit",
-                hour12: true,
-            }
-        );
-    };
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        {children}
+      </DialogTrigger>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Register for {event.title}</DialogTitle>
+          <DialogDescription>
+            Fill out the form below to register for this event and select the competitions you want to participate in.
+          </DialogDescription>
+        </DialogHeader>
 
-    if (!event) return null;
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* Personal Information */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Personal Information</h3>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter your full name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-    return (
-        <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="min-w-7xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                    <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                            <DialogTitle className="text-2xl font-bold mb-2">
-                                {event.title}
-                            </DialogTitle>
-                            <DialogDescription className="text-base">
-                                Register for this event and join us for an
-                                exciting mathematical experience!
-                            </DialogDescription>
-                        </div>
+                <FormField
+                  control={form.control}
+                  name="institution"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Institution</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter your institution name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="level"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Education Level</FormLabel>
+                      <Select
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          // Reset class when level changes
+                          const options = getClassOptions(value);
+                          if (options.length > 0) {
+                            form.setValue("class", options[0].value);
+                          }
+                        }}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select education level" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="School">School</SelectItem>
+                          <SelectItem value="College">College</SelectItem>
+                          <SelectItem value="University">University</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {selectedLevel && (
+                  <FormField
+                    control={form.control}
+                    name="class"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Class/Year</FormLabel>
+                        <Select
+                          onValueChange={(value) => field.onChange(parseInt(value))}
+                          value={field.value?.toString()}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select class/year" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {getClassOptions(selectedLevel).map((option) => (
+                              <SelectItem key={option.value} value={option.value.toString()}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+              </div>
+
+              <FormField
+                control={form.control}
+                name="id_at_institution"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Student ID at Institution</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter your student ID" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email Address</FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="Enter your email" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter your phone number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="note"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Additional Information (Optional)</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Additional information that you might want to share"
+                        className="resize-none"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <Separator />
+
+            {/* Competition Selection */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Competition Selection</h3>
+              
+              <FormField
+                control={form.control}
+                name="competitions"
+                render={() => (
+                  <FormItem>
+                    <FormLabel>Select Competitions</FormLabel>
+                    <div className="space-y-3">
+                      {competitions.map((competition) => (
+                        <FormField
+                          key={competition.id}
+                          control={form.control}
+                          name="competitions"
+                          render={({ field }) => {
+                            return (
+                              <FormItem
+                                key={competition.id}
+                                className="flex flex-row items-center space-x-3 space-y-0 p-3 border rounded-lg"
+                              >
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(competition.id)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([...field.value, competition.id])
+                                        : field.onChange(
+                                            field.value?.filter((value) => value !== competition.id)
+                                          );
+                                    }}
+                                  />
+                                </FormControl>
+                                <div className="flex-1 space-y-1">
+                                  <div className="flex items-center justify-between">
+                                    <FormLabel className="text-sm font-medium">
+                                      {competition.title}
+                                    </FormLabel>
+                                    {competition.fee > 0 && (
+                                      <Badge variant="outline" className="ml-2">
+                                        <DollarSign className="h-3 w-3 mr-1" />
+                                        ${competition.fee}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </div>
+                              </FormItem>
+                            );
+                          }}
+                        />
+                      ))}
                     </div>
-                </DialogHeader>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-                <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-8">
-                    {/* Event Details */}
-                    <div className="lg:col-span-2 space-y-6">
-                        {/* Event Poster */}
-                        {event.poster_url && (
-                            <div className="aspect-[16/9] relative overflow-hidden rounded-lg border">
-                                <Image
-                                    src={event.poster_url}
-                                    alt={event.title}
-                                    fill
-                                    className="object-cover"
-                                />
-                            </div>
-                        )}
-
-                        {/* Event Type */}
-                        <div>
-                            <Badge variant="secondary" className="mb-4">
-                                {event.event_type?.event_type_name || "Event"}
-                            </Badge>
-                        </div>
-
-                        {/* Event Info */}
-                        <div className="flex items-center justify-start gap-5">
-                            <div className="flex items-center gap-3">
-                                <Calendar className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                                <div>
-                                    <p className="font-medium">Date</p>
-                                    <p className="text-sm text-muted-foreground">
-                                        {formatDate(event.event_date)}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                                <Clock className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                                <div>
-                                    <p className="font-medium">Time</p>
-                                    <p className="text-sm text-muted-foreground">
-                                        {formatTime(event.event_time)}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                                <MapPin className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                                <div>
-                                    <p className="font-medium">Location</p>
-                                    <p className="text-sm text-muted-foreground">
-                                        {event.location}
-                                    </p>
-                                </div>
-                            </div>
-
-                            {event.max_participants && (
-                                <div className="flex items-center gap-3">
-                                    <Users className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                                    <div>
-                                        <p className="font-medium">
-                                            Max Participants
-                                        </p>
-                                        <p className="text-sm text-muted-foreground">
-                                            {event.max_participants}{" "}
-                                            participants
-                                        </p>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Event Description */}
-                        <div>
-                            <h4 className="font-semibold mb-2">
-                                About This Event
-                            </h4>
-                            <p className="text-sm text-muted-foreground leading-relaxed">
-                                {event.description}
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Registration Form */}
-                    <div className="space-y-6">
-                        <div className="text-center">
-                            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">
-                                <UserPlus className="h-6 w-6 text-primary" />
-                            </div>
-                            <h3 className="text-xl font-semibold mb-2">
-                                Register for the Event
-                            </h3>
-                            <p className="text-sm text-muted-foreground">
-                                Fill out the form below to register for this
-                                event
-                            </p>
-                        </div>
-
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="name">Full Name</Label>
-                                <Input
-                                    id="name"
-                                    name="name"
-                                    placeholder="Enter your full name"
-                                    value={formData.name}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="email">Email Address</Label>
-                                <Input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    placeholder="Enter your email address"
-                                    value={formData.email}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="institution">
-                                    Institution/School
-                                </Label>
-                                <Input
-                                    id="institution"
-                                    name="institution"
-                                    placeholder="Enter your school or organization"
-                                    value={formData.institution}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="requirements">
-                                    Special Requirements or Interests
-                                </Label>
-                                <Textarea
-                                    id="requirements"
-                                    name="requirements"
-                                    placeholder="e.g., dietary restrictions, topics of interest, accessibility needs"
-                                    rows={4}
-                                    value={formData.requirements}
-                                    onChange={handleInputChange}
-                                />
-                            </div>
-
-                            <Button
-                                type="submit"
-                                className="w-full"
-                                disabled={isSubmitting}
-                            >
-                                {isSubmitting ? (
-                                    <>
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                                        Submitting Registration...
-                                    </>
-                                ) : (
-                                    <>
-                                        <UserPlus className="h-4 w-4 mr-2" />
-                                        Submit Registration
-                                    </>
-                                )}
-                            </Button>
-                        </form>
-                    </div>
+              {totalFee > 0 && (
+                <div className="p-3 bg-muted rounded-lg">
+                  <p className="text-sm font-medium">
+                    Total Registration Fee: <span className="text-primary">${totalFee}</span>
+                  </p>
                 </div>
-            </DialogContent>
-        </Dialog>
-    );
+              )}
+            </div>
+
+            {/* Payment Information */}
+            {isPaymentRequired && (
+              <>
+                <Separator />
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Payment Information</h3>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="payment_provider"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Payment Provider</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select payment provider" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="BKash">BKash</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="transaction_id"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Transaction ID</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter transaction ID" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
+            <div className="flex justify-end space-x-2 pt-4">
+              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                Register
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
 }

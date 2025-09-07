@@ -34,3 +34,25 @@ export const signupSchema = z
 export const resetPasswordSchema = z.object({
     email: z.string().email("Please enter a valid email address"),
 });
+
+// Event registration validations
+export const eventRegistrationSchema = z.object({
+    name: z.string().min(2, "Name must be at least 2 characters"),
+    institution: z.string().min(2, "Institution name must be at least 2 characters"),
+    level: z.enum(["School", "College", "University"], {
+        message: "Please select an education level",
+    }),
+    class: z.number().min(1).max(24, "Invalid class value"),
+    id_at_institution: z.string().min(1, "Student ID is required"),
+    email: z.string().email("Please enter a valid email address"),
+    phone: z.string().regex(/^[+]?[\d\s-()]+$/, "Please enter a valid phone number"),
+    note: z.string().optional(),
+    competitions: z.array(z.string()).min(1, "Please select at least one competition"),
+    transaction_id: z.string().optional(),
+    payment_provider: z.enum(["BKash"]).optional(),
+}).refine((data) => {
+    // If any selected competitions have fees, payment info is required
+    return true; // We'll validate this dynamically in the component
+}, {
+    message: "Payment information is required for paid competitions",
+});

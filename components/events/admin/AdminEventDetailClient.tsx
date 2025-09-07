@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -60,6 +61,7 @@ export default function AdminEventDetailClient({
   competitions, 
   error 
 }: AdminEventDetailClientProps) {
+  const router = useRouter();
   const [isAddCompetitionOpen, setIsAddCompetitionOpen] = useState(false);
 
   const getStatusBadge = (isPublished: boolean) => {
@@ -98,6 +100,13 @@ export default function AdminEventDetailClient({
                 {getModeBadge(event.event_mode)}
               </div>
             </div>
+            <div className="flex items-center gap-4">
+              <Button
+              className="flex items-center gap-2"
+              onClick={() => router.push(`/admin/events/${event.id}/participants`)}
+            >
+              View Participants
+            </Button>
             <Button
               onClick={() => setIsAddCompetitionOpen(true)}
               className="flex items-center gap-2"
@@ -105,6 +114,7 @@ export default function AdminEventDetailClient({
               <Plus className="h-4 w-4" />
               Add Competition
             </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-6">

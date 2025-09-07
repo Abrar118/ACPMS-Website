@@ -18,6 +18,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { MinimalTiptapEditor } from "@/components/ui/minimal-tiptap";
+import EventRegistrationDialog from "./EventRegistrationDialog";
 import { JSONContent } from "@tiptap/react";
 import type { EventRow } from "@/queries/events";
 import type { CompetitionRow } from "@/queries/competitions";
@@ -336,9 +337,11 @@ export default function EventDetailClient({
                 Registration is open for this event. Don't miss out on this
                 exciting opportunity!
               </p>
-              <Button size="lg" className="px-6 sm:px-8">
-                Register Now
-              </Button>
+              <EventRegistrationDialog event={event} competitions={competitions}>
+                <Button size="lg" className="px-6 sm:px-8">
+                  Register Now
+                </Button>
+              </EventRegistrationDialog>
             </CardContent>
           </Card>
         )}

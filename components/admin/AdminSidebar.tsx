@@ -96,11 +96,6 @@ const managementItems = [
         url: "/admin/events",
         icon: Calendar,
       },
-      {
-        title: "Participants",
-        url: "/admin/participants",
-        icon: Users,
-      }
     ],
   },
   // {
