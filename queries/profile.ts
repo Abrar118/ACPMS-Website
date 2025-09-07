@@ -47,63 +47,63 @@ export interface UpdateUserProfileData {
 }
 
 // React Query compatible functions
-export function getUserRegisteredEventsQuery(
-    client: TypedSupabaseClient,
-    userId: string
-) {
-    const today = new Date().toISOString().split("T")[0];
+// export function getUserRegisteredEventsQuery(
+//     client: TypedSupabaseClient,
+//     userId: string
+// ) {
+//     const today = new Date().toISOString().split("T")[0];
 
-    return client
-        .from("event_registrations")
-        .select(
-            `
-            *,
-            event:events (
-                id,
-                title,
-                description,
-                event_date,
-                location,
-                poster_url,
-                event_type:event_type (
-                    event_type_name
-                )
-            )
-        `
-        )
-        .eq("user_id", userId)
-        .gte("event.event_date", today)
-        .order("event(event_date)", { ascending: true });
-}
+//     return client
+//         .from("event_registrations")
+//         .select(
+//             `
+//             *,
+//             event:events (
+//                 id,
+//                 title,
+//                 description,
+//                 event_date,
+//                 location,
+//                 poster_url,
+//                 event_type:event_type (
+//                     event_type_name
+//                 )
+//             )
+//         `
+//         )
+//         .eq("user_id", userId)
+//         .gte("event.event_date", today)
+//         .order("event(event_date)", { ascending: true });
+// }
 
-export function getUserPastEventsQuery(
-    client: TypedSupabaseClient,
-    userId: string
-) {
-    const today = new Date().toISOString().split("T")[0];
+// export function getUserPastEventsQuery(
+//     client: TypedSupabaseClient,
+//     userId: string
+// ) {
+//     const today = new Date().toISOString().split("T")[0];
 
-    return client
-        .from("event_registrations")
-        .select(
-            `
-            *,
-            event:events (
-                id,
-                title,
-                description,
-                event_date,
-                location,
-                poster_url,
-                event_type:event_type (
-                    event_type_name
-                )
-            )
-        `
-        )
-        .eq("user_id", userId)
-        .lt("event.event_date", today)
-        .order("event(event_date)", { ascending: false });
-}
+//     return client
+//         .from("event_registrations")
+//         .select(
+//             `
+//             *,
+//             event:events (
+//                 id,
+//                 title,
+//                 description,
+//                 event_date,
+//                 location,
+//                 poster_url,
+//                 event_type:event_type (
+//                     event_type_name
+//                 )
+//             )
+//         `
+//         )
+//         .eq("user_id", userId)
+//         .lt("event.event_date", today)
+//         .order("event(event_date)", { ascending: false });
+// }
 
 // Update user profile
 export async function updateUserProfile(
@@ -129,68 +129,68 @@ export async function updateUserProfile(
     }
 }
 
-// Get user's registration statistics
-export async function getUserRegistrationStats(
-    client: TypedSupabaseClient,
-    userId: string
-): Promise<
-    QueryResponseType<{
-        totalRegistrations: number;
-        upcomingEvents: number;
-        pastEvents: number;
-        completedEvents: number;
-    } | null>
-> {
-    try {
-        const today = new Date().toISOString().split("T")[0];
+// // Get user's registration statistics
+// export async function getUserRegistrationStats(
+//     client: TypedSupabaseClient,
+//     userId: string
+// ): Promise<
+//     QueryResponseType<{
+//         totalRegistrations: number;
+//         upcomingEvents: number;
+//         pastEvents: number;
+//         completedEvents: number;
+//     } | null>
+// > {
+//     try {
+//         const today = new Date().toISOString().split("T")[0];
 
-        // Get all registrations
-        const { data: allRegistrations, error: allError } = await client
-            .from("event_registrations")
-            .select("id, event:events(event_date)")
-            .eq("user_id", userId);
+//         // Get all registrations
+//         const { data: allRegistrations, error: allError } = await client
+//             .from("event_registrations")
+//             .select("id, event:events(event_date)")
+//             .eq("user_id", userId);
 
-        if (allError) throw allError;
+//         if (allError) throw allError;
 
-        // Get upcoming events
-        const { data: upcomingRegistrations, error: upcomingError } =
-            await client
-                .from("event_registrations")
-                .select("id, event:events(event_date)")
-                .eq("user_id", userId)
-                .gte("event.event_date", today);
+//         // Get upcoming events
+//         const { data: upcomingRegistrations, error: upcomingError } =
+//             await client
+//                 .from("event_registrations")
+//                 .select("id, event:events(event_date)")
+//                 .eq("user_id", userId)
+//                 .gte("event.event_date", today);
 
-        if (upcomingError) throw upcomingError;
+//         if (upcomingError) throw upcomingError;
 
-        // Get past events
-        const { data: pastRegistrations, error: pastError } = await client
-            .from("event_registrations")
-            .select("id, event:events(event_date)")
-            .eq("user_id", userId)
-            .lt("event.event_date", today);
+//         // Get past events
+//         const { data: pastRegistrations, error: pastError } = await client
+//             .from("event_registrations")
+//             .select("id, event:events(event_date)")
+//             .eq("user_id", userId)
+//             .lt("event.event_date", today);
 
-        if (pastError) throw pastError;
+//         if (pastError) throw pastError;
 
-        // Get completed events (past events with certificates)
-        const { data: completedRegistrations, error: completedError } =
-            await client
-                .from("event_registrations")
-                .select("id, certificate_url, event:events(event_date)")
-                .eq("user_id", userId)
-                .lt("event.event_date", today)
-                .not("certificate_url", "is", null);
+//         // Get completed events (past events with certificates)
+//         const { data: completedRegistrations, error: completedError } =
+//             await client
+//                 .from("event_registrations")
+//                 .select("id, certificate_url, event:events(event_date)")
+//                 .eq("user_id", userId)
+//                 .lt("event.event_date", today)
+//                 .not("certificate_url", "is", null);
 
-        if (completedError) throw completedError;
+//         if (completedError) throw completedError;
 
-        const stats = {
-            totalRegistrations: allRegistrations?.length || 0,
-            upcomingEvents: upcomingRegistrations?.length || 0,
-            pastEvents: pastRegistrations?.length || 0,
-            completedEvents: completedRegistrations?.length || 0,
-        };
+//         const stats = {
+//             totalRegistrations: allRegistrations?.length || 0,
+//             upcomingEvents: upcomingRegistrations?.length || 0,
+//             pastEvents: pastRegistrations?.length || 0,
+//             completedEvents: completedRegistrations?.length || 0,
+//         };
 
-        return QueryResponse.success(stats);
-    } catch (error: any) {
-        return QueryResponse.error(error.message);
-    }
-}
+//         return QueryResponse.success(stats);
+//     } catch (error: any) {
+//         return QueryResponse.error(error.message);
+//     }
+// }

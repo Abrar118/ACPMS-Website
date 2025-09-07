@@ -5,10 +5,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import createSupabaseBrowser from "@/utils/supabase/supabase-browser";
-import {
-    getUserRegisteredEventsQuery,
-    getUserPastEventsQuery,
-} from "@/queries/profile";
+// import {
+//     getUserRegisteredEventsQuery,
+//     getUserPastEventsQuery,
+// } from "@/queries/profile";
 import type { User } from "@supabase/supabase-js";
 import type { UserProfile } from "@/queries/auth";
 import RegisteredEvents from "./RegisteredEvents";
@@ -25,40 +25,40 @@ export default function ProfileClient({ user, profile }: ProfileClientProps) {
     const [activeTab, setActiveTab] = useState("registered");
 
     // Fetch user's registered events
-    const {
-        data: registeredEvents,
-        isLoading: loadingRegistered,
-        error: registeredError,
-    } = useQuery({
-        queryKey: ["user-registered-events", user.id],
-        queryFn: async () => {
-            const { data, error } = await getUserRegisteredEventsQuery(
-                supabase,
-                user.id
-            );
-            if (error) throw error;
-            return data;
-        },
-        enabled: !!user.id,
-    });
+    // const {
+    //     data: registeredEvents,
+    //     isLoading: loadingRegistered,
+    //     error: registeredError,
+    // } = useQuery({
+    //     queryKey: ["user-registered-events", user.id],
+    //     queryFn: async () => {
+    //         const { data, error } = await getUserRegisteredEventsQuery(
+    //             supabase,
+    //             user.id
+    //         );
+    //         if (error) throw error;
+    //         return data;
+    //     },
+    //     enabled: !!user.id,
+    // });
 
-    // Fetch user's past events
-    const {
-        data: pastEvents,
-        isLoading: loadingPast,
-        error: pastError,
-    } = useQuery({
-        queryKey: ["user-past-events", user.id],
-        queryFn: async () => {
-            const { data, error } = await getUserPastEventsQuery(
-                supabase,
-                user.id
-            );
-            if (error) throw error;
-            return data;
-        },
-        enabled: !!user.id,
-    });
+    // // Fetch user's past events
+    // const {
+    //     data: pastEvents,
+    //     isLoading: loadingPast,
+    //     error: pastError,
+    // } = useQuery({
+    //     queryKey: ["user-past-events", user.id],
+    //     queryFn: async () => {
+    //         const { data, error } = await getUserPastEventsQuery(
+    //             supabase,
+    //             user.id
+    //         );
+    //         if (error) throw error;
+    //         return data;
+    //     },
+    //     enabled: !!user.id,
+    // });
 
     if (!profile) {
         return (
@@ -140,7 +140,7 @@ export default function ProfileClient({ user, profile }: ProfileClientProps) {
                     </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="registered" className="mt-0">
+                {/* <TabsContent value="registered" className="mt-0">
                     <RegisteredEvents
                         events={registeredEvents || []}
                         isLoading={loadingRegistered}
@@ -154,7 +154,7 @@ export default function ProfileClient({ user, profile }: ProfileClientProps) {
                         isLoading={loadingPast}
                         error={pastError}
                     />
-                </TabsContent>
+                </TabsContent> */}
 
                 <TabsContent value="information" className="mt-0">
                     <PersonalInformation user={user} profile={profile} />
