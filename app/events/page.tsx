@@ -6,9 +6,7 @@ import {
 import { prefetchQuery } from "@supabase-cache-helpers/postgrest-react-query";
 import createSupabaseServer from "@/utils/supabase/supabase-server";
 import {
-    getUpcomingEventsQuery,
-    getPastEventsQuery,
-    getEventTypesQuery,
+    getEventsQuery,
 } from "@/queries/events";
 import Footer from "@/components/home/Footer";
 import EventsClient from "@/components/events/EventsClient";
@@ -22,9 +20,7 @@ export default async function EventsPage() {
 
     // Prefetch events data for SSR
     await Promise.all([
-        prefetchQuery(queryClient, getUpcomingEventsQuery(supabase)),
-        prefetchQuery(queryClient, getPastEventsQuery(supabase)),
-        prefetchQuery(queryClient, getEventTypesQuery(supabase)),
+        prefetchQuery(queryClient, getEventsQuery(supabase)),
     ]);
 
     return (
@@ -69,7 +65,7 @@ export default async function EventsPage() {
                                     Workshops
                                 </h3>
                                 <p className="text-sm text-muted-foreground">
-                                    Interactive learning sessions
+                                    Interactive learning sessions and hands-on activities
                                 </p>
                             </CardContent>
                         </Card>
@@ -81,7 +77,7 @@ export default async function EventsPage() {
                                 </div>
                                 <h3 className="font-semibold mb-2">Sessions</h3>
                                 <p className="text-sm text-muted-foreground">
-                                    Deep-dive topic discussions
+                                    Educational talks and topic discussions
                                 </p>
                             </CardContent>
                         </Card>
@@ -95,7 +91,7 @@ export default async function EventsPage() {
                                     Competitions
                                 </h3>
                                 <p className="text-sm text-muted-foreground">
-                                    Mathematical challenges
+                                    Mathematical contests and challenges
                                 </p>
                             </CardContent>
                         </Card>
@@ -105,9 +101,9 @@ export default async function EventsPage() {
                                 <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-orange-100 dark:bg-orange-800 flex items-center justify-center">
                                     <Calendar className="h-6 w-6 text-orange-600 dark:text-orange-400" />
                                 </div>
-                                <h3 className="font-semibold mb-2">Explore</h3>
+                                <h3 className="font-semibold mb-2">Seminars</h3>
                                 <p className="text-sm text-muted-foreground">
-                                    Hands-on discovery sessions
+                                    Academic presentations and lectures
                                 </p>
                             </CardContent>
                         </Card>

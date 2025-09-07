@@ -100,24 +100,6 @@ export type Database = {
           },
         ]
       }
-      event_type: {
-        Row: {
-          event_code: string
-          event_type_name: string
-          id: string
-        }
-        Insert: {
-          event_code: string
-          event_type_name?: string
-          id?: string
-        }
-        Update: {
-          event_code?: string
-          event_type_name?: string
-          id?: string
-        }
-        Relationships: []
-      }
       events: {
         Row: {
           created_at: string | null
@@ -258,36 +240,42 @@ export type Database = {
         Row: {
           class: number
           created_at: string
+          email: string | null
           id: string
           id_at_institution: string
           institution: string
           name: string
           note: string
           payment_provider: string | null
+          phone: string | null
           transaction_id: string | null
           updated_at: string
         }
         Insert: {
           class: number
           created_at?: string
+          email?: string | null
           id?: string
           id_at_institution: string
           institution: string
           name: string
           note?: string
           payment_provider?: string | null
+          phone?: string | null
           transaction_id?: string | null
           updated_at?: string
         }
         Update: {
           class?: number
           created_at?: string
+          email?: string | null
           id?: string
           id_at_institution?: string
           institution?: string
           name?: string
           note?: string
           payment_provider?: string | null
+          phone?: string | null
           transaction_id?: string | null
           updated_at?: string
         }

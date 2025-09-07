@@ -1,725 +1,549 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import useSupabaseBrowser from "@/utils/supabase/supabase-browser";
 import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
+import { getEventsQuery } from "@/queries/events";
 import {
-    getEventTypesQuery,
-    getUpcomingEventsWithPaginationQuery,
-    getPastEventsWithPaginationQuery,
-} from "@/queries/events";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination";
-import {
-    Calendar,
-    MapPin,
-    Users,
-    Clock,
-    Trophy,
-    BookOpen,
-    Loader2,
+  Calendar,
+  MapPin,
+  Users,
+  Clock,
+  Trophy,
+  BookOpen,
+  Loader2,
+  Search,
+  Star,
+  ExternalLink,
+  Eye,
 } from "lucide-react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import EventRegistrationDialog from "./EventRegistrationDialog";
+import { EEventType } from "../shared/enums";
+import { MinimalTiptapEditor } from "@/components/ui/minimal-tiptap";
+import { JSONContent } from "@tiptap/react";
+import { format, isAfter, isBefore, addDays, parseISO } from "date-fns";
 
-type SearchParamsType = {
-    pageNumber?: number;
-    category?: string;
-};
+interface EventWithType {
+  id: string;
+  title: string;
+  description: any;
+  event_date: string | null;
+  end_date: string | null;
+  venue: string | null;
+  registration_deadline: string | null;
+  is_published: boolean;
+  event_mode: string;
+  event_type: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  created_by: string | null;
+  poster_url: string | null;
+  tags: string[] | null;
+}
 
 export default function EventsClient() {
-    const searchParams = useSearchParams();
-    const router = useRouter();
-    const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
 
-    const [activeCategory, setActiveCategory] = useState(
-        searchParams.get("category") || "All Events"
-    );
-    const [upcomingPage, setUpcomingPage] = useState(
-        Number(searchParams.get("pageNumber")) || 1
-    );
-    const [pastPage, setPastPage] = useState(
-        Number(searchParams.get("pageNumber")) || 1
-    );
-    
-    // Registration dialog state
-    const [selectedEvent, setSelectedEvent] = useState<any>(null);
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
-    
-    const pageSize = 6; // Show 6 events per page
-    const supabase = useSupabaseBrowser();
+  const [activeCategory, setActiveCategory] = useState(
+    searchParams.get("category") || "All Events"
+  );
+  const [searchTerm, setSearchTerm] = useState(
+    searchParams.get("search") || ""
+  );
 
-    // Function to update URL parameters
-    const updateSearchParams = (params: {
-        category?: string;
-        pageNumber?: number;
-    }) => {
-        const current = new URLSearchParams(Array.from(searchParams.entries()));
+  // Registration dialog state
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-        if (params.category !== undefined) {
-            if (params.category === "All Events") {
-                current.delete("category");
-            } else {
-                current.set("category", params.category);
-            }
-        }
+  const supabase = useSupabaseBrowser();
 
-        if (params.pageNumber !== undefined) {
-            if (params.pageNumber === 1) {
-                current.delete("pageNumber");
-            } else {
-                current.set("pageNumber", params.pageNumber.toString());
-            }
-        }
+  // Function to update URL parameters
+  const updateSearchParams = (params: {
+    category?: string;
+    search?: string;
+  }) => {
+    const current = new URLSearchParams(Array.from(searchParams.entries()));
 
-        const search = current.toString();
-        const query = search ? `?${search}` : "";
-        router.push(`${pathname}${query}`, { scroll: false });
-    };
-
-    // Get event types for dynamic categories
-    const { data: eventTypes, isLoading: typesLoading } = useQuery(
-        getEventTypesQuery(supabase)
-    );
-
-    // Get upcoming events with pagination
-    const {
-        data: upcomingEvents,
-        isLoading: upcomingLoading,
-        isError: upcomingError,
-    } = useQuery(
-        getUpcomingEventsWithPaginationQuery(supabase, upcomingPage, pageSize)
-    );
-
-    // Get past events with pagination
-    const {
-        data: pastEvents,
-        isLoading: pastLoading,
-        isError: pastError,
-    } = useQuery(
-        getPastEventsWithPaginationQuery(supabase, pastPage, pageSize)
-    );
-
-    // For count, we'll use a simple approach - if we get the full pageSize, there might be more
-    const hasMoreUpcoming =
-        upcomingEvents && upcomingEvents.length === pageSize;
-    const hasMorePast = pastEvents && pastEvents.length === pageSize;
-
-    // Filter events based on active category
-    const getFilteredEvents = (events: any[]) => {
-        if (!events) return [];
-        if (activeCategory === "All Events") return events;
-
-        return events.filter(
-            (event) =>
-                event.event_type?.event_type_name?.toLowerCase() ===
-                activeCategory.toLowerCase()
-        );
-    };
-
-    const filteredUpcomingEvents = getFilteredEvents(upcomingEvents || []);
-    const filteredPastEvents = getFilteredEvents(pastEvents || []);
-
-    /// Reset pagination when category changes
-    const handleCategoryChange = (category: string) => {
-        setActiveCategory(category);
-        setUpcomingPage(1);
-        setPastPage(1);
-
-        // Update URL parameters
-        updateSearchParams({ category, pageNumber: 1 });
-    };
-
-    // Handle upcoming page change
-    const handleUpcomingPageChange = (page: number) => {
-        setUpcomingPage(page);
-        updateSearchParams({ pageNumber: page });
-    };
-
-    // Handle past page change
-    const handlePastPageChange = (page: number) => {
-        setPastPage(page);
-        updateSearchParams({ pageNumber: page });
-    };
-
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString("en-US", {
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-        });
-    };
-
-    const formatTime = (dateString: string) => {
-        return new Date(dateString).toLocaleTimeString("en-US", {
-            hour: "numeric",
-            minute: "2-digit",
-            hour12: true,
-        });
-    };
-
-    const getCategoryIcon = (category: string) => {
-        const lowerCategory = category.toLowerCase();
-        switch (lowerCategory) {
-            case "competition":
-            case "competitions":
-                return <Trophy className="w-3 h-3 mr-1" />;
-            case "workshop":
-            case "workshops":
-                return <BookOpen className="w-3 h-3 mr-1" />;
-            case "session":
-            case "sessions":
-                return <Users className="w-3 h-3 mr-1" />;
-            case "explore":
-                return <Calendar className="w-3 h-3 mr-1" />;
-            default:
-                return <Calendar className="w-3 h-3 mr-1" />;
-        }
-    };
-
-    // Handle event registration
-    const handleRegister = (event: any) => {
-        setSelectedEvent(event);
-        setIsDialogOpen(true);
-    };
-
-    // Handle dialog close
-    const handleDialogClose = (open: boolean) => {
-        setIsDialogOpen(open);
-        if (!open) {
-            setSelectedEvent(null);
-        }
-    };
-
-    const getBadgeVariant = (category: string) => {
-        const lowerCategory = category.toLowerCase();
-        switch (lowerCategory) {
-            case "competition":
-            case "competitions":
-                return "default" as const;
-            case "workshop":
-            case "workshops":
-                return "secondary" as const;
-            case "session":
-            case "sessions":
-                return "outline" as const;
-            default:
-                return "outline" as const;
-        }
-    };
-
-    if (upcomingLoading || pastLoading || typesLoading) {
-        return (
-            <div className="flex items-center justify-center py-16">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <span className="ml-2 text-muted-foreground">
-                    Loading events...
-                </span>
-            </div>
-        );
+    if (params.category !== undefined) {
+      if (params.category === "All Events") {
+        current.delete("category");
+      } else {
+        current.set("category", params.category);
+      }
     }
 
-    if (upcomingError || pastError) {
-        console.log("Error loading events:", upcomingError || pastError);
-        return (
-            <div className="text-center py-16">
-                <p className="text-muted-foreground">
-                    Error loading events. Please try again later.
-                </p>
-            </div>
-        );
+    if (params.search !== undefined) {
+      if (params.search === "") {
+        current.delete("search");
+      } else {
+        current.set("search", params.search);
+      }
     }
 
-    // Create dynamic categories from event types
-    const dynamicCategories = [
-        "All Events",
-        ...(eventTypes?.map((type) => type.event_type_name) || []),
-    ];
+    const search = current.toString();
+    const query = search ? `?${search}` : "";
+    router.push(`${pathname}${query}`, { scroll: false });
+  };
 
+  // Get all published events
+  const {
+    data: allEvents,
+    isLoading: eventsLoading,
+    isError: eventsError,
+  } = useQuery(getEventsQuery(supabase));
+
+  // Filter and sort events
+  const filteredAndSortedEvents = useMemo(() => {
+    if (!allEvents) return { upcoming: [], past: [] };
+
+    const today = new Date();
+    let filtered = [...allEvents] as EventWithType[];
+
+    // Filter by category
+    if (activeCategory !== "All Events") {
+      filtered = filtered.filter(
+        (event) =>
+          event.event_type?.toLowerCase() === activeCategory.toLowerCase()
+      );
+    }
+
+    // Filter by search term
+    if (searchTerm.trim()) {
+      const search = searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (event) =>
+          event.title.toLowerCase().includes(search) ||
+          event.venue?.toLowerCase().includes(search) ||
+          event.event_type?.toLowerCase().includes(search) ||
+          event.tags?.some((tag) => tag.toLowerCase().includes(search))
+      );
+    }
+
+    // Separate upcoming and past events
+    const upcoming = filtered
+      .filter((event) => {
+        if (!event.event_date) return false;
+        return isAfter(parseISO(event.event_date), today);
+      })
+      .sort((a, b) => {
+        if (!a.event_date || !b.event_date) return 0;
+        return (
+          new Date(a.event_date).getTime() - new Date(b.event_date).getTime()
+        );
+      });
+
+    const past = filtered
+      .filter((event) => {
+        if (!event.event_date) return false;
+        return isBefore(parseISO(event.event_date), today);
+      })
+      .sort((a, b) => {
+        if (!a.event_date || !b.event_date) return 0;
+        return (
+          new Date(b.event_date).getTime() - new Date(a.event_date).getTime()
+        );
+      });
+
+    return { upcoming, past };
+  }, [allEvents, activeCategory, searchTerm]);
+
+  // Handle category change
+  const handleCategoryChange = (category: string) => {
+    setActiveCategory(category);
+    updateSearchParams({ category });
+  };
+
+  // Handle search
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    updateSearchParams({ search: value });
+  };
+
+  // Utility functions
+  const formatDate = (dateString: string) => {
+    return format(parseISO(dateString), "PPP");
+  };
+
+  const formatTime = (dateString: string) => {
+    return format(parseISO(dateString), "p");
+  };
+
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case EEventType.Workshop:
+        return <BookOpen className="w-4 h-4" />;
+      case EEventType.Session:
+        return <Users className="w-4 h-4" />;
+      case EEventType.Seminar:
+        return <BookOpen className="w-4 h-4" />;
+      case EEventType.Fest:
+        return <Star className="w-4 h-4" />;
+      case EEventType.InterCanttOlympiad:
+        return <Trophy className="w-4 h-4" />;
+      case EEventType.Meet:
+        return <Users className="w-4 h-4" />;
+      case EEventType.Other:
+        return <Calendar className="w-4 h-4" />;
+      default:
+        return <Calendar className="w-4 h-4" />;
+    }
+  };
+
+  const getBadgeVariant = (category: string) => {
+    switch (category) {
+      case EEventType.Workshop:
+        return "secondary" as const;
+      case EEventType.Session:
+        return "outline" as const;
+      case EEventType.Seminar:
+        return "destructive" as const;
+      case EEventType.Fest:
+        return "default" as const;
+      case EEventType.InterCanttOlympiad:
+        return "default" as const;
+      case EEventType.Meet:
+        return "secondary" as const;
+      case EEventType.Other:
+        return "outline" as const;
+      default:
+        return "outline" as const;
+    }
+  };
+
+  const isUpcoming = (eventDate: string) => {
+    const today = new Date();
+    const eventDay = parseISO(eventDate);
+    const nextWeek = addDays(today, 7);
+    return isAfter(eventDay, today) && isBefore(eventDay, nextWeek);
+  };
+
+  if (eventsLoading) {
     return (
-        <div className="space-y-16">
-            {/* Event Categories Tabs */}
-            <section className="px-4">
-                <div className="max-w-6xl mx-auto">
-                    <Tabs
-                        value={activeCategory}
-                        onValueChange={handleCategoryChange}
-                        className="w-full"
-                    >
-                        <TabsList
-                            className={`grid w-full mb-8`}
-                            style={{
-                                gridTemplateColumns: `repeat(${Math.min(
-                                    dynamicCategories.length,
-                                    6
-                                )}, 1fr)`,
-                            }}
-                        >
-                            {dynamicCategories.slice(0, 6).map((category) => (
-                                <TabsTrigger
-                                    key={category}
-                                    value={category}
-                                    className="text-sm font-medium"
-                                >
-                                    {category}
-                                </TabsTrigger>
-                            ))}
-                        </TabsList>
-                    </Tabs>
-                </div>
-            </section>
-
-            {/* Upcoming Events */}
-            <section className="px-4">
-                <div className="max-w-6xl mx-auto">
-                    <h2 className="text-3xl font-bold mb-8">
-                        {activeCategory === "All Events"
-                            ? "Upcoming Events"
-                            : `Upcoming ${activeCategory}`}
-                    </h2>
-
-                    {!filteredUpcomingEvents ||
-                    filteredUpcomingEvents.length === 0 ? (
-                        <Card className="p-8 text-center">
-                            <p className="text-muted-foreground">
-                                {activeCategory === "All Events"
-                                    ? "No upcoming events at the moment."
-                                    : `No upcoming ${activeCategory.toLowerCase()} events at the moment.`}
-                            </p>
-                            <p className="text-sm text-muted-foreground mt-2">
-                                Check back soon for new events!
-                            </p>
-                        </Card>
-                    ) : (
-                        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                            {filteredUpcomingEvents.map((event) => (
-                                <Card
-                                    key={event.id}
-                                    className="hover:shadow-lg transition-shadow overflow-hidden"
-                                >
-                                    {/* Event Image */}
-                                    <div className="h-48 bg-gradient-to-br from-slate-800 to-slate-900 relative overflow-hidden">
-                                        {event.poster_url ? (
-                                            <img
-                                                src={event.poster_url}
-                                                alt={event.title}
-                                                className="w-full h-full object-cover"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
-                                                <div className="text-center text-white">
-                                                    {getCategoryIcon(
-                                                        event.event_type
-                                                            ?.event_type_name ||
-                                                            ""
-                                                    )}
-                                                    <div className="mt-2 text-sm opacity-75">
-                                                        {event.event_type
-                                                            ?.event_type_name ||
-                                                            "Event"}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-                                        {/* Event Type Badge */}
-                                        <div className="absolute top-3 left-3">
-                                            <Badge
-                                                variant={getBadgeVariant(
-                                                    event.event_type
-                                                        ?.event_type_name || ""
-                                                )}
-                                                className="bg-white/90 text-slate-800 hover:bg-white"
-                                            >
-                                                {event.event_type
-                                                    ?.event_type_name ||
-                                                    "Event"}
-                                            </Badge>
-                                        </div>
-                                        {/* This Week Badge */}
-                                        {event.event_date &&
-                                            new Date(event.event_date) <=
-                                                new Date(
-                                                    Date.now() +
-                                                        7 * 24 * 60 * 60 * 1000
-                                                ) && (
-                                                <div className="absolute top-3 right-3">
-                                                    <Badge
-                                                        variant="destructive"
-                                                        className="animate-pulse"
-                                                    >
-                                                        This Week
-                                                    </Badge>
-                                                </div>
-                                            )}
-                                    </div>
-
-                                    {/* Event Content */}
-                                    <CardHeader className="pb-4">
-                                        <CardTitle className="text-xl mb-2 line-clamp-2">
-                                            {event.title}
-                                        </CardTitle>
-                                        <CardDescription className="text-sm text-muted-foreground line-clamp-2">
-                                            {event.description}
-                                        </CardDescription>
-                                    </CardHeader>
-
-                                    <CardContent className="pt-0">
-                                        {/* Event Details */}
-                                        <div className="space-y-2 text-sm text-muted-foreground mb-4">
-                                            <div className="flex items-center gap-2">
-                                                <Calendar className="w-4 h-4" />
-                                                <span>
-                                                    {event.event_date
-                                                        ? formatDate(
-                                                              event.event_date
-                                                          )
-                                                        : "TBD"}
-                                                </span>
-                                                <Clock className="w-4 h-4 ml-4" />
-                                                <span>
-                                                    {event.event_date
-                                                        ? `${formatTime(
-                                                              event.event_date
-                                                          )} - ${
-                                                              event.end_date
-                                                                  ? formatTime(
-                                                                        event.end_date
-                                                                    )
-                                                                  : "TBD"
-                                                          }`
-                                                        : "TBD"}
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <MapPin className="w-4 h-4" />
-                                                <span>
-                                                    {event.location || "TBD"}
-                                                </span>
-                                                <Users className="w-4 h-4 ml-4" />
-                                                <span>
-                                                    {event.is_online
-                                                        ? "Online Event"
-                                                        : "In-Person"}
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        {/* Action Buttons */}
-                                        <div className="flex gap-2">
-                                            <Button 
-                                                className="flex-1 bg-blue-600 hover:bg-blue-700"
-                                                onClick={() => handleRegister(event)}
-                                            >
-                                                Register
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                className="flex-1"
-                                                onClick={() => handleRegister(event)}
-                                            >
-                                                View Details
-                                            </Button>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </div>
-                    )}
-
-                    {/* Upcoming Events Pagination */}
-                    {filteredUpcomingEvents &&
-                        filteredUpcomingEvents.length > 0 && (
-                            <div className="mt-8 flex justify-center">
-                                <Pagination>
-                                    <PaginationContent>
-                                        <PaginationItem>
-                                            <PaginationPrevious
-                                                href="#"
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    if (upcomingPage > 1) {
-                                                        handleUpcomingPageChange(
-                                                            upcomingPage - 1
-                                                        );
-                                                    }
-                                                }}
-                                                className={
-                                                    upcomingPage <= 1
-                                                        ? "pointer-events-none opacity-50"
-                                                        : "cursor-pointer"
-                                                }
-                                            />
-                                        </PaginationItem>
-
-                                        {/* Page Numbers */}
-                                        {Array.from(
-                                            {
-                                                length: Math.min(
-                                                    5,
-                                                    Math.max(
-                                                        3,
-                                                        upcomingPage + 2
-                                                    )
-                                                ),
-                                            },
-                                            (_, i) => {
-                                                const pageNum =
-                                                    Math.max(
-                                                        1,
-                                                        upcomingPage - 2
-                                                    ) + i;
-                                                if (
-                                                    pageNum <=
-                                                    upcomingPage + 2
-                                                ) {
-                                                    return (
-                                                        <PaginationItem
-                                                            key={pageNum}
-                                                        >
-                                                            <PaginationLink
-                                                                href="#"
-                                                                onClick={(
-                                                                    e
-                                                                ) => {
-                                                                    e.preventDefault();
-                                                                    handleUpcomingPageChange(
-                                                                        pageNum
-                                                                    );
-                                                                }}
-                                                                isActive={
-                                                                    pageNum ===
-                                                                    upcomingPage
-                                                                }
-                                                                className="cursor-pointer"
-                                                            >
-                                                                {pageNum}
-                                                            </PaginationLink>
-                                                        </PaginationItem>
-                                                    );
-                                                }
-                                                return null;
-                                            }
-                                        )}
-
-                                        <PaginationItem>
-                                            <PaginationNext
-                                                href="#"
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    if (hasMoreUpcoming) {
-                                                        handleUpcomingPageChange(
-                                                            upcomingPage + 1
-                                                        );
-                                                    }
-                                                }}
-                                                className={
-                                                    !hasMoreUpcoming
-                                                        ? "pointer-events-none opacity-50"
-                                                        : "cursor-pointer"
-                                                }
-                                            />
-                                        </PaginationItem>
-                                    </PaginationContent>
-                                </Pagination>
-                            </div>
-                        )}
-                </div>
-            </section>
-
-            {/* Past Events */}
-            {filteredPastEvents && filteredPastEvents.length > 0 && (
-                <section className="px-4 bg-muted/50 py-16">
-                    <div className="max-w-6xl mx-auto">
-                        <h2 className="text-3xl font-bold mb-8">
-                            {activeCategory === "All Events"
-                                ? "Recent Events"
-                                : `Recent ${activeCategory}`}
-                        </h2>
-
-                        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
-                            {filteredPastEvents.map((event) => (
-                                <Card
-                                    key={event.id}
-                                    className="hover:shadow-lg transition-shadow overflow-hidden opacity-80"
-                                >
-                                    {/* Event Image */}
-                                    <div className="h-48 bg-gradient-to-br from-slate-600 to-slate-700 relative overflow-hidden">
-                                        {event.poster_url ? (
-                                            <img
-                                                src={event.poster_url}
-                                                alt={event.title}
-                                                className="w-full h-full object-cover grayscale"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-600 to-slate-700">
-                                                <div className="text-center text-white">
-                                                    {getCategoryIcon(
-                                                        event.event_type
-                                                            ?.event_type_name ||
-                                                            ""
-                                                    )}
-                                                    <div className="mt-2 text-sm opacity-75">
-                                                        {event.event_type
-                                                            ?.event_type_name ||
-                                                            "Event"}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-                                        {/* Completed Badge */}
-                                        <div className="absolute top-3 left-3">
-                                            <Badge
-                                                variant="outline"
-                                                className="bg-white/90 text-slate-800"
-                                            >
-                                                Completed
-                                            </Badge>
-                                        </div>
-                                    </div>
-
-                                    {/* Event Content */}
-                                    <CardHeader className="pb-4">
-                                        <CardTitle className="text-lg mb-2 line-clamp-2">
-                                            {event.title}
-                                        </CardTitle>
-                                        <CardDescription className="text-sm text-muted-foreground line-clamp-2">
-                                            {event.description}
-                                        </CardDescription>
-                                    </CardHeader>
-
-                                    <CardContent className="pt-0">
-                                        <div className="space-y-2 text-sm text-muted-foreground">
-                                            <div className="flex items-center gap-2">
-                                                <Calendar className="w-4 h-4" />
-                                                <span>
-                                                    {event.event_date
-                                                        ? formatDate(
-                                                              event.event_date
-                                                          )
-                                                        : "TBD"}
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <MapPin className="w-4 h-4" />
-                                                <span>
-                                                    {event.location || "TBD"}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </div>
-
-                        {/* Past Events Pagination */}
-                        <div className="mt-8 flex justify-center">
-                            <Pagination>
-                                <PaginationContent>
-                                    <PaginationItem>
-                                        <PaginationPrevious
-                                            href="#"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                if (pastPage > 1) {
-                                                    handlePastPageChange(
-                                                        pastPage - 1
-                                                    );
-                                                }
-                                            }}
-                                            className={
-                                                pastPage <= 1
-                                                    ? "pointer-events-none opacity-50"
-                                                    : "cursor-pointer"
-                                            }
-                                        />
-                                    </PaginationItem>
-
-                                    {/* Page Numbers */}
-                                    {Array.from(
-                                        {
-                                            length: Math.min(
-                                                5,
-                                                Math.max(3, pastPage + 2)
-                                            ),
-                                        },
-                                        (_, i) => {
-                                            const pageNum =
-                                                Math.max(1, pastPage - 2) + i;
-                                            if (pageNum <= pastPage + 2) {
-                                                return (
-                                                    <PaginationItem
-                                                        key={pageNum}
-                                                    >
-                                                        <PaginationLink
-                                                            href="#"
-                                                            onClick={(e) => {
-                                                                e.preventDefault();
-                                                                handlePastPageChange(
-                                                                    pageNum
-                                                                );
-                                                            }}
-                                                            isActive={
-                                                                pageNum ===
-                                                                pastPage
-                                                            }
-                                                            className="cursor-pointer"
-                                                        >
-                                                            {pageNum}
-                                                        </PaginationLink>
-                                                    </PaginationItem>
-                                                );
-                                            }
-                                            return null;
-                                        }
-                                    )}
-
-                                    <PaginationItem>
-                                        <PaginationNext
-                                            href="#"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                if (hasMorePast) {
-                                                    handlePastPageChange(
-                                                        pastPage + 1
-                                                    );
-                                                }
-                                            }}
-                                            className={
-                                                !hasMorePast
-                                                    ? "pointer-events-none opacity-50"
-                                                    : "cursor-pointer"
-                                            }
-                                        />
-                                    </PaginationItem>
-                                </PaginationContent>
-                            </Pagination>
-                        </div>
-                    </div>
-                </section>
-            )}
-            
-            {/* Registration Dialog */}
-            <EventRegistrationDialog
-                event={selectedEvent}
-                isOpen={isDialogOpen}
-                onOpenChange={handleDialogClose}
-            />
-        </div>
+      <div className="flex items-center justify-center py-16">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="ml-2 text-muted-foreground">Loading events...</span>
+      </div>
     );
+  }
+
+  if (eventsError) {
+    console.log("Error loading events:", eventsError);
+    return (
+      <div className="text-center py-16">
+        <p className="text-muted-foreground">
+          Error loading events. Please try again later.
+        </p>
+      </div>
+    );
+  }
+
+  // Create dynamic categories from event enum
+  const dynamicCategories = ["All Events", ...Object.values(EEventType)];
+
+  const EventCard = ({
+    event,
+    isUpcomingEvent = false,
+  }: {
+    event: EventWithType;
+    isUpcomingEvent?: boolean;
+  }) => (
+    <Card
+      className={`hover:shadow-lg transition-all duration-300 overflow-hidden group ${
+        isUpcomingEvent ? "ring-2 ring-primary/50 scale-[1.02]" : ""
+      }`}
+    >
+      {/* Event Image */}
+      <div
+        className={`${
+          isUpcomingEvent ? "h-56" : "h-48"
+        } bg-gradient-to-br from-slate-800 to-slate-900 relative overflow-hidden`}
+      >
+        {event.poster_url ? (
+          <img
+            src={event.poster_url}
+            alt={event.title}
+            className={`w-full h-full object-cover transition-transform group-hover:scale-105 ${
+              !isUpcomingEvent &&
+              !isAfter(parseISO(event.event_date || ""), new Date())
+                ? "grayscale opacity-75"
+                : ""
+            }`}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
+            <div className="text-center text-white">
+              {getCategoryIcon(event.event_type || "")}
+              <div className="mt-2 text-sm opacity-75">
+                {event.event_type || "Event"}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Badges */}
+        <div className="absolute top-3 left-3 flex gap-2">
+          <Badge
+            variant={getBadgeVariant(event.event_type || "")}
+            className="bg-white/90 text-slate-800 hover:bg-white"
+          >
+            {event.event_type || "Event"}
+          </Badge>
+          {isUpcomingEvent && (
+            <Badge variant="destructive" className="animate-pulse">
+              <Star className="w-3 h-3 mr-1" />
+              Soon
+            </Badge>
+          )}
+        </div>
+
+        {/* Event Mode */}
+        <div className="absolute top-3 right-3">
+          <Badge
+            variant="outline"
+            className="bg-black/50 text-white border-white/20"
+          >
+            {event.event_mode}
+          </Badge>
+        </div>
+
+        {/* Past Event Overlay */}
+        {!isAfter(parseISO(event.event_date || ""), new Date()) && (
+          <div className="absolute bottom-3 left-3">
+            <Badge
+              variant="outline"
+              className="bg-black/50 text-white border-white/20"
+            >
+              Completed
+            </Badge>
+          </div>
+        )}
+      </div>
+
+      {/* Event Content */}
+      <CardHeader className={`${isUpcomingEvent ? "pt-6" : ""}`}>
+        <CardTitle
+          className={`${
+            isUpcomingEvent ? "text-xl" : "text-lg"
+          } line-clamp-2 group-hover:text-primary transition-colors`}
+        >
+          {event.title}
+        </CardTitle>
+        {/* {event.description && (
+                    <CardDescription className="text-sm text-muted-foreground">
+                        <div className="line-clamp-2">
+                            <MinimalTiptapEditor
+                                value={event.description as JSONContent}
+                                className="w-full border-0 p-0 m-0"
+                                output="text"
+                                autofocus={false}
+                                editable={false}
+                                editorClassName="focus:outline-none text-sm max-h-22 overflow-hidden"
+                                hideToolbar={true}
+                            />
+                        </div>
+                    </CardDescription>
+                )} */}
+      </CardHeader>
+
+      <CardContent className="pt-0 space-y-4">
+        {/* Event Details */}
+        <div className="space-y-2 text-sm text-muted-foreground">
+          {event.event_date && (
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              <span>{formatDate(event.event_date)}</span>
+              {event.event_date && (
+                <>
+                  <Clock className="w-4 h-4 ml-2" />
+                  <span>{formatTime(event.event_date)}</span>
+                </>
+              )}
+            </div>
+          )}
+          {event.venue && (
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4" />
+              <span className="line-clamp-1">{event.venue}</span>
+            </div>
+          )}
+          {event.registration_deadline &&
+            isAfter(parseISO(event.event_date || ""), new Date()) && (
+              <div className="flex items-center gap-2 text-orange-600 dark:text-orange-400">
+                <Clock className="w-4 h-4" />
+                <span className="text-xs">
+                  Registration closes: {formatDate(event.registration_deadline)}
+                </span>
+              </div>
+            )}
+        </div>
+
+        {/* Tags */}
+        {/* {event.tags && event.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                        {event.tags.slice(0, 3).map((tag, index) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                                {tag}
+                            </Badge>
+                        ))}
+                        {event.tags.length > 3 && (
+                            <Badge variant="outline" className="text-xs">
+                                +{event.tags.length - 3}
+                            </Badge>
+                        )}
+                    </div>
+                )} */}
+
+        {/* Action Buttons */}
+        <div className="flex gap-2 pt-2">
+          <Button
+            variant="outline"
+            className="flex-1"
+            onClick={() => window.open(`/events/${event.id}`, "_blank")}
+          >
+            <ExternalLink className="h-4 w-4 mr-2" />
+            View Details
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  return (
+    <div className="space-y-12">
+      {/* Search and Filter Section */}
+      <section className="px-4">
+        <div className="max-w-6xl mx-auto space-y-6">
+          {/* Search Bar */}
+          <div className="relative max-w-md mx-auto">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              placeholder="Search events by title, venue, or tags..."
+              value={searchTerm}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          {/* Category Tabs */}
+          <Tabs
+            value={activeCategory}
+            onValueChange={handleCategoryChange}
+            className="w-full"
+          >
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-1">
+              {dynamicCategories.slice(0, 6).map((category) => (
+                <TabsTrigger
+                  key={category}
+                  value={category}
+                  className="text-sm font-medium"
+                >
+                  {category === "All Events" ? "All" : category}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </div>
+      </section>
+
+      {/* Upcoming Events */}
+      {filteredAndSortedEvents.upcoming.length > 0 && (
+        <section className="px-4">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl font-bold mb-8 flex items-center gap-2">
+              <Star className="h-8 w-8 text-primary" />
+              {activeCategory === "All Events"
+                ? "Upcoming Events"
+                : `Upcoming ${activeCategory}`}
+            </h2>
+
+            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+              {filteredAndSortedEvents.upcoming.map((event) => (
+                <EventCard
+                  key={event.id}
+                  event={event}
+                  isUpcomingEvent={
+                    event.event_date ? isUpcoming(event.event_date) : false
+                  }
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Past Events */}
+      {filteredAndSortedEvents.past.length > 0 && (
+        <section className="px-4 bg-muted/30 py-12">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl font-bold mb-8">
+              {activeCategory === "All Events"
+                ? "Past Events"
+                : `Past ${activeCategory}`}
+            </h2>
+
+            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+              {filteredAndSortedEvents.past.slice(0, 9).map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))}
+            </div>
+
+            {filteredAndSortedEvents.past.length > 9 && (
+              <div className="text-center mt-8">
+                <Button variant="outline">View More Past Events</Button>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* No Events Found */}
+      {filteredAndSortedEvents.upcoming.length === 0 &&
+        filteredAndSortedEvents.past.length === 0 && (
+          <section className="px-4">
+            <div className="max-w-6xl mx-auto">
+              <Card className="p-12 text-center">
+                <Calendar className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-xl font-semibold mb-2">No Events Found</h3>
+                <p className="text-muted-foreground mb-4">
+                  {searchTerm
+                    ? `No events match your search "${searchTerm}"`
+                    : activeCategory === "All Events"
+                    ? "No events are currently available."
+                    : `No ${activeCategory.toLowerCase()} events are currently available.`}
+                </p>
+                {(searchTerm || activeCategory !== "All Events") && (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setSearchTerm("");
+                      setActiveCategory("All Events");
+                      updateSearchParams({
+                        search: "",
+                        category: "All Events",
+                      });
+                    }}
+                  >
+                    Clear Filters
+                  </Button>
+                )}
+              </Card>
+            </div>
+          </section>
+        )}
+    </div>
+  );
 }

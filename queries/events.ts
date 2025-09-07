@@ -53,14 +53,7 @@ export interface CreateEventData {
 export function getEventsQuery(client: TypedSupabaseClient) {
     return client
         .from("events")
-        .select(`
-            *,
-            event_type (
-                id,
-                event_code,
-                event_type_name
-            )
-        `)
+        .select("*")
         .eq("is_published", true)
         .order("event_date", { ascending: true });
 }
@@ -71,14 +64,7 @@ export function getEventsByTypeQuery(
 ) {
     return client
         .from("events")
-        .select(`
-            *,
-            event_type (
-                id,
-                event_code,
-                event_type_name
-            )
-        `)
+        .select("*")
         .eq("is_published", true)
         .eq("event_type", eventType)
         .order("event_date", { ascending: true });
@@ -89,14 +75,7 @@ export function getUpcomingEventsQuery(client: TypedSupabaseClient) {
 
     return client
         .from("events")
-        .select(`
-            *,
-            event_type (
-                id,
-                event_code,
-                event_type_name
-            )
-        `)
+        .select("*")
         .eq("is_published", true)
         .gte("event_date", today)
         .order("event_date", { ascending: true });
@@ -114,14 +93,7 @@ export function getUpcomingEventsWithPaginationQuery(
 
     return client
         .from("events")
-        .select(`
-            *,
-            event_type (
-                id,
-                event_code,
-                event_type_name
-            )
-        `)
+        .select("*")
         .eq("is_published", true)
         .gte("event_date", today)
         .order("event_date", { ascending: true })
@@ -133,14 +105,7 @@ export function getPastEventsQuery(client: TypedSupabaseClient) {
 
     return client
         .from("events")
-        .select(`
-            *,
-            event_type (
-                id,
-                event_code,
-                event_type_name
-            )
-        `)
+        .select("*")
         .eq("is_published", true)
         .lt("event_date", today)
         .order("event_date", { ascending: false })
@@ -159,14 +124,7 @@ export function getPastEventsWithPaginationQuery(
 
     return client
         .from("events")
-        .select(`
-            *,
-            event_type (
-                id,
-                event_code,
-                event_type_name
-            )
-        `)
+        .select("*")
         .eq("is_published", true)
         .lt("event_date", today)
         .order("event_date", { ascending: false })
@@ -179,14 +137,7 @@ export function getEventByIdQuery(
 ) {
     return client
         .from("events")
-        .select(`
-            *,
-            event_type (
-                id,
-                event_code,
-                event_type_name
-            )
-        `)
+        .select("*")
         .eq("id", eventId)
         .eq("is_published", true)
         .single();
@@ -195,22 +146,16 @@ export function getEventByIdQuery(
 export function getAllEventsQuery(client: TypedSupabaseClient) {
     return client
         .from("events")
-        .select(`
-            *,
-            event_type (
-                id,
-                event_code,
-                event_type_name
-            )
-        `)
+        .select("*")
         .order("event_date", { ascending: false });
 }
 
+// Since event_type is just a string field, we don't have a separate table
+// Instead, we'll use the enum values from the shared enums
 export function getEventTypesQuery(client: TypedSupabaseClient) {
-    return client
-        .from("event_type")
-        .select("*")
-        .order("event_type_name", { ascending: true });
+    // This is a dummy query that returns event type enum values
+    // Since we don't have an event_type table, we'll handle this in the component
+    return null;
 }
 
 // Highlights function for landing page
@@ -429,6 +374,28 @@ export async function getEventById(
             .from("events")
             .select("*")
             .eq("id", eventId)
+            .single();
+
+        if (error) throw error;
+        return QueryResponse.success<EventRow>(data);
+    } catch (error: any) {
+        return QueryResponse.error(error.message || "Failed to fetch event");
+    }
+}
+
+/**
+ * Get a single published event by ID (for public viewing)
+ */
+export async function getPublishedEventById(
+    client: TypedSupabaseClient,
+    eventId: string
+): Promise<QueryResponseType<EventRow | null>> {
+    try {
+        const { data, error } = await client
+            .from("events")
+            .select("*")
+            .eq("id", eventId)
+            .eq("is_published", true)
             .single();
 
         if (error) throw error;

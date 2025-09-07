@@ -17,6 +17,8 @@ import { type CompetitionRow } from "@/queries/competitions";
 import AddCompetitionDialog from "./AddCompetitionDialog";
 import CompetitionsList from "./CompetitionsList";
 import { format } from "date-fns";
+import { MinimalTiptapEditor } from "@/components/ui/minimal-tiptap";
+import { JSONContent } from "@tiptap/react";
 
 interface AdminEventDetailClientProps {
   event: EventRow;
@@ -114,7 +116,15 @@ export default function AdminEventDetailClient({
                 <h3 className="font-medium">Description</h3>
               </div>
               <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
-                {formatRichTextToPlainText(event.description)}
+                <MinimalTiptapEditor
+                value={event.description as JSONContent}
+                className="w-full border-0 p-0 m-0"
+                output="json"
+                autofocus={false}
+                editable={false}
+                editorClassName="focus:outline-hidden"
+                hideToolbar={true}
+              />
               </div>
             </div>
           )}
