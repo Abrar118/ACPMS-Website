@@ -89,7 +89,7 @@ export default function Navbar({ user, profile }: NavbarProps) {
                     : "bg-background/70 backdrop-blur-sm border-b"
             }`}
         >
-            <div className="max-w-6xl mx-auto px-4">
+            <div className="mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-20 2xl:px-32 3xl:px-40">
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
                     <Link className="flex items-center space-x-2" href={"/"}>
