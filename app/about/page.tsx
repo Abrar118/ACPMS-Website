@@ -1,4 +1,5 @@
 import Footer from "@/components/home/Footer";
+import Contributors from "@/components/about/Contributors";
 import {
     Card,
     CardContent,
@@ -541,7 +542,7 @@ export default async function AboutPage() {
                                 asChild
                             >
                                 <a 
-                                    href="https://drive.google.com/file/d/1pgNEsjNPELy0Q9bL-PL-w9w7ifsfuxn7/view" 
+                                    href="https://vwkhuivnxctstkhzrext.supabase.co/storage/v1/object/public/public_bucket/The%20Constitution%20of%20ACPSCM%20Vol%200_1.pdf" 
                                     target="_blank" 
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center gap-2"
@@ -714,6 +715,8 @@ export default async function AboutPage() {
                     )}
                 </div>
             </section>
+
+            <Contributors />
 
             <Footer />
         </main>
