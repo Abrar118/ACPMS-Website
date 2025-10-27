@@ -19,6 +19,8 @@ import dynamic from "next/dynamic";
 import { EResourceType } from "../shared/enums";
 import { format, isAfter, parseISO } from "date-fns";
 import Link from "next/link";
+import { MinimalTiptapEditor } from "@/components/ui/minimal-tiptap";
+import { JSONContent } from "@tiptap/react";
 
 export default function ClubHighlights() {
   const supabase = useSupabaseBrowser();
@@ -129,9 +131,14 @@ export default function ClubHighlights() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="px-0">
-                <p className="text-muted-foreground line-clamp-2">
-                  {highlights.event.description}
-                </p>
+                <div className="text-muted-foreground line-clamp-2">
+                  <MinimalTiptapEditor
+                    value={highlights.event.description as JSONContent}
+                    output="text"
+                    editable={false}
+                    hideToolbar={true}
+                  />
+                </div>
                 <Button asChild className="mt-4">
                   <Link href={`/events/${highlights.event.id}`}>Learn More</Link>
                 </Button>
