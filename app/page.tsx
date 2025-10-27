@@ -1,16 +1,18 @@
 import HeroSection from "@/components/home/HeroSection";
-import WelcomeSection from "@/components/home/WelcomeSection";
+import WhatWeDo from "@/components/home/WhatWeDo";
+import WhoWeAre from "@/components/home/WhoWeAre";
 import ClubHighlights from "@/components/home/ClubHighlights";
-import TestimonialsSection from "@/components/home/TestimonialsSection";
+import ClientTestimonials from "@/components/home/ClientTestimonials";
 import Footer from "@/components/home/Footer";
 
 export default function Home() {
     return (
         <main className="min-h-screen">
             <HeroSection />
-            <WelcomeSection />
+            <WhatWeDo />
+            <WhoWeAre />
             <ClubHighlights />
-            <TestimonialsSection />
+            <ClientTestimonials />
             <Footer />
         </main>
     );

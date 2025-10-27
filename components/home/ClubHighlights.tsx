@@ -18,6 +18,7 @@ import { Calendar, BookOpen, FileText, Clock, MapPin } from "lucide-react";
 import dynamic from "next/dynamic";
 import { EResourceType } from "../shared/enums";
 import { format, isAfter, parseISO } from "date-fns";
+import Link from "next/link";
 
 export default function ClubHighlights() {
   const supabase = useSupabaseBrowser();
@@ -52,7 +53,7 @@ export default function ClubHighlights() {
       <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold text-center text-foreground mb-16">
-            Club Highlights
+            From the Club
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[1, 2, 3].map((i) => (
@@ -80,7 +81,7 @@ export default function ClubHighlights() {
       <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold text-center text-foreground mb-16">
-            Club Highlights
+            From the Club
           </h2>
           <div className="text-center">
             <p className="text-muted-foreground">
@@ -96,14 +97,14 @@ export default function ClubHighlights() {
     <section className="py-20 px-4">
       <div className="max-w-6xl mx-auto">
         <h2 className="text-4xl md:text-5xl font-bold text-center text-foreground mb-16">
-          Club Highlights
+          From the Club
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Latest Event */}
           {highlights.event && (
-            <Card className="bg-card/50 border-border/50 hover:shadow-xl transition-all duration-300 hover:scale-105">
-              <div className="relative h-48 w-full overflow-hidden rounded-t-lg">
+            <Card className="bg-transparent border-0 shadow-none">
+              <div className="relative h-48 w-full overflow-hidden rounded-lg">
                 {highlights.event.poster_url ? (
                   <Image
                     src={highlights.event.poster_url}
@@ -116,11 +117,8 @@ export default function ClubHighlights() {
                     <Calendar className="w-16 h-16 text-primary opacity-50" />
                   </div>
                 )}
-                <Badge className="absolute top-3 left-3" variant="secondary">
-                  Latest Event
-                </Badge>
               </div>
-              <CardHeader>
+              <CardHeader className="px-0">
                 <CardTitle className="text-xl text-foreground">
                   {highlights.event.title}
                 </CardTitle>
@@ -130,44 +128,12 @@ export default function ClubHighlights() {
                     : "Date TBD"}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="flex-1 flex flex-col">
-                <div className="space-y-2 text-sm text-muted-foreground flex-1">
-                  {highlights.event.event_date && (
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4" />
-                      <span>{formatDate(highlights.event.event_date)}</span>
-                      {highlights.event.event_date && (
-                        <>
-                          <Clock className="w-4 h-4 ml-2" />
-                          <span>{formatTime(highlights.event.event_date)}</span>
-                        </>
-                      )}
-                    </div>
-                  )}
-                  {highlights.event.venue && (
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4" />
-                      <span className="line-clamp-1">
-                        {highlights.event.venue}
-                      </span>
-                    </div>
-                  )}
-                  {highlights.event.registration_deadline &&
-                    isAfter(
-                      parseISO(highlights.event.event_date || ""),
-                      new Date()
-                    ) && (
-                      <div className="flex items-center gap-2 text-destructive/80">
-                        <Clock className="w-4 h-4" />
-                        <span className="text-xs">
-                          Registration closes:{" "}
-                          {formatDate(highlights.event.registration_deadline)}
-                        </span>
-                      </div>
-                    )}
-                </div>
-                <Button size="sm" className="w-full mt-4">
-                  Learn More
+              <CardContent className="px-0">
+                <p className="text-muted-foreground line-clamp-2">
+                  {highlights.event.description}
+                </p>
+                <Button asChild className="mt-4">
+                  <Link href={`/events/${highlights.event.id}`}>Learn More</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -175,8 +141,8 @@ export default function ClubHighlights() {
 
           {/* Most Popular Resource */}
           {highlights.resource && (
-            <Card className="bg-card/50 border-border/50 hover:shadow-xl transition-all duration-300 hover:scale-105 flex flex-col">
-              <div className="relative h-48 w-full overflow-hidden rounded-t-lg">
+            <Card className="bg-transparent border-0 shadow-none">
+              <div className="relative h-48 w-full overflow-hidden rounded-lg">
                 {highlights.resource.resource_url ? (
                   (() => {
                     const url = highlights.resource.resource_url;
@@ -238,11 +204,8 @@ export default function ClubHighlights() {
                     <BookOpen className="w-16 h-16 text-accent-foreground opacity-50" />
                   </div>
                 )}
-                <Badge className="absolute top-3 left-3" variant="secondary">
-                  Top Resource
-                </Badge>
               </div>
-              <CardHeader>
+              <CardHeader className="px-0">
                 <CardTitle className="text-xl text-foreground">
                   {highlights.resource.title}
                 </CardTitle>
@@ -250,13 +213,14 @@ export default function ClubHighlights() {
                   {highlights.resource.view_count} views
                 </CardDescription>
               </CardHeader>
-              <CardContent className="flex-1 flex flex-col">
-                <p className="text-muted-foreground mb-4 leading-relaxed line-clamp-3 flex-1">
-                  {highlights.resource.description ||
-                    "Explore this valuable resource"}
+              <CardContent className="px-0">
+                <p className="text-muted-foreground line-clamp-2">
+                  {highlights.resource.description}
                 </p>
-                <Button size="sm" className="w-full mt-auto">
-                  View Resource
+                <Button asChild className="mt-4">
+                  <Link href={`/resources/${highlights.resource.id}`}>
+                    Learn More
+                  </Link>
                 </Button>
               </CardContent>
             </Card>
@@ -264,8 +228,8 @@ export default function ClubHighlights() {
 
           {/* Latest Magazine */}
           {highlights.magazine && (
-            <Card className="bg-card/50 border-border/50 hover:shadow-xl transition-all duration-300 hover:scale-105">
-              <div className="relative h-48 w-full overflow-hidden rounded-t-lg">
+            <Card className="bg-transparent border-0 shadow-none">
+              <div className="relative h-48 w-full overflow-hidden rounded-lg">
                 {highlights.magazine.cover_image ? (
                   <Image
                     src={highlights.magazine.cover_image}
@@ -278,11 +242,8 @@ export default function ClubHighlights() {
                     <FileText className="w-16 h-16 text-secondary-foreground opacity-50" />
                   </div>
                 )}
-                <Badge className="absolute top-3 left-3" variant="secondary">
-                  Latest Edition
-                </Badge>
               </div>
-              <CardHeader>
+              <CardHeader className="px-0">
                 <CardTitle className="text-xl text-foreground">
                   {highlights.magazine.title}
                 </CardTitle>
@@ -292,13 +253,14 @@ export default function ClubHighlights() {
                     : "Recently Published"}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="flex flex-col flex-1">
-                <p className="text-muted-foreground mb-4 leading-relaxed line-clamp-3 flex-1">
-                  {highlights.magazine.summary ||
-                    "Read our latest magazine edition"}
+              <CardContent className="px-0">
+                <p className="text-muted-foreground line-clamp-2">
+                  {highlights.magazine.summary}
                 </p>
-                <Button size="sm" className="w-full mt-auto">
-                  Read Now
+                <Button asChild className="mt-4">
+                  <Link href={`/magazine/${highlights.magazine.id}`}>
+                    Learn More
+                  </Link>
                 </Button>
               </CardContent>
             </Card>

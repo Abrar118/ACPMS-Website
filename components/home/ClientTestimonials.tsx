@@ -1,7 +1,8 @@
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 
-export default function TestimonialsSection() {
+export default function ClientTestimonials() {
     return (
         <section className="py-20 px-4">
             <div className="max-w-4xl mx-auto">
