@@ -49,14 +49,14 @@ export default function ClubHighlights() {
 
   if (isLoading) {
     return (
-      <section className="py-20 px-4 bg-muted/30">
+      <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold text-center text-foreground mb-16">
             Club Highlights
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[1, 2, 3].map((i) => (
-              <Card key={i}>
+              <Card key={i} className="bg-card/50">
                 <Skeleton className="h-48 w-full" />
                 <CardHeader>
                   <Skeleton className="h-6 w-3/4" />
@@ -77,7 +77,7 @@ export default function ClubHighlights() {
 
   if (error || !highlights) {
     return (
-      <section className="py-20 px-4 bg-muted/30">
+      <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold text-center text-foreground mb-16">
             Club Highlights
@@ -93,7 +93,7 @@ export default function ClubHighlights() {
   }
 
   return (
-    <section className="py-20 px-4 bg-muted/30">
+    <section className="py-20 px-4">
       <div className="max-w-6xl mx-auto">
         <h2 className="text-4xl md:text-5xl font-bold text-center text-foreground mb-16">
           Club Highlights
@@ -102,8 +102,8 @@ export default function ClubHighlights() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Latest Event */}
           {highlights.event && (
-            <Card className="hover:shadow-xl transition-all duration-300 hover:scale-105">
-              <div className="relative h-48 w-full overflow-hidden">
+            <Card className="bg-card/50 border-border/50 hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <div className="relative h-48 w-full overflow-hidden rounded-t-lg">
                 {highlights.event.poster_url ? (
                   <Image
                     src={highlights.event.poster_url}
@@ -112,8 +112,8 @@ export default function ClubHighlights() {
                     className="object-cover transition-transform duration-300 hover:scale-110"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
-                    <Calendar className="w-16 h-16 text-white opacity-50" />
+                  <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center">
+                    <Calendar className="w-16 h-16 text-primary opacity-50" />
                   </div>
                 )}
                 <Badge className="absolute top-3 left-3" variant="secondary">
@@ -124,18 +124,14 @@ export default function ClubHighlights() {
                 <CardTitle className="text-xl text-foreground">
                   {highlights.event.title}
                 </CardTitle>
-                <CardDescription className="font-medium">
+                <CardDescription className="font-medium text-muted-foreground">
                   {highlights.event.event_date
                     ? formatDate(highlights.event.event_date)
                     : "Date TBD"}
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col">
-                {/* <p className="text-muted-foreground mb-4 leading-relaxed line-clamp-3">
-                  {highlights.event.description ||
-                    "Join us for this exciting event!"}
-                </p> */}
-                <div className="space-y-2 text-sm text-muted-foreground">
+                <div className="space-y-2 text-sm text-muted-foreground flex-1">
                   {highlights.event.event_date && (
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
@@ -161,7 +157,7 @@ export default function ClubHighlights() {
                       parseISO(highlights.event.event_date || ""),
                       new Date()
                     ) && (
-                      <div className="flex items-center gap-2 text-orange-600 dark:text-orange-400">
+                      <div className="flex items-center gap-2 text-destructive/80">
                         <Clock className="w-4 h-4" />
                         <span className="text-xs">
                           Registration closes:{" "}
@@ -170,7 +166,7 @@ export default function ClubHighlights() {
                       </div>
                     )}
                 </div>
-                <Button size="sm" className="w-full mt-auto">
+                <Button size="sm" className="w-full mt-4">
                   Learn More
                 </Button>
               </CardContent>
@@ -179,8 +175,8 @@ export default function ClubHighlights() {
 
           {/* Most Popular Resource */}
           {highlights.resource && (
-            <Card className="hover:shadow-xl transition-all duration-300 hover:scale-105 flex flex-col">
-              <div className="relative h-48 w-full overflow-hidden">
+            <Card className="bg-card/50 border-border/50 hover:shadow-xl transition-all duration-300 hover:scale-105 flex flex-col">
+              <div className="relative h-48 w-full overflow-hidden rounded-t-lg">
                 {highlights.resource.resource_url ? (
                   (() => {
                     const url = highlights.resource.resource_url;
@@ -191,7 +187,6 @@ export default function ClubHighlights() {
                     const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url);
 
                     if (isYoutube) {
-                      // Extract YouTube video ID and show thumbnail
                       let videoId = "";
                       if (url.includes("youtu.be/")) {
                         videoId =
@@ -199,9 +194,7 @@ export default function ClubHighlights() {
                       } else if (url.includes("youtube.com/embed/")) {
                         videoId = url.split("embed/")[1]?.split("?")[0] || "";
                       }
-
                       const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-
                       return (
                         <div className="relative w-full h-full">
                           <Image
@@ -226,7 +219,6 @@ export default function ClubHighlights() {
                         />
                       );
                     } else {
-                      // Generic resource - try as image first, fallback to icon
                       return (
                         <Image
                           src={url}
@@ -234,7 +226,6 @@ export default function ClubHighlights() {
                           fill
                           className="object-cover transition-transform duration-300 hover:scale-110"
                           onError={(e) => {
-                            // Replace with fallback if image fails to load
                             (e.target as HTMLImageElement).style.display =
                               "none";
                           }}
@@ -243,8 +234,8 @@ export default function ClubHighlights() {
                     }
                   })()
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center">
-                    <BookOpen className="w-16 h-16 text-white opacity-50" />
+                  <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/40 flex items-center justify-center">
+                    <BookOpen className="w-16 h-16 text-accent-foreground opacity-50" />
                   </div>
                 )}
                 <Badge className="absolute top-3 left-3" variant="secondary">
@@ -255,7 +246,7 @@ export default function ClubHighlights() {
                 <CardTitle className="text-xl text-foreground">
                   {highlights.resource.title}
                 </CardTitle>
-                <CardDescription className="font-medium">
+                <CardDescription className="font-medium text-muted-foreground">
                   {highlights.resource.view_count} views
                 </CardDescription>
               </CardHeader>
@@ -273,8 +264,8 @@ export default function ClubHighlights() {
 
           {/* Latest Magazine */}
           {highlights.magazine && (
-            <Card className="hover:shadow-xl transition-all duration-300 hover:scale-105">
-              <div className="relative h-48 w-full overflow-hidden">
+            <Card className="bg-card/50 border-border/50 hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <div className="relative h-48 w-full overflow-hidden rounded-t-lg">
                 {highlights.magazine.cover_image ? (
                   <Image
                     src={highlights.magazine.cover_image}
@@ -283,8 +274,8 @@ export default function ClubHighlights() {
                     className="object-cover transition-transform duration-300 hover:scale-110"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center">
-                    <FileText className="w-16 h-16 text-white opacity-50" />
+                  <div className="w-full h-full bg-gradient-to-br from-secondary/20 to-secondary/40 flex items-center justify-center">
+                    <FileText className="w-16 h-16 text-secondary-foreground opacity-50" />
                   </div>
                 )}
                 <Badge className="absolute top-3 left-3" variant="secondary">
@@ -295,14 +286,14 @@ export default function ClubHighlights() {
                 <CardTitle className="text-xl text-foreground">
                   {highlights.magazine.title}
                 </CardTitle>
-                <CardDescription className="font-medium">
+                <CardDescription className="font-medium text-muted-foreground">
                   {highlights.magazine.published_date
                     ? formatDate(highlights.magazine.published_date)
                     : "Recently Published"}
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex flex-col flex-1">
-                <p className="text-muted-foreground mb-4 leading-relaxed line-clamp-3">
+                <p className="text-muted-foreground mb-4 leading-relaxed line-clamp-3 flex-1">
                   {highlights.magazine.summary ||
                     "Read our latest magazine edition"}
                 </p>

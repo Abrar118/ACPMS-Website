@@ -5,16 +5,16 @@ import { Facebook, Twitter, Instagram, Mail } from "lucide-react";
 
 export default function Footer() {
     return (
-        <footer className="bg-muted py-12 px-4">
+        <footer className="bg-card/50 border-t border-border/50 py-12 px-4">
             <div className="max-w-6xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                     {/* Brand */}
                     <div className="md:col-span-1">
                         <h3 className="text-xl font-bold mb-4 text-primary">
-                            ACPS Club of Mathematics
+                            ACPSCM
                         </h3>
                         <p className="text-muted-foreground text-sm">
-                            Think Logical
+                            Exploring the Universe of Numbers.
                         </p>
                     </div>
 
@@ -27,7 +27,7 @@ export default function Footer() {
                             <li>
                                 <a
                                     href="/"
-                                    className="hover:text-foreground transition-colors"
+                                    className="hover:text-primary transition-colors"
                                 >
                                     Home
                                 </a>
@@ -35,7 +35,7 @@ export default function Footer() {
                             <li>
                                 <a
                                     href="/events"
-                                    className="hover:text-foreground transition-colors"
+                                    className="hover:text-primary transition-colors"
                                 >
                                     Events
                                 </a>
@@ -43,17 +43,17 @@ export default function Footer() {
                             <li>
                                 <a
                                     href="/resources"
-                                    className="hover:text-foreground transition-colors"
+                                    className="hover:text-primary transition-colors"
                                 >
                                     Resources
                                 </a>
                             </li>
                             <li>
                                 <a
-                                    href="/admin"
-                                    className="hover:text-foreground transition-colors"
+                                    href="/about"
+                                    className="hover:text-primary transition-colors"
                                 >
-                                    Admin
+                                    About Us
                                 </a>
                             </li>
                         </ul>
@@ -66,7 +66,7 @@ export default function Footer() {
                         </h4>
                         <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                             <Mail className="h-4 w-4" />
-                            <span>contact@mathexplorers.org</span>
+                            <span>contact@acpscm.com</span>
                         </div>
                     </div>
 
@@ -78,16 +78,16 @@ export default function Footer() {
                         <div className="space-y-4">
                             <div className="flex space-x-2">
                                 <Input
-                                    placeholder="Enter email"
-                                    className="text-sm"
+                                    placeholder="Enter your email"
+                                    className="text-sm bg-background/50 border-border/50"
                                 />
                                 <Button size="sm">Subscribe</Button>
                             </div>
-                            <div className="flex space-x-4">
+                            <div className="flex space-x-2">
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-8 w-8"
+                                    className="h-8 w-8 text-muted-foreground hover:text-primary"
                                     aria-label="Twitter"
                                 >
                                     <Twitter className="h-4 w-4" />
@@ -95,7 +95,7 @@ export default function Footer() {
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-8 w-8"
+                                    className="h-8 w-8 text-muted-foreground hover:text-primary"
                                     aria-label="Facebook"
                                 >
                                     <Facebook className="h-4 w-4" />
@@ -103,7 +103,7 @@ export default function Footer() {
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-8 w-8"
+                                    className="h-8 w-8 text-muted-foreground hover:text-primary"
                                     aria-label="Instagram"
                                 >
                                     <Instagram className="h-4 w-4" />
@@ -113,7 +113,7 @@ export default function Footer() {
                     </div>
                 </div>
 
-                <Separator className="my-8" />
+                <Separator className="my-8 bg-border/50" />
 
                 {/* Copyright */}
                 <div className="text-center">
