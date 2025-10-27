@@ -48,18 +48,18 @@ export default function ClubHighlights() {
 
   const formatTime = (dateString: string) => {
     return format(parseISO(dateString), "p");
-  };  
+  };
 
   if (isLoading) {
     return (
       <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center text-foreground mb-16">
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-center text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 py-4">
             From the Club
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
             {[1, 2, 3].map((i) => (
-              <Card key={i} className="bg-card/50">
+              <Card key={i} className="bg-gray-800/80 border-gray-700/80">
                 <Skeleton className="h-48 w-full" />
                 <CardHeader>
                   <Skeleton className="h-6 w-3/4" />
@@ -82,11 +82,11 @@ export default function ClubHighlights() {
     return (
       <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center text-foreground mb-16">
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-center text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 py-4">
             From the Club
           </h2>
           <div className="text-center">
-            <p className="text-muted-foreground">
+            <p className="text-gray-400">
               Unable to load highlights at the moment.
             </p>
           </div>
@@ -98,14 +98,14 @@ export default function ClubHighlights() {
   return (
     <section className="py-20 px-4">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-4xl md:text-5xl font-bold text-center text-foreground mb-16">
+        <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-center text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 py-4">
           From the Club
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
           {/* Latest Event */}
           {highlights.event && (
-            <Card className="bg-transparent border-0 shadow-none">
+            <Card className="bg-gray-800/80 border-gray-700/80">
               <div className="relative h-48 w-full overflow-hidden rounded-lg">
                 {highlights.event.poster_url ? (
                   <Image
@@ -120,18 +120,18 @@ export default function ClubHighlights() {
                   </div>
                 )}
               </div>
-              <CardHeader className="px-0">
-                <CardTitle className="text-xl text-foreground">
+              <CardHeader>
+                <CardTitle className="text-xl text-white">
                   {highlights.event.title}
                 </CardTitle>
-                <CardDescription className="font-medium text-muted-foreground">
+                <CardDescription className="font-medium text-gray-400">
                   {highlights.event.event_date
                     ? formatDate(highlights.event.event_date)
                     : "Date TBD"}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="px-0">
-                <div className="text-muted-foreground line-clamp-2">
+              <CardContent>
+                <div className="text-gray-400 line-clamp-2">
                   <MinimalTiptapEditor
                     value={highlights.event.description as JSONContent}
                     output="text"
@@ -148,7 +148,7 @@ export default function ClubHighlights() {
 
           {/* Most Popular Resource */}
           {highlights.resource && (
-            <Card className="bg-transparent border-0 shadow-none">
+            <Card className="bg-gray-800/80 border-gray-700/80">
               <div className="relative h-48 w-full overflow-hidden rounded-lg">
                 {highlights.resource.resource_url ? (
                   (() => {
@@ -212,16 +212,16 @@ export default function ClubHighlights() {
                   </div>
                 )}
               </div>
-              <CardHeader className="px-0">
-                <CardTitle className="text-xl text-foreground">
+              <CardHeader>
+                <CardTitle className="text-xl text-white">
                   {highlights.resource.title}
                 </CardTitle>
-                <CardDescription className="font-medium text-muted-foreground">
+                <CardDescription className="font-medium text-gray-400">
                   {highlights.resource.view_count} views
                 </CardDescription>
               </CardHeader>
-              <CardContent className="px-0">
-                <p className="text-muted-foreground line-clamp-2">
+              <CardContent>
+                <p className="text-gray-400 line-clamp-2">
                   {highlights.resource.description}
                 </p>
                 <Button asChild className="mt-4">
@@ -235,7 +235,7 @@ export default function ClubHighlights() {
 
           {/* Latest Magazine */}
           {highlights.magazine && (
-            <Card className="bg-transparent border-0 shadow-none">
+            <Card className="bg-gray-800/80 border-gray-700/80">
               <div className="relative h-48 w-full overflow-hidden rounded-lg">
                 {highlights.magazine.cover_image ? (
                   <Image
@@ -250,18 +250,18 @@ export default function ClubHighlights() {
                   </div>
                 )}
               </div>
-              <CardHeader className="px-0">
-                <CardTitle className="text-xl text-foreground">
+              <CardHeader>
+                <CardTitle className="text-xl text-white">
                   {highlights.magazine.title}
                 </CardTitle>
-                <CardDescription className="font-medium text-muted-foreground">
+                <CardDescription className="font-medium text-gray-400">
                   {highlights.magazine.published_date
                     ? formatDate(highlights.magazine.published_date)
                     : "Recently Published"}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="px-0">
-                <p className="text-muted-foreground line-clamp-2">
+              <CardContent>
+                <p className="text-gray-400 line-clamp-2">
                   {highlights.magazine.summary}
                 </p>
                 <Button asChild className="mt-4">
