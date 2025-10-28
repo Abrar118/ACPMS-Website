@@ -45,7 +45,7 @@ export default function BentoGridDemo() {
     return (
       <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-center text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 py-4">
+          <h2 className="text-4xl font-bold text-center mb-12">
             From the Club
           </h2>
           <BentoGrid className="max-w-4xl mx-auto">
@@ -68,7 +68,7 @@ export default function BentoGridDemo() {
     return (
       <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-center text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 py-4">
+          <h2 className="text-4xl font-bold text-center mb-12">
             From the Club
           </h2>
           <div className="text-center">
@@ -88,10 +88,10 @@ export default function BentoGridDemo() {
       title: "Latest Event",
       description: (
         <>
-          <h3 className="text-xl font-bold text-white mb-2">
+          <h3 className="text-xl font-bold mb-2">
             {highlights.event.title}
           </h3>
-          <div className="text-gray-400 line-clamp-2">
+          <div className="text-gray-600 line-clamp-2">
             <MinimalTiptapEditor
               value={highlights.event.description as JSONContent}
               output="text"
@@ -129,10 +129,10 @@ export default function BentoGridDemo() {
       title: "Most Popular Resource",
       description: (
         <>
-          <h3 className="text-xl font-bold text-white mb-2">
+          <h3 className="text-xl font-bold mb-2">
             {highlights.resource.title}
           </h3>
-          <p className="text-gray-400 line-clamp-2">
+          <p className="text-gray-600 line-clamp-2">
             {highlights.resource.description}
           </p>
           <Button asChild className="mt-4">
@@ -210,10 +210,10 @@ export default function BentoGridDemo() {
       title: "Latest Magazine",
       description: (
         <>
-          <h3 className="text-xl font-bold text-white mb-2">
+          <h3 className="text-xl font-bold mb-2">
             {highlights.magazine.title}
           </h3>
-          <p className="text-gray-400 line-clamp-2">
+          <p className="text-gray-600 line-clamp-2">
             {highlights.magazine.summary}
           </p>
           <Button asChild className="mt-4">
@@ -244,7 +244,7 @@ export default function BentoGridDemo() {
   return (
     <section className="py-20 px-4">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-center text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 py-4">
+        <h2 className="text-4xl font-bold text-center mb-12">
           From the Club
         </h2>
         <BentoGrid className="max-w-4xl mx-auto">
