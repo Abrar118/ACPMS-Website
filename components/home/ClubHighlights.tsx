@@ -105,7 +105,7 @@ export default function ClubHighlights() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
           {/* Latest Event */}
           {highlights.event && (
-            <Card className="bg-gray-800/80 border-gray-700/80">
+            <Card className="bg-gray-800/80 border-gray-700/80 transition-transform duration-300 hover:scale-105 hover:shadow-xl">
               <div className="relative h-48 w-full overflow-hidden rounded-lg">
                 {highlights.event.poster_url ? (
                   <Image
@@ -148,7 +148,7 @@ export default function ClubHighlights() {
 
           {/* Most Popular Resource */}
           {highlights.resource && (
-            <Card className="bg-gray-800/80 border-gray-700/80">
+            <Card className="bg-gray-800/80 border-gray-700/80 transition-transform duration-300 hover:scale-105 hover:shadow-xl">
               <div className="relative h-48 w-full overflow-hidden rounded-lg">
                 {highlights.resource.resource_url ? (
                   (() => {
@@ -235,7 +235,7 @@ export default function ClubHighlights() {
 
           {/* Latest Magazine */}
           {highlights.magazine && (
-            <Card className="bg-gray-800/80 border-gray-700/80">
+            <Card className="bg-gray-800/80 border-gray-700/80 transition-transform duration-300 hover:scale-105 hover:shadow-xl">
               <div className="relative h-48 w-full overflow-hidden rounded-lg">
                 {highlights.magazine.cover_image ? (
                   <Image

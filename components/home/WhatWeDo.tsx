@@ -10,8 +10,7 @@ export default function WhatWeDo() {
                     What We Do
                 </h2>
                 <p className="text-lg text-gray-400 max-w-2xl mx-auto text-center">
-                    We are a team of experienced developers who are passionate
-                    about creating high-quality software solutions.
+                    We are a passionate community dedicated to exploring the beauty and challenge of mathematics.
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
                     <Card className="bg-gray-800/80 border-gray-700/80">

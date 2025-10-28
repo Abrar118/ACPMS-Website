@@ -1,55 +1,55 @@
 
 import {
     Heart,
-    MousePointer,
+    Users,
     Expand,
     Zap,
     Wind,
-    Users,
+    Bot,
     ZoomIn,
-    Bot
+    BrainCircuit // Using a different icon for variety
 } from "lucide-react";
 
 const features = [
     {
         icon: <Heart size={24} />,
-        title: "Client Relations",
-        description: "Long-term relationships with our clients with exceptional service and support.",
+        title: "Community Passion",
+        description: "Join a vibrant community of students who share a deep passion for the beauty and challenge of mathematics.",
     },
     {
-        icon: <MousePointer size={24} />,
-        title: "Consistency",
-        description: "Ensure a consistent brand identity with regular design output.",
+        icon: <BrainCircuit size={24} />,
+        title: "Problem Solving Workshops",
+        description: "Engage in stimulating workshops that sharpen your analytical skills and collaborative problem-solving abilities.",
     },
     {
         icon: <Expand size={24} />,
-        title: "Scalability",
-        description: "Access high-quality design services at a fraction of traditional costs.",
+        title: "Skill Expansion",
+        description: "Broaden your mathematical horizons by exploring advanced topics and concepts beyond the standard curriculum.",
     },
     {
         icon: <Zap size={24} />,
-        title: "Speed",
-        description: "Get quicker turnarounds on design projects without sacrificing quality at a way better price on your wallet.",
+        title: "Competition Training",
+        description: "Prepare for local and national math competitions with dedicated training sessions and experienced mentors.",
     },
     {
         icon: <Wind size={24} />,
-        title: "Flexibility",
-        description: "Adapt the service to cover a wide range of design tasks as needed.",
+        title: "Flexible Learning",
+        description: "Adapt your learning path by exploring diverse mathematical fields, from pure theory to applied sciences.",
     },
     {
         icon: <Users size={24} />,
-        title: "Diversity",
-        description: "Access to a variety of styles and expertise from a pool of creative professionals and people around the world.",
+        title: "Peer Support",
+        description: "Benefit from a strong peer support network, offering help with challenging coursework and collaborative study.",
     },
     {
         icon: <Bot size={24} />,
-        title: "Support",
-        description: "Enjoy dedicated customer service and revisions to perfect your designs.",
+        title: "Applied Projects",
+        description: "Participate in hands-on projects that apply mathematical concepts to real-world challenges in tech and science.",
     },
     {
         icon: <ZoomIn size={24} />,
-        title: "Attention to detail",
-        description: "We pay attention to the smallest details to ensure the highest quality.",
+        title: "Attention to Detail",
+        description: "Cultivate precision and logical rigor by focusing on the intricate details of mathematical proofs and arguments.",
     },
 ];
 
@@ -61,7 +61,7 @@ export default function WhoWeAre() {
                     Where Others Stop <br /> We Keep Going
                 </h2>
                 <p className="text-lg text-gray-400 max-w-2xl mx-auto text-center">
-                    Our team goes the extra mile, providing unmatched attention to detail and delivering results that exceed expectations. We prioritize your needs, ensuring every project is handled with care, precision, and a forward-thinking approach.
+                    Our club delves into the depths of mathematics, providing unmatched attention to detail and fostering a community that thrives on solving complex problems and pushing the boundaries of knowledge.
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-left mt-16">
                     {features.map((feature, index) => (
