@@ -1,8 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Github, GitCommit, ExternalLink } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { GlassCard } from "@/components/ui/glass-card";
+import { SectionHeader } from "@/components/ui/section-header";
 import Link from "next/link";
 
 interface GitHubContributor {
@@ -48,16 +46,15 @@ export default async function Contributors() {
     }
 
     return (
-        <section className="py-16 px-4">
-            <div className="max-w-6xl mx-auto">
-                <div className="text-center mb-8">
-                    <h2 className="text-3xl font-bold mb-2">Contributors</h2>
-                    <p className="text-muted-foreground">
-                        Thank you to everyone who contributed to this project
-                    </p>
-                </div>
+        <section className="py-24 px-4">
+            <div className="max-w-7xl mx-auto">
+                <SectionHeader
+                    title="Contributors"
+                    subtitle="Thank you to everyone who contributed to this project"
+                    className="mb-8"
+                />
 
-                <Card className="p-6">
+                <GlassCard className="p-6">
                     <div className="flex flex-wrap justify-start gap-3">
                         {contributors.map((contributor) => (
                             <Link
@@ -68,7 +65,7 @@ export default async function Contributors() {
                                 className="group"
                                 title={`${contributor.login}`}
                             >
-                                <Avatar className="w-12 h-12 ring-2 ring-border group-hover:ring-primary/90 transition-all duration-300 group-hover:scale-110">
+                                <Avatar className="w-12 h-12 ring-2 ring-white/[0.08] group-hover:ring-primary/90 transition-all duration-300 group-hover:scale-110">
                                     <AvatarImage
                                         src={contributor.avatar_url}
                                         alt={contributor.login}
@@ -80,7 +77,7 @@ export default async function Contributors() {
                             </Link>
                         ))}
                     </div>
-                </Card>
+                </GlassCard>
             </div>
         </section>
     );

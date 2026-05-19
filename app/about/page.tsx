@@ -1,12 +1,5 @@
 import Footer from "@/components/home/Footer";
 import Contributors from "@/components/about/Contributors";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -26,6 +19,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { getMembersBySession, getUniqueSessions } from "@/lib/db/members";
 import type { Member } from "@/lib/generated/prisma";
+import { GlassCard } from "@/components/ui/glass-card";
+import { SectionHeader } from "@/components/ui/section-header";
+import { AmbientGlow } from "@/components/ui/ambient-glow";
 
 // Serialized member type for use in components (dates as strings after JSON serialization)
 type SerializedMember = Omit<Member, 'created_at' | 'updated_at'> & {
@@ -54,8 +50,8 @@ function getSocialIcon(platform: string) {
 // Component for rendering member card
 function MemberCard({ member }: { member: SerializedMember }) {
     return (
-        <Card className="hover:shadow-lg transition-all duration-300 group">
-            <CardHeader className="text-center pb-4">
+        <GlassCard className="p-6">
+            <div className="text-center pb-4">
                 <Avatar className="w-20 h-20 mx-auto mb-4 ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all">
                     <AvatarImage
                         src={member.image_url || ""}
@@ -68,29 +64,29 @@ function MemberCard({ member }: { member: SerializedMember }) {
                             .join("")}
                     </AvatarFallback>
                 </Avatar>
-                <CardTitle className="text-lg">
+                <h3 className="text-lg font-semibold text-foreground">
                     {member.name}
-                </CardTitle>
+                </h3>
                 {member.designation && (
-                    <CardDescription className="font-medium text-primary">
+                    <p className="font-medium text-primary text-sm mt-1">
                         {member.designation}
-                    </CardDescription>
+                    </p>
                 )}
                 {member.position && (
-                    <CardDescription className="font-medium text-muted-foreground">
+                    <p className="font-medium text-muted-foreground text-sm mt-1">
                         {member.position}
-                    </CardDescription>
+                    </p>
                 )}
                 {member.session && member.session !== "Moderators" && (
                     <Badge
                         variant="outline"
-                        className="w-fit mx-auto"
+                        className="w-fit mx-auto mt-2 border-white/[0.08] text-muted-foreground"
                     >
                         {`Session ${member.session}`}
                     </Badge>
                 )}
-            </CardHeader>
-            <CardContent className="pt-0">
+            </div>
+            <div className="pt-0">
                 {member.bio && (
                     <p className="text-sm text-muted-foreground mb-4 text-center">
                         {member.bio}
@@ -98,88 +94,62 @@ function MemberCard({ member }: { member: SerializedMember }) {
                 )}
                 <div className="flex justify-center space-x-2">
                     {member.email && (
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-8 w-8 p-0"
-                            asChild
+                        <a
+                            href={`mailto:${member.email}`}
+                            className="inline-flex items-center justify-center h-8 w-8 rounded-md border border-white/[0.08] bg-white/[0.03] text-muted-foreground hover:text-primary hover:border-white/[0.15] transition-all"
                         >
-                            <a href={`mailto:${member.email}`}>
-                                <Mail className="h-3 w-3" />
-                            </a>
-                        </Button>
+                            <Mail className="h-3 w-3" />
+                        </a>
                     )}
                     {member.phone && (
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-8 w-8 p-0"
-                            asChild
+                        <a
+                            href={`tel:${member.phone}`}
+                            className="inline-flex items-center justify-center h-8 w-8 rounded-md border border-white/[0.08] bg-white/[0.03] text-muted-foreground hover:text-primary hover:border-white/[0.15] transition-all"
                         >
-                            <a href={`tel:${member.phone}`}>
-                                <Phone className="h-3 w-3" />
-                            </a>
-                        </Button>
+                            <Phone className="h-3 w-3" />
+                        </a>
                     )}
                     {member.linkedin_id_link && (
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-8 w-8 p-0"
-                            asChild
+                        <a
+                            href={member.linkedin_id_link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center h-8 w-8 rounded-md border border-white/[0.08] bg-white/[0.03] text-muted-foreground hover:text-primary hover:border-white/[0.15] transition-all"
                         >
-                            <a 
-                                href={member.linkedin_id_link} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                            >
-                                <Linkedin className="h-3 w-3" />
-                            </a>
-                        </Button>
+                            <Linkedin className="h-3 w-3" />
+                        </a>
                     )}
                     {member.facebook_id_link && (
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-8 w-8 p-0"
-                            asChild
+                        <a
+                            href={member.facebook_id_link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center h-8 w-8 rounded-md border border-white/[0.08] bg-white/[0.03] text-muted-foreground hover:text-primary hover:border-white/[0.15] transition-all"
                         >
-                            <a 
-                                href={member.facebook_id_link} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                            >
-                                <Facebook className="h-3 w-3" />
-                            </a>
-                        </Button>
+                            <Facebook className="h-3 w-3" />
+                        </a>
                     )}
                     {member.instagram_id_link && (
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-8 w-8 p-0"
-                            asChild
+                        <a
+                            href={member.instagram_id_link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center h-8 w-8 rounded-md border border-white/[0.08] bg-white/[0.03] text-muted-foreground hover:text-primary hover:border-white/[0.15] transition-all"
                         >
-                            <a 
-                                href={member.instagram_id_link} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                            >
-                                <Instagram className="h-3 w-3" />
-                            </a>
-                        </Button>
+                            <Instagram className="h-3 w-3" />
+                        </a>
                     )}
                 </div>
-            </CardContent>
-        </Card>
+            </div>
+        </GlassCard>
     );
 }
 
 // Component for founder card with special styling
 function FounderCard({ member }: { member: SerializedMember }) {
     return (
-        <Card className="hover:shadow-lg transition-all duration-300 group border-2 border-primary/10">
-            <CardHeader className="text-center pb-4">
+        <GlassCard glow className="p-6">
+            <div className="text-center pb-4">
                 <Avatar className="w-24 h-24 mx-auto mb-4 ring-2 ring-primary/30 group-hover:ring-primary/50 transition-all">
                     <AvatarImage
                         src={member.image_url || ""}
@@ -193,24 +163,24 @@ function FounderCard({ member }: { member: SerializedMember }) {
                             .join("")}
                     </AvatarFallback>
                 </Avatar>
-                <CardTitle className="text-xl">
+                <h3 className="text-xl font-semibold text-foreground">
                     {member.name}
-                </CardTitle>
+                </h3>
                 {member.position && (
-                    <CardDescription className="font-medium text-primary">
+                    <p className="font-medium text-primary text-sm mt-1">
                         {member.position}
-                    </CardDescription>
+                    </p>
                 )}
                 {member.session && (
                     <Badge
                         variant="default"
-                        className="w-fit mx-auto"
+                        className="w-fit mx-auto mt-2"
                     >
                         Session {member.session}
                     </Badge>
                 )}
-            </CardHeader>
-            <CardContent className="pt-0">
+            </div>
+            <div className="pt-0">
                 {member.bio && (
                     <p className="text-sm text-muted-foreground mb-4 text-center">
                         {member.bio}
@@ -218,36 +188,26 @@ function FounderCard({ member }: { member: SerializedMember }) {
                 )}
                 <div className="flex justify-center space-x-2">
                     {member.email && (
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-8 w-8 p-0"
-                            asChild
+                        <a
+                            href={`mailto:${member.email}`}
+                            className="inline-flex items-center justify-center h-8 w-8 rounded-md border border-white/[0.08] bg-white/[0.03] text-muted-foreground hover:text-primary hover:border-white/[0.15] transition-all"
                         >
-                            <a href={`mailto:${member.email}`}>
-                                <Mail className="h-3 w-3" />
-                            </a>
-                        </Button>
+                            <Mail className="h-3 w-3" />
+                        </a>
                     )}
                     {member.linkedin_id_link && (
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-8 w-8 p-0"
-                            asChild
+                        <a
+                            href={member.linkedin_id_link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center h-8 w-8 rounded-md border border-white/[0.08] bg-white/[0.03] text-muted-foreground hover:text-primary hover:border-white/[0.15] transition-all"
                         >
-                            <a 
-                                href={member.linkedin_id_link} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                            >
-                                <Linkedin className="h-3 w-3" />
-                            </a>
-                        </Button>
+                            <Linkedin className="h-3 w-3" />
+                        </a>
                     )}
                 </div>
-            </CardContent>
-        </Card>
+            </div>
+        </GlassCard>
     );
 }
 
@@ -277,7 +237,7 @@ export default async function AboutPage() {
             phone: null,
         },
         {
-            id: "founder-2", 
+            id: "founder-2",
             name: "Tazrif Raim",
             position: "Founder Vice President",
             session: "2017-18",
@@ -294,7 +254,7 @@ export default async function AboutPage() {
         },
         {
             id: "founder-3",
-            name: "Abrar Mahir Esam", 
+            name: "Abrar Mahir Esam",
             position: "Founder General Secretary",
             session: "2017-18",
             image_url: "/avatars/abrar.jpg",
@@ -310,7 +270,7 @@ export default async function AboutPage() {
         },
         {
             id: "founder-4",
-            name: "Sultan Mehedi Masud", 
+            name: "Sultan Mehedi Masud",
             position: "Founder Organising Secretary",
             session: "2017-18",
             image_url: "",
@@ -326,7 +286,7 @@ export default async function AboutPage() {
         },
         {
             id: "founder-5",
-            name: "Md Ashrarul Haque Sifat", 
+            name: "Md Ashrarul Haque Sifat",
             position: "Founder Organising Secretary",
             session: "2017-18",
             image_url: "",
@@ -381,28 +341,24 @@ export default async function AboutPage() {
     return (
         <main className="min-h-screen">
             {/* Hero Section */}
-            <section className="pt-24 pb-16 px-4 bg-gradient-to-br from-primary/10 via-background to-secondary/5">
-                <div className="max-w-4xl mx-auto text-center">
-                    <Badge variant="secondary" className="mb-4">
+            <section className="py-24 px-4">
+                <div className="max-w-7xl mx-auto text-center">
+                    <Badge variant="secondary" className="mb-4 border-white/[0.08] bg-white/[0.04] text-muted-foreground">
                         Est. 2017
                     </Badge>
-                    <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                        About ACPSCM
-                    </h1>
-                    <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-                        The official Mathematics Club of Adamjee Cantonment
-                        Public School, dedicated to nurturing mathematical minds
-                        and fostering a love for problem-solving.
-                    </p>
+                    <SectionHeader
+                        title="About ACPSCM"
+                        subtitle="The official Mathematics Club of Adamjee Cantonment Public School, dedicated to nurturing mathematical minds and fostering a love for problem-solving."
+                    />
                 </div>
             </section>
 
             {/* Mission Section */}
-            <section className="py-16 px-4">
-                <div className="max-w-6xl mx-auto">
+            <section className="py-24 px-4">
+                <div className="max-w-7xl mx-auto">
                     <div className="grid md:grid-cols-2 gap-12 items-center">
                         <div>
-                            <h2 className="text-3xl font-bold mb-6">
+                            <h2 className="text-3xl font-bold mb-6 text-foreground">
                                 Our Mission
                             </h2>
                             <p className="text-lg text-muted-foreground mb-6">
@@ -421,18 +377,18 @@ export default async function AboutPage() {
                                 professional success.
                             </p>
                         </div>
-                        <Card className="p-6">
-                            <CardHeader className="text-center">
+                        <GlassCard className="p-6">
+                            <div className="text-center">
                                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
                                     <Calculator className="h-8 w-8 text-primary" />
                                 </div>
-                                <CardTitle>Join Our Community</CardTitle>
-                                <CardDescription>
+                                <h3 className="text-xl font-semibold text-foreground mb-2">Join Our Community</h3>
+                                <p className="text-sm text-muted-foreground mb-6">
                                     Be part of a dynamic group of math
                                     enthusiasts
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="text-center">
+                                </p>
+                            </div>
+                            <div className="text-center">
                                 <div className="grid grid-cols-3 gap-4 mb-6">
                                     <div>
                                         <div className="text-2xl font-bold text-primary">
@@ -459,91 +415,83 @@ export default async function AboutPage() {
                                         </div>
                                     </div>
                                 </div>
-                            </CardContent>
-                        </Card>
+                            </div>
+                        </GlassCard>
                     </div>
                 </div>
             </section>
 
             {/* Values Section */}
-            <section className="py-16 px-4 bg-muted/50">
-                <div className="max-w-6xl mx-auto">
-                    <div className="text-center mb-12">
-                        <h2 className="text-3xl font-bold mb-4">
-                            Our Core Values
-                        </h2>
-                        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                            The principles that guide everything we do at ACPSCM
-                        </p>
-                    </div>
+            <section className="py-24 px-4">
+                <div className="max-w-7xl mx-auto">
+                    <SectionHeader
+                        title="Our Core Values"
+                        subtitle="The principles that guide everything we do at ACPSCM"
+                        className="mb-12"
+                    />
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {values.map((value, index) => (
-                            <Card
+                            <GlassCard
                                 key={index}
-                                className="text-center p-6 hover:shadow-lg transition-shadow"
+                                className="text-center p-6"
                             >
-                                <CardHeader className="pb-4">
+                                <div className="pb-4">
                                     <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
                                         <value.icon className="h-6 w-6 text-primary" />
                                     </div>
-                                    <CardTitle className="text-lg">
+                                    <h3 className="text-lg font-semibold text-foreground">
                                         {value.title}
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-sm text-muted-foreground">
-                                        {value.description}
-                                    </p>
-                                </CardContent>
-                            </Card>
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-muted-foreground">
+                                    {value.description}
+                                </p>
+                            </GlassCard>
                         ))}
                     </div>
                 </div>
             </section>
 
             {/* Constitution Section */}
-            <section className="py-16 px-4">
-                <div className="min-w-8xl mx-auto">
+            <section className="py-24 px-4">
+                <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-12">
-                        <Badge variant="secondary" className="mb-4">
+                        <Badge variant="secondary" className="mb-4 border-white/[0.08] bg-white/[0.04] text-muted-foreground">
                             Official Document
                         </Badge>
-                        <h2 className="text-3xl font-bold mb-4">
-                            ACPSCM Constitution
-                        </h2>
-                        <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-                            Our constitution outlines the fundamental principles, structure, 
-                            and governance that guide ACPSCM in achieving its mission and objectives.
-                        </p>
+                        <SectionHeader
+                            title="ACPSCM Constitution"
+                            subtitle="Our constitution outlines the fundamental principles, structure, and governance that guide ACPSCM in achieving its mission and objectives."
+                        />
                     </div>
 
-                    <Card className="max-w-2xl mx-auto bg-gradient-to-br from-primary/5 to-secondary/5 border-2 border-primary/10 hover:border-primary/20 transition-all duration-300">
-                        <CardHeader className="text-center pb-6">
+                    <GlassCard glow className="max-w-2xl mx-auto p-8">
+                        <div className="text-center pb-6">
                             <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-primary/10 flex items-center justify-center ring-4 ring-primary/5">
                                 <FileText className="h-10 w-10 text-primary" />
                             </div>
-                            <CardTitle className="text-2xl mb-2">
+                            <h3 className="text-2xl font-semibold text-foreground mb-2">
                                 Official Constitution
-                            </CardTitle>
-                            <CardDescription className="text-base">
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
                                 Read our complete constitution document
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="text-center">
+                            </p>
+                        </div>
+                        <div className="text-center">
                             <p className="text-muted-foreground mb-6">
-                                This document contains our club's bylaws, membership guidelines, 
-                                executive roles and responsibilities, meeting procedures, and all 
+                                This document contains our club&apos;s bylaws, membership guidelines,
+                                executive roles and responsibilities, meeting procedures, and all
                                 governing policies that ensure transparent and effective leadership.
                             </p>
-                            <Button 
-                                size="lg" 
-                                className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-gray-900 font-semibold px-8 py-3 h-auto"
+                            <Button
+                                size="lg"
+                                className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-3 h-auto"
                                 asChild
                             >
-                                <a 
-                                    href="https://vwkhuivnxctstkhzrext.supabase.co/storage/v1/object/public/public_bucket/The%20Constitution%20of%20ACPSCM%20Vol%200_1.pdf" 
-                                    target="_blank" 
+                                <a
+                                    href="https://vwkhuivnxctstkhzrext.supabase.co/storage/v1/object/public/public_bucket/The%20Constitution%20of%20ACPSCM%20Vol%200_1.pdf"
+                                    target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center gap-2"
                                 >
@@ -552,25 +500,26 @@ export default async function AboutPage() {
                                     <ExternalLink className="h-4 w-4" />
                                 </a>
                             </Button>
-                        </CardContent>
-                    </Card>
+                        </div>
+                    </GlassCard>
                 </div>
             </section>
 
             {/* History Section */}
-            <section className="py-16 px-4 bg-muted/50">
+            <section className="py-24 px-4">
                 <div className="max-w-4xl mx-auto">
-                    <h2 className="text-3xl font-bold text-center mb-12">
-                        Our Journey
-                    </h2>
+                    <SectionHeader
+                        title="Our Journey"
+                        className="mb-12"
+                    />
 
                     <div className="space-y-8">
                         <div className="flex gap-4">
                             <div className="flex-shrink-0 w-24 text-right">
-                                <Badge variant="outline">2018</Badge>
+                                <Badge variant="outline" className="border-white/[0.08] text-muted-foreground">2018</Badge>
                             </div>
-                            <div className="flex-grow border-l-2 border-muted pl-6 pb-8">
-                                <h3 className="font-semibold mb-2">
+                            <div className="flex-grow border-l-2 border-white/[0.08] pl-6 pb-8">
+                                <h3 className="font-semibold text-foreground mb-2">
                                     Foundation
                                 </h3>
                                 <p className="text-muted-foreground">
@@ -583,10 +532,10 @@ export default async function AboutPage() {
 
                         <div className="flex gap-4">
                             <div className="flex-shrink-0 w-24 text-right">
-                                <Badge variant="outline">2021</Badge>
+                                <Badge variant="outline" className="border-white/[0.08] text-muted-foreground">2021</Badge>
                             </div>
-                            <div className="flex-grow border-l-2 border-muted pl-6 pb-8">
-                                <h3 className="font-semibold mb-2">
+                            <div className="flex-grow border-l-2 border-white/[0.08] pl-6 pb-8">
+                                <h3 className="font-semibold text-foreground mb-2">
                                     First Competition
                                 </h3>
                                 <p className="text-muted-foreground">
@@ -599,10 +548,10 @@ export default async function AboutPage() {
 
                         <div className="flex gap-4">
                             <div className="flex-shrink-0 w-24 text-right">
-                                <Badge variant="outline">2023</Badge>
+                                <Badge variant="outline" className="border-white/[0.08] text-muted-foreground">2023</Badge>
                             </div>
-                            <div className="flex-grow border-l-2 border-muted pl-6 pb-8">
-                                <h3 className="font-semibold mb-2">
+                            <div className="flex-grow border-l-2 border-white/[0.08] pl-6 pb-8">
+                                <h3 className="font-semibold text-foreground mb-2">
                                     National Recognition
                                 </h3>
                                 <p className="text-muted-foreground">
@@ -617,7 +566,7 @@ export default async function AboutPage() {
                                 <Badge variant="default">2025</Badge>
                             </div>
                             <div className="flex-grow pl-6">
-                                <h3 className="font-semibold mb-2">
+                                <h3 className="font-semibold text-foreground mb-2">
                                     Digital Platform Launch
                                 </h3>
                                 <p className="text-muted-foreground">
@@ -632,23 +581,24 @@ export default async function AboutPage() {
             </section>
 
             {/* Executives Section */}
-            <section className="py-16 px-4">
-                <div className="max-w-6xl mx-auto">
-                    <div className="text-center mb-12">
-                        <h2 className="text-3xl font-bold mb-4">
-                            Our Leadership
-                        </h2>
-                        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                            Meet the dedicated individuals who have shaped and
-                            continue to lead ACPSCM
-                        </p>
-                    </div>
+            <section className="py-24 px-4 relative">
+                <AmbientGlow position="top-right" size="lg" />
+                <div className="max-w-7xl mx-auto relative">
+                    <SectionHeader
+                        title="Our Leadership"
+                        subtitle="Meet the dedicated individuals who have shaped and continue to lead ACPSCM"
+                        className="mb-12"
+                    />
 
                     {tabsList.length > 0 ? (
                         <Tabs defaultValue={tabsList[0]?.value || "founders"} className="w-full">
-                            <TabsList className="w-full justify-center flex-wrap h-auto p-2 mb-8">
+                            <TabsList className="w-full justify-center flex-wrap h-auto p-2 mb-8 bg-transparent border-0">
                                 {tabsList.map((tab) => (
-                                    <TabsTrigger key={tab.value} value={tab.value} className="m-1">
+                                    <TabsTrigger
+                                        key={tab.value}
+                                        value={tab.value}
+                                        className="m-1 bg-white/[0.04] border border-white/[0.08] text-muted-foreground rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary"
+                                    >
                                         {tab.label}
                                     </TabsTrigger>
                                 ))}
@@ -675,10 +625,10 @@ export default async function AboutPage() {
                             {/* Founders Tab */}
                             <TabsContent value="founders" className="space-y-8">
                                 <div className="text-center mb-8">
-                                    <Badge variant="secondary" className="mb-4">
+                                    <Badge variant="secondary" className="mb-4 border-white/[0.08] bg-white/[0.04] text-muted-foreground">
                                         Legacy Leaders
                                     </Badge>
-                                    <h3 className="text-2xl font-bold mb-2">
+                                    <h3 className="text-2xl font-bold text-foreground mb-2">
                                         The Visionaries
                                     </h3>
                                     <p className="text-muted-foreground">
@@ -700,14 +650,14 @@ export default async function AboutPage() {
                                 <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-primary/10 flex items-center justify-center">
                                     <Users className="h-8 w-8 text-primary" />
                                 </div>
-                                <h3 className="text-xl font-semibold mb-2">
+                                <h3 className="text-xl font-semibold text-foreground mb-2">
                                     Leadership Information Coming Soon
                                 </h3>
                                 <p className="text-muted-foreground mb-6">
-                                    We're currently updating our leadership information. 
+                                    We&apos;re currently updating our leadership information.
                                     Please check back soon to meet our amazing team of executives and founders.
                                 </p>
-                                <Badge variant="outline">
+                                <Badge variant="outline" className="border-white/[0.08] text-muted-foreground">
                                     Update in Progress
                                 </Badge>
                             </div>
