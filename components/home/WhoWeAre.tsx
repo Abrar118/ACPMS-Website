@@ -20,9 +20,11 @@ const features = [
     title: "A Community That Cares",
     description:
       "Join 50+ students from class 6-10 who share your passion. Study together, compete together, grow together.",
-    span: "md:col-span-2 md:row-span-1",
-    accent: "border-l-4 border-l-red-500/50",
-    iconColor: "text-red-400",
+    span: "md:col-span-2",
+    lightBg: "bg-amber-100/70",
+    lightBorder: "border-amber-200",
+    borderAccent: "border-l-4 border-l-red-400 dark:border-l-red-500/50",
+    iconColor: "text-red-600 dark:text-red-400",
     stat: "50+",
     statLabel: "Active Members",
   },
@@ -32,8 +34,10 @@ const features = [
     description:
       "Hands-on problem solving sessions every week. No boring lectures — just puzzles, teamwork, and breakthroughs.",
     span: "",
-    accent: "border-l-4 border-l-blue-500/50",
-    iconColor: "text-blue-400",
+    lightBg: "bg-sky-100/70",
+    lightBorder: "border-sky-200",
+    borderAccent: "border-l-4 border-l-blue-400 dark:border-l-blue-500/50",
+    iconColor: "text-blue-600 dark:text-blue-400",
   },
   {
     icon: Expand,
@@ -41,8 +45,10 @@ const features = [
     description:
       "Number theory, combinatorics, geometry proofs — explore topics your school syllabus doesn't cover.",
     span: "",
-    accent: "border-l-4 border-l-emerald-500/50",
-    iconColor: "text-emerald-400",
+    lightBg: "bg-emerald-100/70",
+    lightBorder: "border-emerald-200",
+    borderAccent: "border-l-4 border-l-emerald-400 dark:border-l-emerald-500/50",
+    iconColor: "text-emerald-600 dark:text-emerald-400",
   },
   {
     icon: Zap,
@@ -50,8 +56,10 @@ const features = [
     description:
       "From BDMO to APMO — structured training to help you qualify and medal at every level.",
     span: "",
-    accent: "border-l-4 border-l-amber-500/50",
-    iconColor: "text-amber-400",
+    lightBg: "bg-amber-50",
+    lightBorder: "border-amber-200",
+    borderAccent: "border-l-4 border-l-amber-400 dark:border-l-amber-500/50",
+    iconColor: "text-amber-600 dark:text-amber-400",
     stat: "3",
     statLabel: "Olympiad Levels",
   },
@@ -61,17 +69,21 @@ const features = [
     description:
       "Beginner, intermediate, or advanced — find your level and progress at a speed that suits you.",
     span: "",
-    accent: "border-l-4 border-l-violet-500/50",
-    iconColor: "text-violet-400",
+    lightBg: "bg-violet-50",
+    lightBorder: "border-violet-200",
+    borderAccent: "border-l-4 border-l-violet-400 dark:border-l-violet-500/50",
+    iconColor: "text-violet-600 dark:text-violet-400",
   },
   {
     icon: Users,
     title: "Mentored by Seniors",
     description:
       "Our mentors are students who've been in your shoes. They know what works, and they'll help you get there.",
-    span: "md:col-span-2 md:row-span-1",
-    accent: "border-l-4 border-l-cyan-500/50",
-    iconColor: "text-cyan-400",
+    span: "md:col-span-2",
+    lightBg: "bg-sky-50",
+    lightBorder: "border-sky-200",
+    borderAccent: "border-l-4 border-l-cyan-400 dark:border-l-cyan-500/50",
+    iconColor: "text-cyan-600 dark:text-cyan-400",
     stat: "10+",
     statLabel: "Mentors",
   },
@@ -81,8 +93,10 @@ const features = [
     description:
       "Our members consistently rank at national competitions. Your hard work here pays off on the big stage.",
     span: "",
-    accent: "border-l-4 border-l-pink-500/50",
-    iconColor: "text-pink-400",
+    lightBg: "bg-rose-50",
+    lightBorder: "border-rose-200",
+    borderAccent: "border-l-4 border-l-pink-400 dark:border-l-pink-500/50",
+    iconColor: "text-pink-600 dark:text-pink-400",
   },
   {
     icon: Sparkles,
@@ -90,8 +104,10 @@ const features = [
     description:
       "Math fests, puzzle hunts, team challenges, and more. Because the best learning happens when you're having fun.",
     span: "",
-    accent: "border-l-4 border-l-orange-500/50",
-    iconColor: "text-orange-400",
+    lightBg: "bg-orange-50",
+    lightBorder: "border-orange-200",
+    borderAccent: "border-l-4 border-l-orange-400 dark:border-l-orange-500/50",
+    iconColor: "text-orange-600 dark:text-orange-400",
   },
 ];
 
@@ -104,6 +120,7 @@ export default function WhoWeAre() {
         size="lg"
         position="bottom-left"
         color="rgba(220, 38, 38, 0.06)"
+        className="hidden dark:block"
       />
 
       <div className="relative max-w-7xl mx-auto">
@@ -123,13 +140,13 @@ export default function WhoWeAre() {
               className={feature.span}
             >
               <div
-                className={`group h-full rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl overflow-hidden transition-all duration-300 hover:bg-white/[0.06] hover:border-white/[0.15] ${feature.accent}`}
+                className={`group h-full rounded-2xl border overflow-hidden transition-all duration-300 hover:shadow-md
+                  ${feature.lightBg} ${feature.lightBorder} ${feature.borderAccent}
+                  dark:bg-white/[0.03] dark:border-white/[0.08] dark:backdrop-blur-xl dark:hover:bg-white/[0.06] dark:hover:border-white/[0.15] dark:hover:shadow-none`}
               >
                 <div className="p-6 flex flex-col h-full">
                   <div className="flex items-start justify-between mb-4">
-                    <feature.icon
-                      className={`w-7 h-7 ${feature.iconColor} shrink-0`}
-                    />
+                    <feature.icon className={`w-7 h-7 ${feature.iconColor} shrink-0`} />
                     {feature.stat && (
                       <div className="text-right">
                         <div className="text-2xl font-bold text-foreground leading-none">

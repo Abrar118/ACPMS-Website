@@ -12,11 +12,11 @@ const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
             <div
                 ref={ref}
                 className={cn(
-                    "rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl",
+                    "rounded-2xl border border-border bg-card backdrop-blur-xl dark:border-white/[0.08] dark:bg-white/[0.03]",
                     hover &&
-                        "hover:border-white/[0.15] hover:bg-white/[0.06] transition-all duration-300",
+                        "hover:border-border hover:shadow-md dark:hover:border-white/[0.15] dark:hover:bg-white/[0.06] dark:hover:shadow-none transition-all duration-300",
                     glow &&
-                        "shadow-[0_0_30px_-5px_rgba(220,38,38,0.15)]",
+                        "shadow-[0_0_30px_-5px_rgba(220,38,38,0.1)] dark:shadow-[0_0_30px_-5px_rgba(220,38,38,0.15)]",
                     className
                 )}
                 {...props}

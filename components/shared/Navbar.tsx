@@ -11,7 +11,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Menu, User, LogOut, Settings, Shield } from "lucide-react";
+import { Menu, User, LogOut, Settings, Shield, Sun, Moon } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -32,6 +33,7 @@ export default function Navbar({ user, profile }: NavbarProps) {
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
     const pathname = usePathname();
+    const { theme, setTheme } = useTheme();
 
     useEffect(() => {
         // Force avatar refresh when profile changes
@@ -84,7 +86,7 @@ export default function Navbar({ user, profile }: NavbarProps) {
         <nav
             className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
                 isScrolled
-                    ? "bg-black/60 backdrop-blur-xl border-b border-white/[0.08] shadow-lg shadow-black/20"
+                    ? "bg-background/80 backdrop-blur-xl border-b border-border shadow-sm"
                     : "bg-transparent border-b border-transparent"
             }`}
         >
@@ -131,6 +133,14 @@ export default function Navbar({ user, profile }: NavbarProps) {
 
                     {/* Actions */}
                     <div className="flex items-center space-x-3">
+                        <button
+                            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                            className="hidden md:flex w-9 h-9 rounded-lg border border-border bg-secondary items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                            aria-label="Toggle theme"
+                        >
+                            <Sun className="w-4 h-4 hidden dark:block" />
+                            <Moon className="w-4 h-4 block dark:hidden" />
+                        </button>
                         {!isLoading &&
                             (user ? (
                                 // Authenticated user dropdown

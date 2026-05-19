@@ -10,10 +10,12 @@ const objectives = [
     title: "Problem Solving",
     description:
       "Tackle challenging puzzles and real-world problems that sharpen your critical thinking.",
-    accent: "from-red-500/20 to-orange-500/20",
-    iconBg: "bg-red-500/15",
-    iconColor: "text-red-400",
-    border: "hover:border-red-500/30",
+    lightBg: "bg-amber-50",
+    lightBorder: "border-amber-200",
+    darkAccent: "from-red-500/20 to-orange-500/20",
+    iconBg: "bg-red-500/15 dark:bg-red-500/15",
+    iconColor: "text-red-600 dark:text-red-400",
+    hoverBorder: "hover:border-amber-300 dark:hover:border-red-500/30",
     emoji: "🧩",
   },
   {
@@ -21,10 +23,12 @@ const objectives = [
     title: "Olympiad Prep",
     description:
       "Train for national and international math competitions with expert guidance.",
-    accent: "from-amber-500/20 to-yellow-500/20",
-    iconBg: "bg-amber-500/15",
-    iconColor: "text-amber-400",
-    border: "hover:border-amber-500/30",
+    lightBg: "bg-sky-50",
+    lightBorder: "border-sky-200",
+    darkAccent: "from-amber-500/20 to-yellow-500/20",
+    iconBg: "bg-amber-500/15 dark:bg-amber-500/15",
+    iconColor: "text-amber-600 dark:text-amber-400",
+    hoverBorder: "hover:border-sky-300 dark:hover:border-amber-500/30",
     emoji: "🏆",
   },
   {
@@ -32,10 +36,12 @@ const objectives = [
     title: "Creative Thinking",
     description:
       "Discover how mathematical creativity leads to elegant solutions and new ideas.",
-    accent: "from-emerald-500/20 to-teal-500/20",
-    iconBg: "bg-emerald-500/15",
-    iconColor: "text-emerald-400",
-    border: "hover:border-emerald-500/30",
+    lightBg: "bg-emerald-50",
+    lightBorder: "border-emerald-200",
+    darkAccent: "from-emerald-500/20 to-teal-500/20",
+    iconBg: "bg-emerald-500/15 dark:bg-emerald-500/15",
+    iconColor: "text-emerald-600 dark:text-emerald-400",
+    hoverBorder: "hover:border-emerald-300 dark:hover:border-emerald-500/30",
     emoji: "💡",
   },
   {
@@ -43,10 +49,12 @@ const objectives = [
     title: "Love for Math",
     description:
       "Join a community that celebrates mathematics and makes learning genuinely fun.",
-    accent: "from-violet-500/20 to-purple-500/20",
-    iconBg: "bg-violet-500/15",
-    iconColor: "text-violet-400",
-    border: "hover:border-violet-500/30",
+    lightBg: "bg-violet-50",
+    lightBorder: "border-violet-200",
+    darkAccent: "from-violet-500/20 to-purple-500/20",
+    iconBg: "bg-violet-500/15 dark:bg-violet-500/15",
+    iconColor: "text-violet-600 dark:text-violet-400",
+    hoverBorder: "hover:border-violet-300 dark:hover:border-violet-500/30",
     emoji: "❤️",
   },
 ];
@@ -72,19 +80,15 @@ export default function WhatWeDo() {
               transition={{ duration: 0.5, delay: index * 0.1, ease }}
             >
               <div
-                className={`group relative rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl overflow-hidden transition-all duration-300 ${obj.border} hover:bg-white/[0.06] hover:-translate-y-1`}
+                className={`group relative rounded-2xl border overflow-hidden transition-all duration-300 hover:-translate-y-1
+                  ${obj.lightBg} ${obj.lightBorder} ${obj.hoverBorder}
+                  dark:bg-white/[0.03] dark:border-white/[0.08] dark:backdrop-blur-xl dark:hover:bg-white/[0.06]`}
               >
-                {/* Gradient accent strip at top */}
-                <div
-                  className={`h-1 w-full bg-gradient-to-r ${obj.accent}`}
-                />
+                <div className={`h-1 w-full bg-gradient-to-r ${obj.darkAccent} hidden dark:block`} />
 
                 <div className="p-6">
-                  {/* Icon + emoji row */}
                   <div className="flex items-center justify-between mb-5">
-                    <div
-                      className={`w-12 h-12 rounded-xl ${obj.iconBg} flex items-center justify-center`}
-                    >
+                    <div className={`w-12 h-12 rounded-xl ${obj.iconBg} flex items-center justify-center`}>
                       <obj.icon className={`w-6 h-6 ${obj.iconColor}`} />
                     </div>
                     <span className="text-2xl opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300">

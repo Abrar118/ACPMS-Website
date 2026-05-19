@@ -29,15 +29,15 @@ export default async function RootLayout({
 
     return (
         <ReactQueryClientProvider>
-            <html lang="en" className="dark">
+            <html lang="en" suppressHydrationWarning>
                 <body
                     className={`${inter.variable} font-sans antialiased`}
                 >
                     <LoadingScreen />
                     <ThemeProvider
                         attribute="class"
-                        defaultTheme="dark"
-                        forcedTheme="dark"
+                        defaultTheme="system"
+                        enableSystem
                         disableTransitionOnChange
                     >
                         <ConditionalNavbar user={user} profile={profile ? JSON.parse(JSON.stringify(profile)) : null} />
