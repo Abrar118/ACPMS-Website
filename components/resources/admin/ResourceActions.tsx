@@ -18,12 +18,12 @@ import {
   toggleResourceFeatured,
 } from "@/actions/resources";
 import { EResourceStatus } from "@/components/shared/enums";
-import type { ResourceRow } from "@/queries/resources";
+import type { Resource } from "@/lib/db/resources";
 import ViewerModal from "@/components/shared/ViewerModal";
 import { DeleteResourceDialog } from "./DeleteResourceDialog";
 
 interface ResourceActionsProps {
-  resource: ResourceRow;
+  resource: Resource;
 }
 
 export function ResourceActions({ resource }: ResourceActionsProps) {

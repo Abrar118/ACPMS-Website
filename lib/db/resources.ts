@@ -1,6 +1,8 @@
 import prisma from "@/lib/prisma";
 import type { Resource } from "@/lib/generated/prisma";
 
+export type { Resource };
+
 export type CreateResourceData = {
   title: string;
   description?: string;

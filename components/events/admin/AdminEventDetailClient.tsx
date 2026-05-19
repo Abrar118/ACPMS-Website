@@ -13,8 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Plus, Calendar, MapPin, Clock, User, Tag, FileText } from "lucide-react";
-import { type EventRow } from "@/queries/events";
-import { type CompetitionRow } from "@/queries/competitions";
+import type { Event } from "@/lib/db/events";
+import type { Competition } from "@/lib/db/competitions";
 import AddCompetitionDialog from "./AddCompetitionDialog";
 import CompetitionsList from "./CompetitionsList";
 import { format } from "date-fns";
@@ -22,8 +22,8 @@ import { MinimalTiptapEditor } from "@/components/ui/minimal-tiptap";
 import { JSONContent } from "@tiptap/react";
 
 interface AdminEventDetailClientProps {
-  event: EventRow;
-  competitions: CompetitionRow[];
+  event: Event;
+  competitions: Competition[];
   error?: string;
 }
 

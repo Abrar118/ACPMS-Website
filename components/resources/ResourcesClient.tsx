@@ -28,12 +28,12 @@ import {
   Eye,
 } from "lucide-react";
 import { EResourceCategory, EResourceType } from "@/components/shared/enums";
-import type { ResourceRow } from "@/queries/resources";
+import type { Resource } from "@/lib/db/resources";
 import { incrementViewCount } from "@/actions/resources";
 
 interface ResourcesClientProps {
-  featuredResources: ResourceRow[];
-  allResources: ResourceRow[];
+  featuredResources: Resource[];
+  allResources: Resource[];
 }
 
 export default function ResourcesClient({
@@ -53,7 +53,7 @@ export default function ResourcesClient({
       );
       return acc;
     },
-    {} as Record<string, ResourceRow[]>
+    {} as Record<string, Resource[]>
   );
 
   const getIcon = (category: string) => {

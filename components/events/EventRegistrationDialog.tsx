@@ -36,13 +36,13 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { eventRegistrationSchema } from "@/lib/validations";
 import { registerForEventAction } from "@/actions/registration";
-import type { Event } from "@/queries/events";
-import type { CompetitionRow } from "@/queries/competitions";
+import type { Event } from "@/lib/db/events";
+import type { Competition } from "@/lib/db/competitions";
 import { Loader2, DollarSign } from "lucide-react";
 
 interface EventRegistrationDialogProps {
   event: Event;
-  competitions: CompetitionRow[];
+  competitions: Competition[];
   children: React.ReactNode;
 }
 

@@ -21,11 +21,11 @@ import {
     Filter
 } from "lucide-react";
 import { EResourceCategory, EResourceType, EResourceLevel } from "@/components/shared/enums";
-import type { ResourceRow } from "@/queries/resources";
+import type { Resource } from "@/lib/db/resources";
 import { incrementViewCount } from "@/actions/resources";
 
 interface CategoryResourcesClientProps {
-    resources: ResourceRow[];
+    resources: Resource[];
     category: string;
     categoryName: string;
 }

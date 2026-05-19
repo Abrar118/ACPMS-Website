@@ -43,8 +43,8 @@ import {
   Clock,
   AlertCircle
 } from "lucide-react";
-import { type EventRow } from "@/queries/events";
-import { type CompetitionRow } from "@/queries/competitions";
+import type { Event } from "@/lib/db/events";
+import type { Competition } from "@/lib/db/competitions";
 import { 
   updateParticipantStatusAction, 
   updateAllParticipantStatusesAction 
@@ -72,13 +72,13 @@ interface ParticipantData {
     status: string;
     created_at: string;
     updated_at: string;
-    competition: CompetitionRow;
+    competition: Competition;
   }>;
 }
 
 interface EventParticipantsClientProps {
-  event: EventRow;
-  competitions: CompetitionRow[];
+  event: Event;
+  competitions: Competition[];
   participants: ParticipantData[];
   error?: string;
 }

@@ -42,7 +42,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { logout } from "@/actions/auth";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
-import type { UserProfile } from "@/queries/auth";
+import type { UserProfile } from "@/lib/db/users";
 
 interface AdminSidebarProps {
   user: SupabaseUser;

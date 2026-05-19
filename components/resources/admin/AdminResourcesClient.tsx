@@ -23,7 +23,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import AddResourceDialog from "@/components/resources/admin/addResourceForm/AddResourceDialog";
 import { EResourceCategory, EResourceType } from "@/components/shared/enums";
-import { type ResourceRow as TResourceRow } from "@/queries/resources";
+import type { Resource as TResourceRow } from "@/lib/db/resources";
 import { ResourceActions } from "@/components/resources/admin/ResourceActions";
 
 interface AdminResourcesClientProps {

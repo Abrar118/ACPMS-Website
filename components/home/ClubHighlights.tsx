@@ -11,9 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
-import { useQuery } from "@tanstack/react-query";
-import useSupabaseBrowser from "@/utils/supabase/supabase-browser";
-import { getHighlights } from "@/queries/events";
 import { Calendar, BookOpen, FileText, Clock, MapPin } from "lucide-react";
 import dynamic from "next/dynamic";
 import { EResourceType } from "../shared/enums";
@@ -22,21 +19,21 @@ import Link from "next/link";
 import { MinimalTiptapEditor } from "@/components/ui/minimal-tiptap";
 import { JSONContent } from "@tiptap/react";
 
-export default function ClubHighlights() {
-  const supabase = useSupabaseBrowser();
+interface HighlightsData {
+  event: any;
+  resource: any;
+  magazine: any;
+}
+
+interface ClubHighlightsProps {
+  highlights: HighlightsData | null;
+}
+
+export default function ClubHighlights({ highlights }: ClubHighlightsProps) {
   const PdfThumbnail = dynamic(
     () => import("@/components/client-only/PdfThumbnail"),
     { ssr: false }
   );
-
-  const {
-    data: highlights,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["highlights"],
-    queryFn: () => getHighlights(supabase),
-  });
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -50,35 +47,7 @@ export default function ClubHighlights() {
     return format(parseISO(dateString), "p");
   };
 
-  if (isLoading) {
-    return (
-      <section className="py-20 px-4">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-center text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 py-4">
-            From the Club
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="bg-gray-800/80 border-gray-700/80">
-                <Skeleton className="h-48 w-full" />
-                <CardHeader>
-                  <Skeleton className="h-6 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-4 w-full mb-2" />
-                  <Skeleton className="h-4 w-2/3 mb-4" />
-                  <Skeleton className="h-9 w-full" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (error || !highlights) {
+  if (!highlights) {
     return (
       <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">

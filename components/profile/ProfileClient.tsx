@@ -1,16 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import createSupabaseBrowser from "@/utils/supabase/supabase-browser";
-// import {
-//     getUserRegisteredEventsQuery,
-//     getUserPastEventsQuery,
-// } from "@/queries/profile";
 import type { User } from "@supabase/supabase-js";
-import type { UserProfile } from "@/queries/auth";
+import type { UserProfile } from "@/lib/db/users";
 import RegisteredEvents from "./RegisteredEvents";
 import PastEvents from "./PastEvents";
 import PersonalInformation from "./PersonalInformation";
@@ -21,7 +15,6 @@ interface ProfileClientProps {
 }
 
 export default function ProfileClient({ user, profile }: ProfileClientProps) {
-    const supabase = createSupabaseBrowser();
     const [activeTab, setActiveTab] = useState("registered");
 
     // Fetch user's registered events

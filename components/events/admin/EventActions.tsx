@@ -13,12 +13,12 @@ import {
 import { MoreHorizontal, ExternalLink, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { deleteEventAction, toggleEventStatusAction } from "@/actions/events";
-import type { EventRow } from "@/queries/events";
+import type { Event } from "@/lib/db/events";
 import { UpdateEventDescriptionForm } from "./eventDescriptionForm/UpdateEventDescriptionForm";
 // import { DeleteEventDialog } from "./DeleteEventDialog";
 
 interface EventActionsProps {
-  event: EventRow;
+  event: Event;
 }
 
 export function EventActions({ event }: EventActionsProps) {

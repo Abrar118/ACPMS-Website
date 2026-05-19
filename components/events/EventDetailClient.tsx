@@ -20,15 +20,15 @@ import {
 import { MinimalTiptapEditor } from "@/components/ui/minimal-tiptap";
 import EventRegistrationDialog from "./EventRegistrationDialog";
 import { JSONContent } from "@tiptap/react";
-import type { EventRow } from "@/queries/events";
-import type { CompetitionRow } from "@/queries/competitions";
+import type { Event } from "@/lib/db/events";
+import type { Competition } from "@/lib/db/competitions";
 import { EEventMode, EEventType } from "@/components/shared/enums";
 import { useRouter } from "next/navigation";
 import Footer from "@/components/home/Footer";
 
 interface EventDetailClientProps {
-  event: EventRow;
-  competitions: CompetitionRow[];
+  event: Event;
+  competitions: Competition[];
 }
 
 export default function EventDetailClient({

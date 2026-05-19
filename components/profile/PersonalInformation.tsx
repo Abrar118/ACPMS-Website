@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import {
     Card,
     CardContent,
@@ -12,11 +12,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import createSupabaseBrowser from "@/utils/supabase/supabase-browser";
-import { updateUserProfile } from "@/queries/profile";
+import { updateProfile } from "@/actions/profile";
 import type { User } from "@supabase/supabase-js";
-import type { UserProfile } from "@/queries/auth";
+import type { UserProfile } from "@/lib/db/users";
 
 interface PersonalInformationProps {
     user: User;
@@ -27,8 +25,7 @@ export default function PersonalInformation({
     user,
     profile,
 }: PersonalInformationProps) {
-    const supabase = createSupabaseBrowser();
-    const queryClient = useQueryClient();
+    const [isPending, startTransition] = useTransition();
 
     const [formData, setFormData] = useState({
         name: profile.name || "",
@@ -36,29 +33,6 @@ export default function PersonalInformation({
     });
 
     const [isEditing, setIsEditing] = useState(false);
-
-    const updateProfileMutation = useMutation({
-        mutationFn: async (data: typeof formData) => {
-            const result = await updateUserProfile(supabase, user.id, {
-                name: data.name,
-                ssc_batch: data.ssc_batch,
-            });
-
-            if (!result.success) {
-                throw new Error(result.error || "Failed to update profile");
-            }
-
-            return result.data;
-        },
-        onSuccess: () => {
-            toast.success("Profile updated successfully!");
-            setIsEditing(false);
-            queryClient.invalidateQueries({ queryKey: ["current-user"] });
-        },
-        onError: (error: Error) => {
-            toast.error(error.message || "Failed to update profile");
-        },
-    });
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -70,7 +44,23 @@ export default function PersonalInformation({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        updateProfileMutation.mutate(formData);
+        startTransition(async () => {
+            try {
+                const result = await updateProfile(user.id, {
+                    name: formData.name,
+                    ssc_batch: formData.ssc_batch,
+                });
+
+                if (result.success) {
+                    toast.success("Profile updated successfully!");
+                    setIsEditing(false);
+                } else {
+                    toast.error(result.error || "Failed to update profile");
+                }
+            } catch (error: any) {
+                toast.error(error.message || "Failed to update profile");
+            }
+        });
     };
 
     const handleCancel = () => {
@@ -182,7 +172,7 @@ export default function PersonalInformation({
                                         variant="outline"
                                         onClick={handleCancel}
                                         disabled={
-                                            updateProfileMutation.isPending
+                                            isPending
                                         }
                                     >
                                         Cancel
@@ -190,11 +180,11 @@ export default function PersonalInformation({
                                     <Button
                                         type="submit"
                                         disabled={
-                                            updateProfileMutation.isPending
+                                            isPending
                                         }
                                         className="bg-blue-600 hover:bg-blue-700"
                                     >
-                                        {updateProfileMutation.isPending
+                                        {isPending
                                             ? "Updating..."
                                             : "Update Information"}
                                     </Button>
