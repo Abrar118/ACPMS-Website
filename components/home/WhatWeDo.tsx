@@ -1,6 +1,5 @@
 "use client";
 
-import { GlassCard } from "@/components/ui/glass-card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { Calculator, Trophy, Lightbulb, HeartHandshake } from "lucide-react";
 import { motion } from "framer-motion";
@@ -10,61 +9,97 @@ const objectives = [
     icon: Calculator,
     title: "Problem Solving",
     description:
-      "Develop your math skills through challenging problems and real-world applications. Build critical thinking and problem-solving abilities.",
+      "Tackle challenging puzzles and real-world problems that sharpen your critical thinking.",
+    accent: "from-red-500/20 to-orange-500/20",
+    iconBg: "bg-red-500/15",
+    iconColor: "text-red-400",
+    border: "hover:border-red-500/30",
+    emoji: "🧩",
   },
   {
     icon: Trophy,
-    title: "Olympiad Preparation",
+    title: "Olympiad Prep",
     description:
-      "Preparing for math Olympiads helps you think outside the box and tackle advanced problems with confidence.",
+      "Train for national and international math competitions with expert guidance.",
+    accent: "from-amber-500/20 to-yellow-500/20",
+    iconBg: "bg-amber-500/15",
+    iconColor: "text-amber-400",
+    border: "hover:border-amber-500/30",
+    emoji: "🏆",
   },
   {
     icon: Lightbulb,
-    title: "Creativity",
+    title: "Creative Thinking",
     description:
-      "Learn how creativity fuels problem-solving. Apply mathematical thinking in innovative ways.",
+      "Discover how mathematical creativity leads to elegant solutions and new ideas.",
+    accent: "from-emerald-500/20 to-teal-500/20",
+    iconBg: "bg-emerald-500/15",
+    iconColor: "text-emerald-400",
+    border: "hover:border-emerald-500/30",
+    emoji: "💡",
   },
   {
     icon: HeartHandshake,
     title: "Love for Math",
     description:
-      "Embrace your passion for mathematics and explore its beauty in a supportive environment.",
+      "Join a community that celebrates mathematics and makes learning genuinely fun.",
+    accent: "from-violet-500/20 to-purple-500/20",
+    iconBg: "bg-violet-500/15",
+    iconColor: "text-violet-400",
+    border: "hover:border-violet-500/30",
+    emoji: "❤️",
   },
 ];
+
+const ease = [0.16, 1, 0.3, 1] as const;
 
 export default function WhatWeDo() {
   return (
     <section className="py-24 px-4">
       <div className="max-w-7xl mx-auto">
         <SectionHeader
-          title="Our Objectives"
-          subtitle="Empowering students through mathematical excellence"
+          title="What We Do"
+          subtitle="Four pillars that drive everything at ACPSCM"
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-16">
-          {objectives.map((objective, index) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-16">
+          {objectives.map((obj, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{
-                duration: 0.5,
-                delay: index * 0.1,
-                ease: [0.16, 1, 0.3, 1],
-              }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: index * 0.1, ease }}
             >
-              <GlassCard className="p-6">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                  <objective.icon className="w-6 h-6 text-primary" />
+              <div
+                className={`group relative rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl overflow-hidden transition-all duration-300 ${obj.border} hover:bg-white/[0.06] hover:-translate-y-1`}
+              >
+                {/* Gradient accent strip at top */}
+                <div
+                  className={`h-1 w-full bg-gradient-to-r ${obj.accent}`}
+                />
+
+                <div className="p-6">
+                  {/* Icon + emoji row */}
+                  <div className="flex items-center justify-between mb-5">
+                    <div
+                      className={`w-12 h-12 rounded-xl ${obj.iconBg} flex items-center justify-center`}
+                    >
+                      <obj.icon className={`w-6 h-6 ${obj.iconColor}`} />
+                    </div>
+                    <span className="text-2xl opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300">
+                      {obj.emoji}
+                    </span>
+                  </div>
+
+                  <h3 className="text-lg font-bold text-foreground mb-2">
+                    {obj.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {obj.description}
+                  </p>
                 </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">
-                  {objective.title}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {objective.description}
-                </p>
-              </GlassCard>
+              </div>
             </motion.div>
           ))}
         </div>

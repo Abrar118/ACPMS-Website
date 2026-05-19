@@ -70,7 +70,32 @@ export default function EventCountdown({ nextEvent }: EventCountdownProps) {
         return () => clearInterval(interval);
     }, [nextEvent]);
 
-    if (!nextEvent) return null;
+    if (!nextEvent) {
+        return (
+            <section className="py-16 px-4">
+                <GlassCard
+                    hover={false}
+                    className="max-w-2xl mx-auto p-8 text-center"
+                >
+                    <p className="text-sm text-primary font-medium uppercase tracking-wider">
+                        Events
+                    </p>
+                    <h3 className="text-2xl md:text-3xl font-bold text-foreground mt-2">
+                        No Upcoming Events
+                    </h3>
+                    <p className="text-muted-foreground mt-3 text-sm">
+                        Stay tuned — new events are coming soon!
+                    </p>
+                    <Link
+                        href="/events"
+                        className="mt-6 text-primary text-sm font-medium hover:underline inline-block"
+                    >
+                        Browse Past Events &rarr;
+                    </Link>
+                </GlassCard>
+            </section>
+        );
+    }
 
     const isUpcoming = !isPast && timeLeft !== null;
 

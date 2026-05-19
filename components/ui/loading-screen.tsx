@@ -30,23 +30,13 @@ export function LoadingScreen() {
   const [skip, setSkip] = useState(false);
 
   useEffect(() => {
-    const alreadyShown = sessionStorage.getItem("acpscm-loading-shown");
-    if (alreadyShown) {
-      setShow(false);
-      setShouldRender(false);
-      return;
-    }
-
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reducedMotion) {
       setSkip(true);
-      sessionStorage.setItem("acpscm-loading-shown", "1");
       setShow(false);
       setShouldRender(false);
       return;
     }
-
-    sessionStorage.setItem("acpscm-loading-shown", "1");
 
     const timer = setTimeout(() => {
       setShow(false);

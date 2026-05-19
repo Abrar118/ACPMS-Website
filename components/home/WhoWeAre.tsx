@@ -1,108 +1,155 @@
 "use client";
 
-import { GlassCard } from "@/components/ui/glass-card";
 import { SectionHeader } from "@/components/ui/section-header";
+import { AmbientGlow } from "@/components/ui/ambient-glow";
 import {
   Heart,
   Users,
   Expand,
   Zap,
-  Wind,
-  Bot,
-  ZoomIn,
+  GraduationCap,
+  Target,
+  Sparkles,
   BrainCircuit,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
 const features = [
   {
     icon: Heart,
-    title: "Community Passion",
+    title: "A Community That Cares",
     description:
-      "Join a vibrant community of students who share a deep passion for the beauty and challenge of mathematics.",
-    className: "lg:col-span-2",
+      "Join 50+ students from class 6-10 who share your passion. Study together, compete together, grow together.",
+    span: "md:col-span-2 md:row-span-1",
+    accent: "border-l-4 border-l-red-500/50",
+    iconColor: "text-red-400",
+    stat: "50+",
+    statLabel: "Active Members",
   },
   {
     icon: BrainCircuit,
-    title: "Problem Solving Workshops",
+    title: "Weekly Workshops",
     description:
-      "Engage in stimulating workshops that sharpen your analytical skills and collaborative problem-solving abilities.",
-    className: "",
+      "Hands-on problem solving sessions every week. No boring lectures — just puzzles, teamwork, and breakthroughs.",
+    span: "",
+    accent: "border-l-4 border-l-blue-500/50",
+    iconColor: "text-blue-400",
   },
   {
     icon: Expand,
-    title: "Skill Expansion",
+    title: "Beyond the Textbook",
     description:
-      "Broaden your mathematical horizons by exploring advanced topics and concepts beyond the standard curriculum.",
-    className: "",
+      "Number theory, combinatorics, geometry proofs — explore topics your school syllabus doesn't cover.",
+    span: "",
+    accent: "border-l-4 border-l-emerald-500/50",
+    iconColor: "text-emerald-400",
   },
   {
     icon: Zap,
-    title: "Competition Training",
+    title: "Competition Ready",
     description:
-      "Prepare for local and national math competitions with dedicated training sessions and experienced mentors.",
-    className: "",
+      "From BDMO to APMO — structured training to help you qualify and medal at every level.",
+    span: "",
+    accent: "border-l-4 border-l-amber-500/50",
+    iconColor: "text-amber-400",
+    stat: "3",
+    statLabel: "Olympiad Levels",
   },
   {
-    icon: Wind,
-    title: "Flexible Learning",
+    icon: GraduationCap,
+    title: "Learn at Your Pace",
     description:
-      "Adapt your learning path by exploring diverse mathematical fields, from pure theory to applied sciences.",
-    className: "",
+      "Beginner, intermediate, or advanced — find your level and progress at a speed that suits you.",
+    span: "",
+    accent: "border-l-4 border-l-violet-500/50",
+    iconColor: "text-violet-400",
   },
   {
     icon: Users,
-    title: "Peer Support",
+    title: "Mentored by Seniors",
     description:
-      "Benefit from a strong peer support network, offering help with challenging coursework and collaborative study.",
-    className: "lg:col-span-2",
+      "Our mentors are students who've been in your shoes. They know what works, and they'll help you get there.",
+    span: "md:col-span-2 md:row-span-1",
+    accent: "border-l-4 border-l-cyan-500/50",
+    iconColor: "text-cyan-400",
+    stat: "10+",
+    statLabel: "Mentors",
   },
   {
-    icon: Bot,
-    title: "Practical Applications",
+    icon: Target,
+    title: "Real Results",
     description:
-      "Discover the real-world applications of mathematical concepts through projects and interdisciplinary collaborations.",
-    className: "lg:col-span-2",
+      "Our members consistently rank at national competitions. Your hard work here pays off on the big stage.",
+    span: "",
+    accent: "border-l-4 border-l-pink-500/50",
+    iconColor: "text-pink-400",
   },
   {
-    icon: ZoomIn,
-    title: "Attention to Detail",
+    icon: Sparkles,
+    title: "It's Actually Fun",
     description:
-      "Cultivate precision and logical rigor by focusing on the intricate details of mathematical proofs and arguments.",
-    className: "lg:col-span-2",
+      "Math fests, puzzle hunts, team challenges, and more. Because the best learning happens when you're having fun.",
+    span: "",
+    accent: "border-l-4 border-l-orange-500/50",
+    iconColor: "text-orange-400",
   },
 ];
 
+const ease = [0.16, 1, 0.3, 1] as const;
+
 export default function WhoWeAre() {
   return (
-    <section className="py-24 px-4">
-      <div className="max-w-7xl mx-auto">
-        <SectionHeader title="Where Others Stop, We Keep Going" />
+    <section className="relative py-24 px-4 overflow-hidden">
+      <AmbientGlow
+        size="lg"
+        position="bottom-left"
+        color="rgba(220, 38, 38, 0.06)"
+      />
+
+      <div className="relative max-w-7xl mx-auto">
+        <SectionHeader
+          title="Why Join ACPSCM?"
+          subtitle="Here's what makes our math club different from the rest"
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-16">
           {features.map((feature, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 25 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{
-                duration: 0.5,
-                delay: index * 0.1,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-              className={cn(feature.className)}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.5, delay: index * 0.06, ease }}
+              className={feature.span}
             >
-              <GlassCard className="p-6 h-full">
-                <feature.icon className="w-6 h-6 text-primary mb-3" />
-                <h3 className="text-lg font-semibold text-foreground mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {feature.description}
-                </p>
-              </GlassCard>
+              <div
+                className={`group h-full rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl overflow-hidden transition-all duration-300 hover:bg-white/[0.06] hover:border-white/[0.15] ${feature.accent}`}
+              >
+                <div className="p-6 flex flex-col h-full">
+                  <div className="flex items-start justify-between mb-4">
+                    <feature.icon
+                      className={`w-7 h-7 ${feature.iconColor} shrink-0`}
+                    />
+                    {feature.stat && (
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-foreground leading-none">
+                          {feature.stat}
+                        </div>
+                        <div className="text-[11px] text-muted-foreground mt-0.5">
+                          {feature.statLabel}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <h3 className="text-base font-bold text-foreground mb-2">
+                    {feature.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {feature.description}
+                  </p>
+                </div>
+              </div>
             </motion.div>
           ))}
         </div>

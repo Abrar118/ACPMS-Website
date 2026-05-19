@@ -8,12 +8,18 @@ import { motion } from "framer-motion";
 const ease = [0.16, 1, 0.3, 1] as const;
 
 const floatingSymbols = [
-  { char: "π", className: "top-[15%] left-[10%] text-6xl", delay: "0s" },
-  { char: "∑", className: "bottom-[20%] right-[12%] text-7xl", delay: "4s" },
-  { char: "∫", className: "top-[45%] left-[5%] text-5xl", delay: "8s" },
-  { char: "∞", className: "top-[25%] right-[8%] text-8xl", delay: "2s" },
-  { char: "√", className: "bottom-[35%] left-[20%] text-4xl", delay: "12s" },
-  { char: "Δ", className: "top-[65%] right-[25%] text-6xl", delay: "6s" },
+  { char: "π", className: "top-[10%] left-[8%] text-7xl", delay: "0s", color: "rgba(220, 38, 38, 0.12)" },
+  { char: "∑", className: "bottom-[15%] right-[10%] text-8xl", delay: "4s", color: "rgba(255, 255, 255, 0.06)" },
+  { char: "∫", className: "top-[40%] left-[3%] text-6xl", delay: "8s", color: "rgba(220, 38, 38, 0.10)" },
+  { char: "∞", className: "top-[18%] right-[6%] text-9xl", delay: "2s", color: "rgba(220, 38, 38, 0.14)" },
+  { char: "√", className: "bottom-[30%] left-[18%] text-5xl", delay: "12s", color: "rgba(255, 255, 255, 0.05)" },
+  { char: "Δ", className: "top-[60%] right-[22%] text-7xl", delay: "6s", color: "rgba(220, 38, 38, 0.10)" },
+  { char: "∂", className: "top-[75%] left-[12%] text-6xl", delay: "10s", color: "rgba(255, 255, 255, 0.05)" },
+  { char: "Ω", className: "top-[8%] right-[30%] text-5xl", delay: "14s", color: "rgba(220, 38, 38, 0.08)" },
+  { char: "θ", className: "bottom-[10%] left-[40%] text-6xl", delay: "3s", color: "rgba(220, 38, 38, 0.10)" },
+  { char: "λ", className: "top-[50%] right-[5%] text-8xl", delay: "7s", color: "rgba(255, 255, 255, 0.06)" },
+  { char: "φ", className: "bottom-[45%] right-[35%] text-5xl", delay: "16s", color: "rgba(220, 38, 38, 0.08)" },
+  { char: "±", className: "top-[30%] left-[25%] text-4xl", delay: "11s", color: "rgba(255, 255, 255, 0.05)" },
 ];
 
 export default function HeroSection() {
@@ -39,8 +45,9 @@ export default function HeroSection() {
         {floatingSymbols.map((symbol) => (
           <div
             key={symbol.char}
-            className={`absolute text-white/[0.03] font-bold ${symbol.className}`}
+            className={`absolute font-bold ${symbol.className}`}
             style={{
+              color: symbol.color,
               animation: `float 20s ease-in-out infinite`,
               animationDelay: symbol.delay,
             }}

@@ -1,23 +1,13 @@
 "use client";
 
-import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { Button } from "@/components/ui/button";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { AnimatedThemeToggler } from "./ui/animated-theme-toggler";
 
 export function ThemeToggle() {
     const { setTheme } = useTheme();
 
     return (
-        <Button variant={"outline"} size="icon">
-            <AnimatedThemeToggler />
-        </Button>
+        <AnimatedThemeToggler className="inline-flex items-center justify-center rounded-md border border-input bg-background h-9 w-9 hover:bg-accent hover:text-accent-foreground" />
         // <DropdownMenu>
         //     <DropdownMenuTrigger asChild>
         //         <Button variant="outline" size="icon">
