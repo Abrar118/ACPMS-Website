@@ -103,7 +103,7 @@ export default function Navbar({ user, profile }: NavbarProps) {
                                 alt="ACPSCM Logo"
                             />
                         </div>
-                        <span className="text-xl font-bold text-white">
+                        <span className="text-xl font-bold text-foreground">
                             ACPSCM
                         </span>
                     </Link>
