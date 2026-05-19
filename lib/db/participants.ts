@@ -126,6 +126,7 @@ export async function getEventParticipantsDetailed(
       id: registration.id,
       competition_id: registration.competition_id,
       participant_id: registration.participant_id,
+      team_id: registration.team_id,
       status: registration.status,
       created_at: registration.created_at,
       updated_at: registration.updated_at,

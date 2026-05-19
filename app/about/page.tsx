@@ -235,6 +235,7 @@ export default async function AboutPage() {
             facebook_id_link: null,
             instagram_id_link: null,
             phone: null,
+            user_id: null,
         },
         {
             id: "founder-2",
@@ -251,6 +252,7 @@ export default async function AboutPage() {
             facebook_id_link: null,
             instagram_id_link: null,
             phone: null,
+            user_id: null,
         },
         {
             id: "founder-3",
@@ -267,6 +269,7 @@ export default async function AboutPage() {
             facebook_id_link: null,
             instagram_id_link: null,
             phone: null,
+            user_id: null,
         },
         {
             id: "founder-4",
@@ -283,6 +286,7 @@ export default async function AboutPage() {
             facebook_id_link: null,
             instagram_id_link: null,
             phone: null,
+            user_id: null,
         },
         {
             id: "founder-5",
@@ -299,6 +303,7 @@ export default async function AboutPage() {
             facebook_id_link: null,
             instagram_id_link: null,
             phone: null,
+            user_id: null,
         }
     ];
 
