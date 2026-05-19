@@ -8,7 +8,6 @@ import {
   incrementResourceViewCount,
 } from "@/lib/db/resources";
 import { addResourceSchema } from "@/components/resources/admin/addResourceForm/AddResourceHelper";
-import { EResourceStatus } from "@/components/shared/enums";
 import { getCurrentUser, isAdminOrExecutive } from "@/lib/auth-server";
 import { z } from "zod";
 
@@ -152,19 +151,17 @@ export async function deleteResourceAction(
   }
 }
 
-export async function toggleResourceStatus(
+export async function toggleResourcePublished(
   resourceId: string,
-  newStatus: EResourceStatus
+  isPublished: boolean
 ): Promise<ResourceActionResult> {
   try {
-    // Get current user and verify authentication
     const { user, profile } = await getCurrentUser();
 
     if (!user || !profile) {
       return { success: false, error: "Authentication required" };
     }
 
-    // Check if user has permission to change resource status (admin or executive)
     if (!(await isAdminOrExecutive())) {
       return {
         success: false,
@@ -172,18 +169,16 @@ export async function toggleResourceStatus(
       };
     }
 
-    // Update the resource status
     const resource = await updateResource(resourceId, {
-      status: newStatus,
+      isPublished,
     });
 
-    // Revalidate relevant pages
     revalidatePath("/admin/resources", "page");
     revalidatePath("/resources", "page");
 
     return {
       success: true,
-      message: `Resource ${newStatus.toLowerCase()} successfully`,
+      message: `Resource ${isPublished ? "published" : "unpublished"} successfully`,
       data: resource,
     };
   } catch (error: any) {

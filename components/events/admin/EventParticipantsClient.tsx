@@ -445,19 +445,7 @@ export default function EventParticipantsClient({
 
                       {/* Payment */}
                       <TableCell>
-                        {participant.transaction_id ? (
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-1 text-sm">
-                              <CreditCard className="h-3 w-3" />
-                              {participant.payment_provider || "Unknown"}
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                              {participant.transaction_id}
-                            </p>
-                          </div>
-                        ) : (
-                          <span className="text-sm text-muted-foreground">No payment info</span>
-                        )}
+                        <span className="text-sm text-muted-foreground">See Payments tab</span>
                       </TableCell>
 
                       {/* Actions */}

@@ -13,7 +13,7 @@ export interface EventRegistrationData {
   email: string;
   phone: string;
   note?: string;
-  competitions: string[]; // Array of competition IDs
+  competitions: string[];
   transaction_id?: string;
   payment_provider?: string;
 }
@@ -39,8 +39,6 @@ export async function registerForEvent(
         email: data.email,
         phone: data.phone,
         note: data.note || "",
-        transaction_id: data.transaction_id,
-        payment_provider: data.payment_provider,
       },
     });
 

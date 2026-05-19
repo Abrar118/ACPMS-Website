@@ -121,8 +121,6 @@ model Participant {
   email             String?
   phone             String?
   note              String   @default("")
-  transaction_id    String?
-  payment_provider  String?
   created_at        DateTime @default(now())
   updated_at        DateTime @default(now())
 
@@ -180,7 +178,6 @@ model Resource {
   resource_type String
   resource_url  String?
   author        String?
-  status        String    @default("Draft")
   is_featured   Boolean   @default(false)
   is_archived   Boolean   @default(false)
   is_published  Boolean   @default(false)
@@ -205,8 +202,7 @@ model Magazine {
   pdf_url        String?
   cover_image    String?
   published_date DateTime?
-  is_published   Int?
-  published      Boolean   @default(false)
+  is_published   Boolean   @default(false)
   is_archived    Boolean?
   language       String?
   doi            String?

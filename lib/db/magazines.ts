@@ -32,8 +32,7 @@ export async function createMagazine(
       pdf_url: data.pdf_url ?? null,
       cover_image: data.cover_image ?? null,
       published_date: data.published_date ? new Date(data.published_date) : null,
-      is_published: 0,
-      published: false,
+      is_published: false,
       is_archived: false,
       language: data.language ?? "English",
       doi: data.doi ?? null,
@@ -50,7 +49,7 @@ export async function createMagazine(
 
 export async function getPublishedMagazines(): Promise<Magazine[]> {
   return prisma.magazine.findMany({
-    where: { published: true, is_archived: false },
+    where: { is_published: true, is_archived: false },
     orderBy: { published_date: "desc" },
   });
 }
@@ -100,8 +99,7 @@ export async function toggleMagazinePublished(
   return prisma.magazine.update({
     where: { id: magazineId },
     data: {
-      published: isPublished,
-      is_published: isPublished ? 1 : 0,
+      is_published: isPublished,
       updated_at: new Date(),
     },
   });

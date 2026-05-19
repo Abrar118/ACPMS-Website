@@ -1,7 +1,3 @@
-export enum EResourceStatus {
-  Published = "Published",
-  Pending = "Pending",
-}
 
 export enum EResourceType {
   Pdf = "pdf",

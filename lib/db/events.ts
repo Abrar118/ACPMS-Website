@@ -249,7 +249,7 @@ export async function getClubStats() {
     prisma.member.count(),
     prisma.event.count({ where: { is_published: true } }),
     prisma.competition.count({ where: { is_published: true } }),
-    prisma.resource.count({ where: { status: "Published", is_archived: false } }),
+    prisma.resource.count({ where: { is_published: true, is_archived: false } }),
   ]);
   return { memberCount, eventCount, competitionCount, resourceCount };
 }
@@ -283,13 +283,13 @@ export async function getHighlights(): Promise<{
     }),
     prisma.resource.findFirst({
       where: {
-        status: "Published",
+        is_published: true,
         is_archived: false,
       },
       orderBy: { view_count: "desc" },
     }),
     prisma.magazine.findFirst({
-      where: { is_published: 1 },
+      where: { is_published: true },
       orderBy: { published_date: "desc" },
     }),
   ]);

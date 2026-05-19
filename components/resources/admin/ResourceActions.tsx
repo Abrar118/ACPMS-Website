@@ -14,10 +14,9 @@ import { MoreHorizontal, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import {
   deleteResourceAction,
-  toggleResourceStatus,
+  toggleResourcePublished,
   toggleResourceFeatured,
 } from "@/actions/resources";
-import { EResourceStatus } from "@/components/shared/enums";
 import type { Resource } from "@/lib/db/resources";
 import ViewerModal from "@/components/shared/ViewerModal";
 import { DeleteResourceDialog } from "./DeleteResourceDialog";
@@ -33,12 +32,7 @@ export function ResourceActions({ resource }: ResourceActionsProps) {
 
   const handleStatusToggle = () => {
     startTransition(async () => {
-      const newStatus =
-        resource.status === "Published"
-          ? EResourceStatus.Pending
-          : EResourceStatus.Published;
-
-      const result = await toggleResourceStatus(resource.id, newStatus);
+      const result = await toggleResourcePublished(resource.id, !resource.is_published);
 
       if (result.success) {
         toast.success(result.message);
@@ -109,7 +103,7 @@ export function ResourceActions({ resource }: ResourceActionsProps) {
           <DropdownMenuSeparator />
 
           <DropdownMenuItem onClick={handleStatusToggle}>
-            {resource.status === "Published" ? "Unpublish" : "Publish"}
+            {resource.is_published ? "Unpublish" : "Publish"}
           </DropdownMenuItem>
 
           <DropdownMenuItem onClick={handleFeaturedToggle}>

@@ -10,7 +10,7 @@ export type CreateResourceData = {
   resourceType: string;
   resourceUrl?: string;
   author?: string;
-  status?: string;
+  isPublished?: boolean;
   isFeatured?: boolean;
   levels?: { value: string }[];
   tags?: { value: string }[];
@@ -33,8 +33,7 @@ export async function createResource(
       resource_type: data.resourceType,
       resource_url: data.resourceUrl ?? null,
       author: data.author ?? null,
-      status: data.status ?? "Draft",
-      is_published: data.status === "Published" || false,
+      is_published: data.isPublished ?? false,
       is_featured: data.isFeatured ?? false,
       is_archived: false,
       levels: data.levels?.map((l) => l.value) ?? [],
@@ -61,10 +60,7 @@ export async function getAllResources(): Promise<Resource[]> {
 export async function getPublishedResources(): Promise<Resource[]> {
   return prisma.resource.findMany({
     where: {
-      OR: [
-        { status: "Published" },
-        { is_published: true },
-      ],
+      is_published: true,
       is_archived: false,
     },
     orderBy: { created_at: "desc" },
@@ -77,10 +73,7 @@ export async function getPublishedResources(): Promise<Resource[]> {
 export async function getFeaturedResources(): Promise<Resource[]> {
   return prisma.resource.findMany({
     where: {
-      OR: [
-        { status: "Published" },
-        { is_published: true },
-      ],
+      is_published: true,
       is_featured: true,
       is_archived: false,
     },
@@ -119,10 +112,7 @@ export async function updateResource(
         resource_url: data.resourceUrl ?? null,
       }),
       ...(data.author !== undefined && { author: data.author ?? null }),
-      ...(data.status !== undefined && {
-        status: data.status,
-        is_published: data.status === "Published",
-      }),
+      ...(data.isPublished !== undefined && { is_published: data.isPublished }),
       ...(data.isFeatured !== undefined && { is_featured: data.isFeatured }),
       ...(data.levels !== undefined && {
         levels: data.levels.map((l) => l.value),
@@ -165,10 +155,7 @@ export async function getResourcesByCategory(
 ): Promise<Resource[]> {
   return prisma.resource.findMany({
     where: {
-      OR: [
-        { status: "Published" },
-        { is_published: true },
-      ],
+      is_published: true,
       category,
       is_archived: false,
     },

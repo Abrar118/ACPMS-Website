@@ -1,7 +1,6 @@
 import {
   EResourceCategory,
   EResourceLevel,
-  EResourceStatus,
   EResourceType,
 } from "@/components/shared/enums";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,7 +13,7 @@ export const addResourceInitialValues = {
   resourceType: EResourceType.Link,
   resourceUrl: "",
   isFeatured: false,
-  status: EResourceStatus.Pending,
+  isPublished: false,
   levels: [] as Array<{ label: string; value: EResourceLevel }>,
   author: "",
   tags: [] as Array<{ label: string; value: string }>,
@@ -27,7 +26,7 @@ export const addResourceSchema = z.object({
   resourceType: z.nativeEnum(EResourceType),
   resourceUrl: z.string().min(1, "Resource URL is required").url("Please enter a valid URL"),
   isFeatured: z.boolean(),
-  status: z.nativeEnum(EResourceStatus),
+  isPublished: z.boolean(),
   levels: z.array(
     z.object({
       label: z.string(),

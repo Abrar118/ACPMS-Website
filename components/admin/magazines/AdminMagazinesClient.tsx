@@ -161,10 +161,10 @@ function MagazineRow({
       <TableCell className="text-sm text-muted-foreground">{volumeIssue}</TableCell>
       <TableCell>
         <Badge
-          variant={magazine.published ? "default" : "secondary"}
-          className={magazine.published ? "bg-green-600 hover:bg-green-700 text-white" : ""}
+          variant={magazine.is_published ? "default" : "secondary"}
+          className={magazine.is_published ? "bg-green-600 hover:bg-green-700 text-white" : ""}
         >
-          {magazine.published ? "Published" : "Draft"}
+          {magazine.is_published ? "Published" : "Draft"}
         </Badge>
       </TableCell>
       <TableCell className="text-sm">{magazine.language ?? "English"}</TableCell>
@@ -188,7 +188,7 @@ function MagazineRow({
               Edit
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => onTogglePublished(magazine)}>
-              {magazine.published ? (
+              {magazine.is_published ? (
                 <>
                   <ToggleLeft className="mr-2 h-4 w-4" />
                   Unpublish
@@ -336,7 +336,7 @@ export default function AdminMagazinesClient({ magazines }: AdminMagazinesClient
 
   const handleTogglePublished = (magazine: Magazine) => {
     startTransition(async () => {
-      const result = await toggleMagazinePublishedAction(magazine.id, !magazine.published);
+      const result = await toggleMagazinePublishedAction(magazine.id, !magazine.is_published);
       if (result.success) toast.success(result.message);
       else toast.error(result.error || "Failed to update magazine status");
     });
