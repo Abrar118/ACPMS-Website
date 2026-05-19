@@ -27,15 +27,10 @@ import {
     Clock,
     Download,
 } from "lucide-react";
-import createSupabaseServer from "@/utils/supabase/supabase-server";
-import { getAllUsers } from "@/queries/auth";
+import { getAllUsers } from "@/lib/db/users";
 
 async function getAnalyticsData() {
-    const supabase = await createSupabaseServer();
-
-    const [usersResponse] = await Promise.all([getAllUsers(supabase)]);
-
-    const users = usersResponse.success ? usersResponse.data || [] : [];
+    const users = await getAllUsers();
 
     // Calculate user statistics
     const totalUsers = users.length;

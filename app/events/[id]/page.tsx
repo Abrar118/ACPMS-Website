@@ -1,9 +1,8 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import createSupabaseServer from "@/utils/supabase/supabase-server";
-import { getPublishedEventById } from "@/queries/events";
-import { getEventCompetitions, type CompetitionRow } from "@/queries/competitions";
+import { getPublishedEventById } from "@/lib/db/events";
+import { getEventCompetitions } from "@/lib/db/competitions";
 import { Skeleton } from "@/components/ui/skeleton";
 import EventDetailClient from "@/components/events/EventDetailClient";
 
@@ -15,26 +14,24 @@ export async function generateMetadata({
   params,
 }: EventDetailPageProps): Promise<Metadata> {
   const { id } = await params;
-  const supabase = await createSupabaseServer();
-  const eventResult = await getPublishedEventById(supabase, id);
+  const event = await getPublishedEventById(id);
 
-  if (eventResult.error || !eventResult.data) {
+  if (!event) {
     return {
       title: "Event Not Found",
       description: "The requested event could not be found.",
     };
   }
 
-  const event = eventResult.data;
   return {
     title: `${event.title} | ACPSCM Events`,
-    description: typeof event.description === 'string' 
-      ? event.description.substring(0, 160) 
+    description: typeof event.description === 'string'
+      ? event.description.substring(0, 160)
       : "Join this exciting ACPSCM event",
     openGraph: {
       title: event.title,
-      description: typeof event.description === 'string' 
-        ? event.description.substring(0, 160) 
+      description: typeof event.description === 'string'
+        ? event.description.substring(0, 160)
         : "Join this exciting ACPSCM event",
       images: event.poster_url ? [event.poster_url] : [],
     },
@@ -42,25 +39,26 @@ export async function generateMetadata({
 }
 
 async function EventDetail({ eventId }: { eventId: string }) {
-  const supabase = await createSupabaseServer();
-
   // Fetch event details and competitions in parallel
-  const [eventResult, competitionsResult] = await Promise.all([
-    getPublishedEventById(supabase, eventId),
-    getEventCompetitions(supabase, eventId),
+  const [event, competitions] = await Promise.all([
+    getPublishedEventById(eventId),
+    getEventCompetitions(eventId),
   ]);
 
-  if (eventResult.error || !eventResult.data) {
+  if (!event) {
     notFound();
   }
 
-  const event = eventResult.data;
-  const competitions = competitionsResult.success ? competitionsResult.data || [] : [];
+  // Serialize dates for client component and filter to published competitions
+  const serializedEvent = JSON.parse(JSON.stringify(event));
+  const serializedCompetitions = JSON.parse(
+    JSON.stringify(competitions.filter((comp) => comp.is_published))
+  );
 
   return (
     <EventDetailClient
-      event={event} 
-      competitions={competitions.filter((comp: CompetitionRow) => comp.is_published)} 
+      event={serializedEvent}
+      competitions={serializedCompetitions}
     />
   );
 }

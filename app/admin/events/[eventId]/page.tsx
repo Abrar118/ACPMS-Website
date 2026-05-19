@@ -10,9 +10,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import createSupabaseServer from "@/utils/supabase/supabase-server";
-import { getEventById } from "@/queries/events";
-import { getEventCompetitions } from "@/queries/competitions";
+import { getEventById } from "@/lib/db/events";
+import { getEventCompetitions } from "@/lib/db/competitions";
 import AdminEventDetailClient from "@/components/events/admin/AdminEventDetailClient";
 
 interface AdminEventDetailPageProps {
@@ -20,23 +19,20 @@ interface AdminEventDetailPageProps {
 }
 
 async function EventDetail({ eventId }: { eventId: string }) {
-  const supabase = await createSupabaseServer();
-  
   // Fetch event details and competitions in parallel
-  const [eventResult, competitionsResult] = await Promise.all([
-    getEventById(supabase, eventId),
-    getEventCompetitions(supabase, eventId),
+  const [event, competitions] = await Promise.all([
+    getEventById(eventId),
+    getEventCompetitions(eventId),
   ]);
 
-  if (eventResult.error || !eventResult.data) {
+  if (!event) {
     notFound();
   }
 
   return (
     <AdminEventDetailClient
-      event={eventResult.data}
-      competitions={competitionsResult.data || []}
-      error={competitionsResult.error || undefined}
+      event={JSON.parse(JSON.stringify(event))}
+      competitions={JSON.parse(JSON.stringify(competitions))}
     />
   );
 }

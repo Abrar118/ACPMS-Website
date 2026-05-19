@@ -38,7 +38,7 @@ export default async function RootLayout({
                         enableSystem
                         disableTransitionOnChange
                     >
-                        <ConditionalNavbar user={user} profile={profile} />
+                        <ConditionalNavbar user={user} profile={profile ? JSON.parse(JSON.stringify(profile)) : null} />
                         <main className="bg-background flex flex-col min-h-screen">
                             {children}
                         </main>

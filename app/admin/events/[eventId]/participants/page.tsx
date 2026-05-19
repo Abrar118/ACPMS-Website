@@ -1,9 +1,8 @@
 import { notFound } from "next/navigation";
-import createSupabaseServer from "@/utils/supabase/supabase-server";
 import { getCurrentUser, isAdminOrExecutive } from "@/lib/auth-server";
-import { getEventById } from "@/queries/events";
-import { getEventCompetitions } from "@/queries/competitions";
-import { getEventParticipantsDetailed } from "@/queries/participants";
+import { getEventById } from "@/lib/db/events";
+import { getEventCompetitions } from "@/lib/db/competitions";
+import { getEventParticipantsDetailed } from "@/lib/db/participants";
 import EventParticipantsClient from "@/components/events/admin/EventParticipantsClient";
 
 
@@ -30,32 +29,25 @@ export default async function EventParticipantsPage({
     notFound();
   }
 
-  const supabase = await createSupabaseServer();
+  // Fetch event, competitions, and participants in parallel
+  const [event, competitions, participants] = await Promise.all([
+    getEventById(eventId),
+    getEventCompetitions(eventId),
+    getEventParticipantsDetailed(eventId),
+  ]);
 
-  // Fetch event data
-  const eventResult = await getEventById(supabase, eventId);
-  if (eventResult.error || !eventResult.data) {
+  if (!event) {
     notFound();
   }
 
-  // Fetch competitions for this event
-  const competitionsResult = await getEventCompetitions(supabase, eventId);
-  if (competitionsResult.error) {
-    console.error("Error fetching competitions:", competitionsResult.error);
-  }
-
-  // Fetch participants for this event
-  const participantsResult = await getEventParticipantsDetailed(supabase, eventId);
-  if (participantsResult.error) {
-    console.error("Error fetching participants:", participantsResult.error);
-  }
+  // Serialize dates for client component
+  const serialized = JSON.parse(JSON.stringify({ event, competitions, participants }));
 
   return (
     <EventParticipantsClient
-      event={eventResult.data}
-      competitions={competitionsResult.data || []}
-      participants={participantsResult.data || []}
-      error={participantsResult.error || undefined}
+      event={serialized.event}
+      competitions={serialized.competitions}
+      participants={serialized.participants}
     />
   );
 }

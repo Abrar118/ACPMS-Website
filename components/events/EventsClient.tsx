@@ -1,9 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import useSupabaseBrowser from "@/utils/supabase/supabase-browser";
-import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
-import { getEventsQuery } from "@/queries/events";
 import {
   Card,
   CardContent,
@@ -53,7 +50,11 @@ interface EventWithType {
   tags: string[] | null;
 }
 
-export default function EventsClient() {
+interface EventsClientProps {
+  events: EventWithType[];
+}
+
+export default function EventsClient({ events: allEvents }: EventsClientProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -68,8 +69,6 @@ export default function EventsClient() {
   // Registration dialog state
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  const supabase = useSupabaseBrowser();
 
   // Function to update URL parameters
   const updateSearchParams = (params: {
@@ -98,13 +97,6 @@ export default function EventsClient() {
     const query = search ? `?${search}` : "";
     router.push(`${pathname}${query}`, { scroll: false });
   };
-
-  // Get all published events
-  const {
-    data: allEvents,
-    isLoading: eventsLoading,
-    isError: eventsError,
-  } = useQuery(getEventsQuery(supabase));
 
   // Filter and sort events
   const filteredAndSortedEvents = useMemo(() => {
@@ -230,26 +222,6 @@ export default function EventsClient() {
     const nextWeek = addDays(today, 7);
     return isAfter(eventDay, today) && isBefore(eventDay, nextWeek);
   };
-
-  if (eventsLoading) {
-    return (
-      <div className="flex items-center justify-center py-16">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2 text-muted-foreground">Loading events...</span>
-      </div>
-    );
-  }
-
-  if (eventsError) {
-    console.log("Error loading events:", eventsError);
-    return (
-      <div className="text-center py-16">
-        <p className="text-muted-foreground">
-          Error loading events. Please try again later.
-        </p>
-      </div>
-    );
-  }
 
   // Create dynamic categories from event enum
   const dynamicCategories = ["All Events", ...Object.values(EEventType)];

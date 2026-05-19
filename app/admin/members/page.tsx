@@ -38,19 +38,11 @@ import {
 import { MoreHorizontal, UserPlus, Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import createSupabaseServer from "@/utils/supabase/supabase-server";
-import { getAllUsers } from "@/queries/auth";
-import type { UserProfile } from "@/queries/auth";
+import { getAllUsers } from "@/lib/db/users";
+import type { UserProfile } from "@/lib/generated/prisma";
 
 async function getMembers() {
-    const supabase = await createSupabaseServer();
-    const response = await getAllUsers(supabase);
-
-    if (!response.success || !response.data) {
-        return [];
-    }
-
-    return response.data;
+    return getAllUsers();
 }
 
 function getStatusBadge(status: string | null) {

@@ -4,14 +4,17 @@ import WhoWeAre from "@/components/home/WhoWeAre";
 import ClientTestimonials from "@/components/home/ClientTestimonials";
 import Footer from "@/components/home/Footer";
 import ClubHighlights from "@/components/home/ClubHighlights";
+import { getHighlights } from "@/lib/db/events";
 
-export default function Home() {
+export default async function Home() {
+    const highlights = await getHighlights();
+
     return (
         <main className="min-h-screen">
             <HeroSection />
             <WhatWeDo />
             <WhoWeAre />
-            <ClubHighlights />
+            <ClubHighlights highlights={highlights ? JSON.parse(JSON.stringify(highlights)) : null} />
             <ClientTestimonials />
             <Footer />
         </main>

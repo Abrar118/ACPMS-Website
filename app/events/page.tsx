@@ -1,13 +1,4 @@
-import {
-    dehydrate,
-    HydrationBoundary,
-    QueryClient,
-} from "@tanstack/react-query";
-import { prefetchQuery } from "@supabase-cache-helpers/postgrest-react-query";
-import createSupabaseServer from "@/utils/supabase/supabase-server";
-import {
-    getEventsQuery,
-} from "@/queries/events";
+import { getPublishedEvents } from "@/lib/db/events";
 import Footer from "@/components/home/Footer";
 import EventsClient from "@/components/events/EventsClient";
 import { Badge } from "@/components/ui/badge";
@@ -15,13 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Calendar } from "lucide-react";
 
 export default async function EventsPage() {
-    const queryClient = new QueryClient();
-    const supabase = await createSupabaseServer();
-
-    // Prefetch events data for SSR
-    await Promise.all([
-        prefetchQuery(queryClient, getEventsQuery(supabase)),
-    ]);
+    // Fetch published events server-side
+    const events = await getPublishedEvents();
 
     return (
         <main className="min-h-screen">
@@ -43,10 +29,8 @@ export default async function EventsPage() {
                 </div>
             </section>
 
-            {/* Events Content with React Query */}
-            <HydrationBoundary state={dehydrate(queryClient)}>
-                <EventsClient />
-            </HydrationBoundary>
+            {/* Events Content */}
+            <EventsClient events={JSON.parse(JSON.stringify(events))} />
 
             {/* Event Categories Info */}
             <section className="py-16 px-4">

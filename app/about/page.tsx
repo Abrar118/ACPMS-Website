@@ -24,9 +24,14 @@ import {
     ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import createSupabaseServer from "@/utils/supabase/supabase-server";
-import { getMembersBySession, getUniqueSessions } from "@/queries/members";
-import type { MemberRow } from "@/queries/members";
+import { getMembersBySession, getUniqueSessions } from "@/lib/db/members";
+import type { Member } from "@/lib/generated/prisma";
+
+// Serialized member type for use in components (dates as strings after JSON serialization)
+type SerializedMember = Omit<Member, 'created_at' | 'updated_at'> & {
+    created_at: string | Date;
+    updated_at: string | Date;
+};
 
 // Helper function to get social media icon
 function getSocialIcon(platform: string) {
@@ -47,7 +52,7 @@ function getSocialIcon(platform: string) {
 }
 
 // Component for rendering member card
-function MemberCard({ member }: { member: MemberRow }) {
+function MemberCard({ member }: { member: SerializedMember }) {
     return (
         <Card className="hover:shadow-lg transition-all duration-300 group">
             <CardHeader className="text-center pb-4">
@@ -171,7 +176,7 @@ function MemberCard({ member }: { member: MemberRow }) {
 }
 
 // Component for founder card with special styling
-function FounderCard({ member }: { member: MemberRow }) {
+function FounderCard({ member }: { member: SerializedMember }) {
     return (
         <Card className="hover:shadow-lg transition-all duration-300 group border-2 border-primary/10">
             <CardHeader className="text-center pb-4">
@@ -248,15 +253,10 @@ function FounderCard({ member }: { member: MemberRow }) {
 
 export default async function AboutPage() {
     // Fetch data from database for session-based members only
-    const supabase = await createSupabaseServer();
-    
-    const [membersBySessionResult, sessionsResult] = await Promise.all([
-        getMembersBySession(supabase),
-        getUniqueSessions(supabase)
+    const [membersBySession, sessions] = await Promise.all([
+        getMembersBySession(),
+        getUniqueSessions()
     ]);
-
-    const membersBySession = membersBySessionResult.success ? membersBySessionResult.data || {} : {};
-    const sessions = sessionsResult.success ? sessionsResult.data || [] : [];
 
     // Hardcoded founders data (as requested)
     const founders = [

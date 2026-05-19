@@ -9,18 +9,15 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import createSupabaseServer from "@/utils/supabase/supabase-server";
-import { getAllEventsAdmin } from "@/queries/events";
+import { getAllEventsAdmin } from "@/lib/db/events";
 import AdminEventsClient from "@/components/events/admin/AdminEventsClient";
 
 async function EventsTable() {
-  const supabase = await createSupabaseServer();
-  const result = await getAllEventsAdmin(supabase);
+  const events = await getAllEventsAdmin();
 
   return (
-    <AdminEventsClient 
-      events={result.data || []} 
-      error={result.error || undefined}
+    <AdminEventsClient
+      events={JSON.parse(JSON.stringify(events))}
     />
   );
 }

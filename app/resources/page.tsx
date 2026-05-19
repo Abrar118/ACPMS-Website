@@ -2,8 +2,7 @@ import { redirect } from "next/navigation";
 import Footer from "@/components/home/Footer";
 import ResourcesClient from "@/components/resources/ResourcesClient";
 import { getCurrentUser } from "@/lib/auth-server";
-import { getFeaturedResources, getPublishedResources } from "@/queries/resources";
-import createSupabaseServer from "@/utils/supabase/supabase-server";
+import { getFeaturedResources, getPublishedResources } from "@/lib/db/resources";
 
 export default async function ResourcesPage() {
     // Check if user is authenticated
@@ -12,22 +11,17 @@ export default async function ResourcesPage() {
         redirect("/auth");
     }
 
-    const supabase = await createSupabaseServer();
-    
     // Fetch featured and published resources
-    const [featuredResponse, allResourcesResponse] = await Promise.all([
-        getFeaturedResources(supabase),
-        getPublishedResources(supabase),
+    const [featuredResources, allResources] = await Promise.all([
+        getFeaturedResources(),
+        getPublishedResources(),
     ]);
-
-    const featuredResources = featuredResponse.data || [];
-    const allResources = allResourcesResponse.data || [];
 
     return (
         <main className="min-h-screen">
-            <ResourcesClient 
-                featuredResources={featuredResources}
-                allResources={allResources}
+            <ResourcesClient
+                featuredResources={JSON.parse(JSON.stringify(featuredResources))}
+                allResources={JSON.parse(JSON.stringify(allResources))}
             />
             <Footer />
         </main>

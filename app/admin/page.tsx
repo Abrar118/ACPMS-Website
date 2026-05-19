@@ -23,25 +23,14 @@ import {
     UserCheck,
     UserX,
 } from "lucide-react";
-import createSupabaseServer from "@/utils/supabase/supabase-server";
-import { getAllUsers } from "@/queries/auth";
+import { getAllUsers } from "@/lib/db/users";
 
 async function getStats() {
-    const supabase = await createSupabaseServer();
+    const users = await getAllUsers();
 
-    const [usersResponse] = await Promise.all([getAllUsers(supabase)]);
-
-    const totalUsers = usersResponse.success
-        ? usersResponse.data?.length || 0
-        : 0;
-    const activeUsers = usersResponse.success
-        ? usersResponse.data?.filter((user) => user.status === "active")
-              .length || 0
-        : 0;
-    const pendingUsers = usersResponse.success
-        ? usersResponse.data?.filter((user) => user.status === "pending")
-              .length || 0
-        : 0;
+    const totalUsers = users.length;
+    const activeUsers = users.filter((user) => user.status === "active").length;
+    const pendingUsers = users.filter((user) => user.status === "pending").length;
 
     // For now, we'll return placeholder values for events, magazines, and resources
     // You can implement these queries based on your database structure
