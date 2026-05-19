@@ -72,8 +72,9 @@ export default function ProfileClient({ user, profile }: ProfileClientProps) {
             .slice(0, 2);
     };
 
-    const formatMemberSince = (date: string) => {
-        return new Date(date).getFullYear();
+    const formatMemberSince = (date: Date | string) => {
+        const d = typeof date === "string" ? new Date(date) : date;
+        return d.getFullYear();
     };
 
     return (

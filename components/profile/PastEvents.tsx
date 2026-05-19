@@ -47,8 +47,9 @@ export default function PastEvents({
     isLoading,
     error,
 }: PastEventsProps) {
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString("en-US", {
+    const formatDate = (date: Date | string) => {
+        const d = typeof date === "string" ? new Date(date) : date;
+        return d.toLocaleDateString("en-US", {
             weekday: "long",
             year: "numeric",
             month: "long",

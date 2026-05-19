@@ -38,9 +38,10 @@ export default function EventDetailClient({
   const router = useRouter();
   const [isImageLoading, setIsImageLoading] = useState(true);
 
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return "TBA";
-    return new Date(dateString).toLocaleDateString("en-US", {
+  const formatDate = (date: Date | string | null) => {
+    if (!date) return "TBA";
+    const d = typeof date === "string" ? new Date(date) : date;
+    return d.toLocaleDateString("en-US", {
       weekday: "long",
       year: "numeric",
       month: "long",
@@ -48,9 +49,10 @@ export default function EventDetailClient({
     });
   };
 
-  const formatTime = (dateString: string | null) => {
-    if (!dateString) return "";
-    return new Date(dateString).toLocaleTimeString("en-US", {
+  const formatTime = (date: Date | string | null) => {
+    if (!date) return "";
+    const d = typeof date === "string" ? new Date(date) : date;
+    return d.toLocaleTimeString("en-US", {
       hour: "numeric",
       minute: "2-digit",
       hour12: true,

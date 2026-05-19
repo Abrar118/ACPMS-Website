@@ -166,12 +166,14 @@ export default function EventsClient({ events: allEvents }: EventsClientProps) {
   };
 
   // Utility functions
-  const formatDate = (dateString: string) => {
-    return format(parseISO(dateString), "PPP");
+  const formatDate = (date: Date | string) => {
+    const d = typeof date === "string" ? parseISO(date) : date;
+    return format(d, "PPP");
   };
 
-  const formatTime = (dateString: string) => {
-    return format(parseISO(dateString), "p");
+  const formatTime = (date: Date | string) => {
+    const d = typeof date === "string" ? parseISO(date) : date;
+    return format(d, "p");
   };
 
   const getCategoryIcon = (category: string) => {

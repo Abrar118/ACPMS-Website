@@ -1,12 +1,12 @@
 import prisma from "@/lib/prisma";
-import type { Competition } from "@/lib/generated/prisma";
+import { Prisma, type Competition } from "@/lib/generated/prisma";
 
 export type { Competition };
 
 export interface CreateCompetitionData {
   event_id: string;
   title: string;
-  description?: Record<string, unknown> | null;
+  description?: unknown;
   fee?: number;
   display_order: number;
   is_published?: boolean;
@@ -32,7 +32,7 @@ export async function createCompetition(
     data: {
       event_id: data.event_id,
       title: data.title,
-      description: data.description ?? null,
+      description: (data.description as Prisma.InputJsonValue) ?? Prisma.JsonNull,
       fee: data.fee ?? 0,
       display_order: data.display_order,
       is_published: data.is_published ?? false,
@@ -53,7 +53,7 @@ export async function updateCompetition(
 
   if (data.title !== undefined) updateData.title = data.title;
   if (data.description !== undefined)
-    updateData.description = data.description ?? null;
+    updateData.description = (data.description as Prisma.InputJsonValue) ?? Prisma.JsonNull;
   if (data.fee !== undefined) updateData.fee = data.fee;
   if (data.display_order !== undefined)
     updateData.display_order = data.display_order;

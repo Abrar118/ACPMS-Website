@@ -35,16 +35,18 @@ export default function ClubHighlights({ highlights }: ClubHighlightsProps) {
     { ssr: false }
   );
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+  const formatDate = (date: Date | string) => {
+    const d = typeof date === "string" ? new Date(date) : date;
+    return d.toLocaleDateString("en-US", {
       month: "long",
       day: "numeric",
       year: "numeric",
     });
   };
 
-  const formatTime = (dateString: string) => {
-    return format(parseISO(dateString), "p");
+  const formatTime = (date: Date | string) => {
+    const d = typeof date === "string" ? parseISO(date) : date;
+    return format(d, "p");
   };
 
   if (!highlights) {

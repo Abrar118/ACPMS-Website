@@ -35,8 +35,9 @@ interface RegisteredEventsProps {
 }
 
 export default function RegisteredEvents({ events, isLoading, error }: RegisteredEventsProps) {
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString("en-US", {
+    const formatDate = (date: Date | string) => {
+        const d = typeof date === "string" ? new Date(date) : date;
+        return d.toLocaleDateString("en-US", {
             weekday: "long",
             year: "numeric",
             month: "long",

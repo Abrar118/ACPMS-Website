@@ -1,11 +1,11 @@
 import prisma from "@/lib/prisma";
-import type { Event, Competition } from "@/lib/generated/prisma";
+import { Prisma, type Event, type Competition } from "@/lib/generated/prisma";
 
 export type { Event };
 
 export interface CreateEventData {
   title: string;
-  description?: Record<string, unknown> | null;
+  description?: unknown;
   event_date?: string | null;
   end_date?: string | null;
   venue?: string | null;
@@ -170,7 +170,7 @@ export async function createEvent(
   return prisma.event.create({
     data: {
       title: data.title,
-      description: data.description ?? null,
+      description: (data.description as Prisma.InputJsonValue) ?? Prisma.JsonNull,
       event_date: data.event_date ? new Date(data.event_date) : null,
       end_date: data.end_date ? new Date(data.end_date) : null,
       venue: data.venue ?? null,
@@ -200,7 +200,7 @@ export async function updateEvent(
 
   if (data.title !== undefined) updateData.title = data.title;
   if (data.description !== undefined)
-    updateData.description = data.description ?? null;
+    updateData.description = (data.description as Prisma.InputJsonValue) ?? Prisma.JsonNull;
   if (data.event_date !== undefined)
     updateData.event_date = data.event_date ? new Date(data.event_date) : null;
   if (data.end_date !== undefined)
