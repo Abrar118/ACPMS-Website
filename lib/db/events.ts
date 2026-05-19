@@ -244,6 +244,32 @@ export async function toggleEventStatus(
   });
 }
 
+export async function getClubStats() {
+  const [memberCount, eventCount, competitionCount, resourceCount] = await Promise.all([
+    prisma.member.count(),
+    prisma.event.count({ where: { is_published: true } }),
+    prisma.competition.count({ where: { is_published: true } }),
+    prisma.resource.count({ where: { status: "Published", is_archived: false } }),
+  ]);
+  return { memberCount, eventCount, competitionCount, resourceCount };
+}
+
+export async function getNextOrLatestEvent(): Promise<Event | null> {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const upcoming = await prisma.event.findFirst({
+    where: { is_published: true, event_date: { gte: today } },
+    orderBy: { event_date: "asc" },
+  });
+  if (upcoming) return upcoming;
+
+  return prisma.event.findFirst({
+    where: { is_published: true },
+    orderBy: { event_date: "desc" },
+  });
+}
+
 // Highlights: latest published event, most-viewed published resource, latest published magazine
 export async function getHighlights(): Promise<{
   event: Awaited<ReturnType<typeof prisma.event.findFirst>>;

@@ -6,31 +6,31 @@ import WhoWeAre from "@/components/home/WhoWeAre";
 import ClientTestimonials from "@/components/home/ClientTestimonials";
 import Footer from "@/components/home/Footer";
 import ClubHighlights from "@/components/home/ClubHighlights";
-import { getHighlights, getUpcomingEvents } from "@/lib/db/events";
+import { getHighlights, getClubStats, getNextOrLatestEvent } from "@/lib/db/events";
 
 export default async function Home() {
-    const [highlights, upcomingEvents] = await Promise.all([
+    const [highlights, stats, featuredEvent] = await Promise.all([
         getHighlights(),
-        getUpcomingEvents(),
+        getClubStats(),
+        getNextOrLatestEvent(),
     ]);
-    const nextEvent = upcomingEvents[0] ?? null;
 
     return (
         <main className="min-h-screen">
             <HeroSection />
             <StatsCounter
                 stats={[
-                    { label: "Active Members", value: 50, suffix: "+" },
-                    { label: "Events Hosted", value: 10, suffix: "+" },
-                    { label: "Competitions", value: 5, suffix: "+" },
-                    { label: "Years Active", value: 3, suffix: "+" },
+                    { label: "Club Members", value: stats.memberCount, suffix: "+" },
+                    { label: "Events Hosted", value: stats.eventCount, suffix: "+" },
+                    { label: "Competitions", value: stats.competitionCount, suffix: "+" },
+                    { label: "Resources", value: stats.resourceCount, suffix: "+" },
                 ]}
             />
             <WhatWeDo />
             <EventCountdown
                 nextEvent={
-                    nextEvent
-                        ? JSON.parse(JSON.stringify(nextEvent))
+                    featuredEvent
+                        ? JSON.parse(JSON.stringify(featuredEvent))
                         : null
                 }
             />

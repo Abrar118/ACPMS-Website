@@ -72,6 +72,8 @@ export default function EventCountdown({ nextEvent }: EventCountdownProps) {
 
     if (!nextEvent) return null;
 
+    const isUpcoming = !isPast && timeLeft !== null;
+
     return (
         <section className="py-16 px-4">
             <GlassCard
@@ -80,7 +82,7 @@ export default function EventCountdown({ nextEvent }: EventCountdownProps) {
                 className="max-w-2xl mx-auto p-8 text-center"
             >
                 <p className="text-sm text-primary font-medium uppercase tracking-wider">
-                    Next Event
+                    {isUpcoming ? "Next Event" : "Latest Event"}
                 </p>
                 <h3 className="text-2xl md:text-3xl font-bold text-foreground mt-2">
                     {nextEvent.title}
