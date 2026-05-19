@@ -3,9 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { GlassCard } from "@/components/ui/glass-card";
 import {
   Calendar,
   MapPin,
@@ -59,41 +58,6 @@ export default function EventDetailClient({
     });
   };
 
-  const getEventModeColor = (mode: string) => {
-    switch (mode) {
-      case EEventMode.Online:
-        return "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300";
-      case EEventMode.InPerson:
-        return "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300";
-      case EEventMode.Hybrid:
-        return "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300";
-      default:
-        return "bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-300";
-    }
-  };
-
-  const getEventTypeColor = (type: string | null) => {
-    if (!type)
-      return "bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-300";
-
-    switch (type) {
-      case EEventType.Workshop:
-        return "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300";
-      case EEventType.Seminar:
-        return "bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300";
-      case EEventType.Session:
-        return "bg-teal-100 text-teal-700 dark:bg-teal-900 dark:text-teal-300";
-      case EEventType.Fest:
-        return "bg-pink-100 text-pink-700 dark:bg-pink-900 dark:text-pink-300";
-      case EEventType.InterCanttOlympiad:
-        return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300";
-      case EEventType.Meet:
-        return "bg-cyan-100 text-cyan-700 dark:bg-cyan-900 dark:text-cyan-300";
-      default:
-        return "bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-300";
-    }
-  };
-
   const isEventPast = event.event_date
     ? new Date(event.event_date) < new Date()
     : false;
@@ -103,25 +67,24 @@ export default function EventDetailClient({
 
   return (
     <div className="min-h-screen">
-      {/* Header with back button */}
-      <div className="pt-20 sm:pt-24 pb-6 sm:pb-8">
-        {/* <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Button
-            variant="ghost"
+      {/* Back button */}
+      <div className="pt-20 sm:pt-24 pb-4">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <button
             onClick={() => router.back()}
-            className="mb-4 sm:mb-6 hover:bg-muted/50"
+            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Events
-          </Button>
-        </div> */}
+          </button>
+        </div>
       </div>
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         {/* Event Poster */}
         {event.poster_url && (
-          <div className="relative w-full h-48 sm:h-64 md:h-80 lg:h-96 mb-8 rounded-lg overflow-hidden shadow-lg">
+          <div className="relative w-full h-48 sm:h-64 md:h-80 lg:h-96 mb-8 rounded-2xl overflow-hidden">
             <Image
               src={event.poster_url}
               alt={`${event.title} poster`}
@@ -133,8 +96,10 @@ export default function EventDetailClient({
               priority
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
             />
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0b] via-transparent to-transparent" />
             {isImageLoading && (
-              <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center">
+              <div className="absolute inset-0 bg-white/[0.03] animate-pulse flex items-center justify-center rounded-2xl">
                 <div className="text-muted-foreground">Loading poster...</div>
               </div>
             )}
@@ -142,168 +107,147 @@ export default function EventDetailClient({
         )}
 
         {/* Event Title */}
-        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight text-foreground">
           {event.title}
         </h1>
 
         {/* Event Meta Information */}
         <div className="flex flex-wrap gap-2 sm:gap-3 mb-8">
           {event.event_type && (
-            <Badge className={getEventTypeColor(event.event_type)}>
-              <Tag className="h-3 w-3 mr-1" />
+            <span className="inline-flex items-center bg-white/[0.06] border border-white/[0.1] text-foreground text-xs font-medium px-3 py-1.5 rounded-full">
+              <Tag className="h-3 w-3 mr-1.5 text-primary/70" />
               {event.event_type}
-            </Badge>
+            </span>
           )}
-          <Badge className={getEventModeColor(event.event_mode)}>
+          <span className="inline-flex items-center bg-white/[0.06] border border-white/[0.1] text-foreground text-xs font-medium px-3 py-1.5 rounded-full">
             {event.event_mode === EEventMode.Online ? (
-              <ExternalLink className="h-3 w-3 mr-1" />
+              <ExternalLink className="h-3 w-3 mr-1.5 text-primary/70" />
             ) : event.event_mode === EEventMode.InPerson ? (
-              <MapPin className="h-3 w-3 mr-1" />
+              <MapPin className="h-3 w-3 mr-1.5 text-primary/70" />
             ) : (
-              <Users className="h-3 w-3 mr-1" />
+              <Users className="h-3 w-3 mr-1.5 text-primary/70" />
             )}
             {event.event_mode}
-          </Badge>
+          </span>
           {isEventPast && (
-            <Badge variant="secondary">
-              <Clock className="h-3 w-3 mr-1" />
+            <span className="inline-flex items-center bg-white/[0.06] border border-white/[0.1] text-muted-foreground text-xs font-medium px-3 py-1.5 rounded-full">
+              <Clock className="h-3 w-3 mr-1.5" />
               Past Event
-            </Badge>
+            </span>
           )}
           {!isEventPast && isRegistrationOpen && (
-            <Badge className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
-              <Users className="h-3 w-3 mr-1" />
+            <span className="inline-flex items-center bg-primary/15 border border-primary/20 text-primary text-xs font-medium px-3 py-1.5 rounded-full">
+              <Users className="h-3 w-3 mr-1.5" />
               Registration Open
-            </Badge>
+            </span>
           )}
         </div>
 
         {/* Event Details Grid */}
-        <div className="grid mb-12">
-          <Card className="py-0">
-            <CardContent className="p-4 sm:p-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex items-center text-sm">
-                  <Calendar className="h-4 w-4 mr-3 text-muted-foreground flex-shrink-0" />
-                  <div>
-                    <div className="font-medium">
-                      {formatDate(event.event_date)}
-                    </div>
-                    {event.event_date && (
-                      <div className="text-muted-foreground">
-                        {formatTime(event.event_date)}
-                      </div>
-                    )}
-                  </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12">
+          <GlassCard className="p-5">
+            <div className="flex items-center text-sm">
+              <Calendar className="h-5 w-5 mr-3 text-primary/70 flex-shrink-0" />
+              <div>
+                <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Date</div>
+                <div className="font-medium text-foreground">
+                  {formatDate(event.event_date)}
                 </div>
-
-                {event.end_date && event.end_date !== event.event_date && (
-                  <div className="flex items-center text-sm">
-                    <Clock className="h-4 w-4 mr-3 text-muted-foreground flex-shrink-0" />
-                    <div>
-                      <div className="font-medium">
-                        Ends: {formatDate(event.end_date)}
-                      </div>
-                      <div className="text-muted-foreground">
-                        {formatTime(event.end_date)}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {event.venue && (
-                  <div className="flex items-center text-sm">
-                    <MapPin className="h-4 w-4 mr-3 text-muted-foreground flex-shrink-0 mt-0.5" />
-                    <div>
-                      <div className="font-medium">Venue</div>
-                      <div className="text-muted-foreground">
-                        <div className="font-medium">{event.venue}</div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {event.registration_deadline && (
-                  <div className="flex items-center text-sm">
-                    <Users className="h-4 w-4 mr-3 text-muted-foreground flex-shrink-0" />
-                    <div>
-                      <div className="font-medium">Registration Deadline</div>
-                      <div className="text-muted-foreground">
-                        {formatDate(event.registration_deadline)}
-                      </div>
-                    </div>
+                {event.event_date && (
+                  <div className="text-muted-foreground text-xs mt-0.5">
+                    {formatTime(event.event_date)}
                   </div>
                 )}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </GlassCard>
 
-          {/* {event.tags && event.tags.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base sm:text-lg">Tags</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {event.tags.map((tag, index) => (
-                    <Badge key={index} variant="outline">
-                      {tag}
-                    </Badge>
-                  ))}
+          {event.venue && (
+            <GlassCard className="p-5">
+              <div className="flex items-center text-sm">
+                <MapPin className="h-5 w-5 mr-3 text-primary/70 flex-shrink-0 mt-0.5" />
+                <div>
+                  <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Venue</div>
+                  <div className="font-medium text-foreground">{event.venue}</div>
                 </div>
-              </CardContent>
-            </Card>
-          )} */}
+              </div>
+            </GlassCard>
+          )}
+
+          {event.end_date && event.end_date !== event.event_date && (
+            <GlassCard className="p-5">
+              <div className="flex items-center text-sm">
+                <Clock className="h-5 w-5 mr-3 text-primary/70 flex-shrink-0" />
+                <div>
+                  <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Ends</div>
+                  <div className="font-medium text-foreground">
+                    {formatDate(event.end_date)}
+                  </div>
+                  <div className="text-muted-foreground text-xs mt-0.5">
+                    {formatTime(event.end_date)}
+                  </div>
+                </div>
+              </div>
+            </GlassCard>
+          )}
+
+          {event.registration_deadline && (
+            <GlassCard className="p-5">
+              <div className="flex items-center text-sm">
+                <Users className="h-5 w-5 mr-3 text-primary/70 flex-shrink-0" />
+                <div>
+                  <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Registration Deadline</div>
+                  <div className="font-medium text-foreground">
+                    {formatDate(event.registration_deadline)}
+                  </div>
+                </div>
+              </div>
+            </GlassCard>
+          )}
         </div>
 
         {/* Event Description */}
         {event.description && (
-          <Card className="mb-12">
-            <CardHeader>
-              <CardTitle className="text-xl sm:text-2xl">
-                About The Event
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="prose prose-sm max-w-none dark:prose-invert">
+          <GlassCard className="mb-12 p-6 sm:p-8">
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-6">
+              About The Event
+            </h2>
+            <div className="prose prose-sm max-w-none dark:prose-invert">
               <MinimalTiptapEditor
                 value={event.description as JSONContent}
                 className="w-full border-0 p-0 m-0"
                 output="text"
                 autofocus={false}
                 editable={false}
-                editorClassName="focus:outline-none text-sm sm:text-base leading-relaxed"
+                editorClassName="focus:outline-none text-sm sm:text-base leading-relaxed text-muted-foreground"
                 hideToolbar={true}
               />
-            </CardContent>
-          </Card>
+            </div>
+          </GlassCard>
         )}
 
         {/* Competitions Section */}
         {competitions.length > 0 && (
-          <Card className="mb-12">
-            <CardHeader>
-              <CardTitle className="text-xl sm:text-2xl flex items-center">
-                <Trophy className="h-5 w-5 sm:h-6 sm:w-6 mr-2" />
-                Competitions
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
+          <div className="mb-12">
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-6 flex items-center">
+              <Trophy className="h-5 w-5 sm:h-6 sm:w-6 mr-2 text-primary" />
+              Competitions
+            </h2>
+            <div className="space-y-4">
               {competitions.map((competition, index) => (
-                <div key={competition.id}>
-                  {index > 0 && <Separator className="my-6" />}
-
+                <GlassCard key={competition.id} className="p-6">
                   <div className="space-y-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h3 className="text-lg sm:text-xl font-semibold mb-2">
+                        <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">
                           {index + 1}. {competition.title}
                         </h3>
 
                         {competition.fee > 0 && (
-                          <div className="flex items-center text-sm text-muted-foreground mb-3">
-                            <DollarSign className="h-4 w-4 mr-1 flex-shrink-0" />
-                            <span>Registration Fee: ${competition.fee}</span>
-                          </div>
+                          <span className="inline-flex items-center bg-primary/10 border border-primary/20 text-primary text-xs font-medium px-3 py-1 rounded-full">
+                            <DollarSign className="h-3 w-3 mr-1" />
+                            Fee: ${competition.fee}
+                          </span>
                         )}
                       </div>
                     </div>
@@ -316,36 +260,34 @@ export default function EventDetailClient({
                           output="text"
                           autofocus={false}
                           editable={false}
-                          editorClassName="focus:outline-none text-sm leading-relaxed"
+                          editorClassName="focus:outline-none text-sm leading-relaxed text-muted-foreground"
                           hideToolbar={true}
                         />
                       </div>
                     )}
                   </div>
-                </div>
+                </GlassCard>
               ))}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
 
         {/* Call to Action */}
         {!isEventPast && isRegistrationOpen && (
-          <Card className="mt-12 bg-gradient-to-r from-primary/10 to-secondary/10">
-            <CardContent className="p-6 sm:p-8 text-center">
-              <h3 className="text-xl sm:text-2xl font-bold mb-4">
-                Ready to Join?
-              </h3>
-              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                Registration is open for this event. Don't miss out on this
-                exciting opportunity!
-              </p>
-              <EventRegistrationDialog event={event} competitions={competitions}>
-                <Button size="lg" className="px-6 sm:px-8">
-                  Register Now
-                </Button>
-              </EventRegistrationDialog>
-            </CardContent>
-          </Card>
+          <GlassCard glow className="mt-12 p-6 sm:p-8 text-center">
+            <h3 className="text-xl sm:text-2xl font-bold mb-4 text-foreground">
+              Ready to Join?
+            </h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              Registration is open for this event. Don't miss out on this
+              exciting opportunity!
+            </p>
+            <EventRegistrationDialog event={event} competitions={competitions}>
+              <Button className="bg-primary text-primary-foreground rounded-xl px-8 py-3 text-base font-medium hover:bg-primary/90 transition-colors">
+                Register Now
+              </Button>
+            </EventRegistrationDialog>
+          </GlassCard>
         )}
       </div>
 

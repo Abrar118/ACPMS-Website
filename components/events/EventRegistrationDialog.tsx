@@ -100,7 +100,7 @@ export default function EventRegistrationDialog({
 
   const selectedLevel = form.watch("level");
   const selectedCompetitions = form.watch("competitions");
-  
+
   // Calculate total fee for selected competitions
   const totalFee = selectedCompetitions.reduce((total, competitionId) => {
     const competition = competitions.find(c => c.id === competitionId);
@@ -140,15 +140,18 @@ export default function EventRegistrationDialog({
     }
   };
 
+  // Glass input classes
+  const glassInputClass = "bg-white/[0.04] border-white/[0.08] rounded-lg text-foreground placeholder:text-muted-foreground focus:ring-primary/50 focus:border-primary/50";
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-[#0f0f10] border border-white/[0.08] rounded-2xl [&_[data-slot=dialog-overlay]]:bg-black/60 [&_[data-slot=dialog-overlay]]:backdrop-blur-sm">
         <DialogHeader>
-          <DialogTitle>Register for {event.title}</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-foreground">Register for {event.title}</DialogTitle>
+          <DialogDescription className="text-muted-foreground">
             Fill out the form below to register for this event and select the competitions you want to participate in.
           </DialogDescription>
         </DialogHeader>
@@ -157,17 +160,17 @@ export default function EventRegistrationDialog({
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Personal Information */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Personal Information</h3>
-              
+              <h3 className="text-lg font-semibold text-foreground">Personal Information</h3>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full Name</FormLabel>
+                      <FormLabel className="text-sm text-foreground">Full Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your full name" {...field} />
+                        <Input placeholder="Enter your full name" className={glassInputClass} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -179,9 +182,9 @@ export default function EventRegistrationDialog({
                   name="institution"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Institution</FormLabel>
+                      <FormLabel className="text-sm text-foreground">Institution</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your institution name" {...field} />
+                        <Input placeholder="Enter your institution name" className={glassInputClass} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -195,7 +198,7 @@ export default function EventRegistrationDialog({
                   name="level"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Education Level</FormLabel>
+                      <FormLabel className="text-sm text-foreground">Education Level</FormLabel>
                       <Select
                         onValueChange={(value) => {
                           field.onChange(value);
@@ -208,11 +211,11 @@ export default function EventRegistrationDialog({
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className={glassInputClass}>
                             <SelectValue placeholder="Select education level" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
+                        <SelectContent className="bg-[#141415] border-white/[0.08]">
                           <SelectItem value="School">School</SelectItem>
                           <SelectItem value="College">College</SelectItem>
                           <SelectItem value="University">University</SelectItem>
@@ -229,17 +232,17 @@ export default function EventRegistrationDialog({
                     name="class"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Class/Year</FormLabel>
+                        <FormLabel className="text-sm text-foreground">Class/Year</FormLabel>
                         <Select
                           onValueChange={(value) => field.onChange(parseInt(value))}
                           value={field.value?.toString()}
                         >
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className={glassInputClass}>
                               <SelectValue placeholder="Select class/year" />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent>
+                          <SelectContent className="bg-[#141415] border-white/[0.08]">
                             {getClassOptions(selectedLevel).map((option) => (
                               <SelectItem key={option.value} value={option.value.toString()}>
                                 {option.label}
@@ -259,9 +262,9 @@ export default function EventRegistrationDialog({
                 name="id_at_institution"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Student ID at Institution</FormLabel>
+                    <FormLabel className="text-sm text-foreground">Student ID at Institution</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter your student ID" {...field} />
+                      <Input placeholder="Enter your student ID" className={glassInputClass} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -274,9 +277,9 @@ export default function EventRegistrationDialog({
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email Address</FormLabel>
+                      <FormLabel className="text-sm text-foreground">Email Address</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="Enter your email" {...field} />
+                        <Input type="email" placeholder="Enter your email" className={glassInputClass} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -288,9 +291,9 @@ export default function EventRegistrationDialog({
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
+                      <FormLabel className="text-sm text-foreground">Phone Number</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your phone number" {...field} />
+                        <Input placeholder="Enter your phone number" className={glassInputClass} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -303,11 +306,11 @@ export default function EventRegistrationDialog({
                 name="note"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Additional Information (Optional)</FormLabel>
+                    <FormLabel className="text-sm text-foreground">Additional Information (Optional)</FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder="Additional information that you might want to share"
-                        className="resize-none"
+                        className={`resize-none ${glassInputClass}`}
                         {...field}
                       />
                     </FormControl>
@@ -317,18 +320,18 @@ export default function EventRegistrationDialog({
               />
             </div>
 
-            <Separator />
+            <Separator className="bg-white/[0.08]" />
 
             {/* Competition Selection */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Competition Selection</h3>
-              
+              <h3 className="text-lg font-semibold text-foreground">Competition Selection</h3>
+
               <FormField
                 control={form.control}
                 name="competitions"
                 render={() => (
                   <FormItem>
-                    <FormLabel>Select Competitions</FormLabel>
+                    <FormLabel className="text-sm text-foreground">Select Competitions</FormLabel>
                     <div className="space-y-3">
                       {competitions.map((competition) => (
                         <FormField
@@ -339,7 +342,7 @@ export default function EventRegistrationDialog({
                             return (
                               <FormItem
                                 key={competition.id}
-                                className="flex flex-row items-center space-x-3 space-y-0 p-3 border rounded-lg"
+                                className="flex flex-row items-center space-x-3 space-y-0 p-3 rounded-xl bg-white/[0.03] border border-white/[0.08] hover:border-white/[0.15] transition-colors"
                               >
                                 <FormControl>
                                   <Checkbox
@@ -351,18 +354,19 @@ export default function EventRegistrationDialog({
                                             field.value?.filter((value) => value !== competition.id)
                                           );
                                     }}
+                                    className="border-white/[0.2] data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                                   />
                                 </FormControl>
                                 <div className="flex-1 space-y-1">
                                   <div className="flex items-center justify-between">
-                                    <FormLabel className="text-sm font-medium">
+                                    <FormLabel className="text-sm font-medium text-foreground">
                                       {competition.title}
                                     </FormLabel>
                                     {competition.fee > 0 && (
-                                      <Badge variant="outline" className="ml-2">
-                                        <DollarSign className="h-3 w-3 mr-1" />
+                                      <span className="inline-flex items-center bg-primary/10 border border-primary/20 text-primary text-xs font-medium px-2.5 py-0.5 rounded-full ml-2">
+                                        <DollarSign className="h-3 w-3 mr-0.5" />
                                         ${competition.fee}
-                                      </Badge>
+                                      </span>
                                     )}
                                   </div>
                                 </div>
@@ -378,8 +382,8 @@ export default function EventRegistrationDialog({
               />
 
               {totalFee > 0 && (
-                <div className="p-3 bg-muted rounded-lg">
-                  <p className="text-sm font-medium">
+                <div className="p-3 rounded-xl bg-white/[0.04] border border-white/[0.08]">
+                  <p className="text-sm font-medium text-foreground">
                     Total Registration Fee: <span className="text-primary">${totalFee}</span>
                   </p>
                 </div>
@@ -389,24 +393,24 @@ export default function EventRegistrationDialog({
             {/* Payment Information */}
             {isPaymentRequired && (
               <>
-                <Separator />
+                <Separator className="bg-white/[0.08]" />
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Payment Information</h3>
-                  
+                  <h3 className="text-lg font-semibold text-foreground">Payment Information</h3>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="payment_provider"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Payment Provider</FormLabel>
+                          <FormLabel className="text-sm text-foreground">Payment Provider</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
-                              <SelectTrigger>
+                              <SelectTrigger className={glassInputClass}>
                                 <SelectValue placeholder="Select payment provider" />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent>
+                            <SelectContent className="bg-[#141415] border-white/[0.08]">
                               <SelectItem value="BKash">BKash</SelectItem>
                             </SelectContent>
                           </Select>
@@ -420,9 +424,9 @@ export default function EventRegistrationDialog({
                       name="transaction_id"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Transaction ID</FormLabel>
+                          <FormLabel className="text-sm text-foreground">Transaction ID</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter transaction ID" {...field} />
+                            <Input placeholder="Enter transaction ID" className={glassInputClass} {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -433,11 +437,20 @@ export default function EventRegistrationDialog({
               </>
             )}
 
-            <div className="flex justify-end space-x-2 pt-4">
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <div className="flex justify-end space-x-3 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+                className="bg-white/[0.04] border-white/[0.08] text-foreground hover:bg-white/[0.08] rounded-xl"
+              >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-6"
+              >
                 {isSubmitting && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 Register
               </Button>
