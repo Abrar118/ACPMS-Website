@@ -19,8 +19,7 @@ export default async function AdminLayout({
         redirect("/auth");
     }
 
-    // Check if user is admin
-    if (profile.role !== "admin") {
+    if (profile.role !== "admin" && profile.role !== "executive") {
         redirect("/");
     }
 

@@ -51,8 +51,8 @@ function generateSlug(title: string): string {
 export default function BlogEditor({ post }: BlogEditorProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [tiptapContent, setTiptapContent] = useState<JSONContent | undefined>(
-    post?.content as JSONContent | undefined
+  const [tiptapContent, setTiptapContent] = useState<JSONContent>(
+    (post?.content as JSONContent) ?? { type: "doc", content: [{ type: "paragraph" }] }
   );
 
   const isEditing = !!post;
@@ -185,9 +185,11 @@ export default function BlogEditor({ post }: BlogEditorProps) {
               <CardContent>
                 <MinimalTiptapEditor
                   value={tiptapContent}
-                  onChange={(value: Content) => setTiptapContent(value as JSONContent | undefined)}
-                  className="min-h-[400px] w-full"
-                  editorContentClassName="p-5"
+                  onChange={(value: Content) => {
+                    if (value) setTiptapContent(value as JSONContent);
+                  }}
+                  className="min-h-[400px] w-full border rounded-md"
+                  editorContentClassName="p-5 min-h-[350px]"
                   output="json"
                   placeholder="Write your post content..."
                   autofocus={false}
