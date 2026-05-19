@@ -187,7 +187,7 @@ export default function Navbar({ user, profile }: NavbarProps) {
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent
-                                        className="w-56 bg-[#0f0f10] border border-white/[0.08] rounded-xl"
+                                        className="w-56 bg-popover border border-border rounded-xl"
                                         align="end"
                                         forceMount
                                     >
@@ -207,7 +207,7 @@ export default function Navbar({ user, profile }: NavbarProps) {
                                                 </p>
                                             </div>
                                         </DropdownMenuLabel>
-                                        <DropdownMenuSeparator className="bg-white/[0.08]" />
+                                        <DropdownMenuSeparator className="bg-border" />
                                         <DropdownMenuItem asChild>
                                             <Link href="/profile">
                                                 <User className="mr-2 h-4 w-4" />
@@ -222,7 +222,7 @@ export default function Navbar({ user, profile }: NavbarProps) {
                                         </DropdownMenuItem>
                                         {profile?.role === "admin" && (
                                             <>
-                                                <DropdownMenuSeparator className="bg-white/[0.08]" />
+                                                <DropdownMenuSeparator className="bg-border" />
                                                 <DropdownMenuItem asChild>
                                                     <Link href="/admin">
                                                         <Shield className="mr-2 h-4 w-4" />
@@ -231,7 +231,7 @@ export default function Navbar({ user, profile }: NavbarProps) {
                                                 </DropdownMenuItem>
                                             </>
                                         )}
-                                        <DropdownMenuSeparator className="bg-white/[0.08]" />
+                                        <DropdownMenuSeparator className="bg-border" />
                                         <DropdownMenuItem
                                             onClick={handleLogout}
                                         >
@@ -270,11 +270,11 @@ export default function Navbar({ user, profile }: NavbarProps) {
                                     <span className="sr-only">Toggle menu</span>
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent className="bg-[#0a0a0b] border-l border-white/[0.08]">
+                            <SheetContent className="bg-background border-l border-border">
                                 <div className="grid gap-6 py-6 ml-5">
                                     {/* Mobile User Info */}
                                     {user && (
-                                        <div className="flex items-center space-x-3 pb-4 border-b border-white/[0.08]">
+                                        <div className="flex items-center space-x-3 pb-4 border-b border-border">
                                             <Avatar className="h-9 w-9 ring-2 ring-primary/30">
                                                 <AvatarImage
                                                     key={`mobile-${avatarKey}`}
@@ -362,7 +362,7 @@ export default function Navbar({ user, profile }: NavbarProps) {
                                             </Link>
                                             <Button
                                                 variant="outline"
-                                                className="w-[90%] border-white/[0.08] text-foreground hover:bg-white/[0.06]"
+                                                className="w-[90%] border-border text-foreground hover:bg-accent"
                                                 onClick={handleLogout}
                                             >
                                                 <LogOut className="mr-2 h-4 w-4" />

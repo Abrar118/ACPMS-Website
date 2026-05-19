@@ -16,6 +16,8 @@ const inter = Inter({
     weight: ["300", "400", "500", "600", "700", "800"],
 });
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
     title: "ACPSCM",
     description: "Adamjee Cantonment Public School Club of Mathematics",
@@ -56,12 +58,8 @@ export default async function RootLayout({
                             richColors
                             position="top-right"
                             toastOptions={{
-                                style: {
-                                    background: "rgba(255, 255, 255, 0.03)",
-                                    backdropFilter: "blur(24px)",
-                                    border: "1px solid rgba(255, 255, 255, 0.08)",
-                                    color: "#f5f5f5",
-                                },
+                                className:
+                                    "bg-background/60 backdrop-blur-xl border border-border text-foreground",
                             }}
                         />
                     </ThemeProvider>
