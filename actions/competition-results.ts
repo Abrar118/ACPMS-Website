@@ -6,6 +6,7 @@ import {
   updateResult,
   deleteResult,
   bulkCreateResults,
+  getResultsByCompetition,
   type CreateResultData,
 } from "@/lib/db/competition-results";
 import { getCurrentUser, isAdminOrExecutive } from "@/lib/auth-server";
@@ -72,6 +73,23 @@ export async function deleteResultAction(
   } catch (error: any) {
     console.error("Error deleting result:", error);
     return { success: false, error: error.message || "Failed to delete result" };
+  }
+}
+
+export async function getResultsForCompetitionAction(
+  competitionId: string
+): Promise<ResultActionResult> {
+  try {
+    const { user, profile } = await getCurrentUser();
+    if (!user || !profile) return { success: false, error: "Authentication required" };
+    if (!(await isAdminOrExecutive()))
+      return { success: false, error: "Insufficient permissions" };
+
+    const results = await getResultsByCompetition(competitionId);
+    return { success: true, data: JSON.parse(JSON.stringify(results)) };
+  } catch (error: any) {
+    console.error("Error fetching results:", error);
+    return { success: false, error: error.message || "Failed to fetch results" };
   }
 }
 
