@@ -29,8 +29,10 @@ export default function BlogClient({ posts }: { posts: SerializedBlogPost[] }) {
     });
   }, [posts, activeTag, searchTerm]);
 
-  const featuredPost = filteredPosts.find((p) => p.is_featured) ?? filteredPosts[0];
-  const remainingPosts = filteredPosts.filter((p) => p.id !== featuredPost?.id);
+  const featuredPost = filteredPosts.find((p) => p.is_featured) ?? null;
+  const remainingPosts = featuredPost
+    ? filteredPosts.filter((p) => p.id !== featuredPost.id)
+    : filteredPosts;
 
   return (
     <section className="py-24 px-4">
