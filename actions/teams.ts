@@ -7,6 +7,7 @@ import {
   deleteTeam,
   addTeamMember,
   removeTeamMember,
+  getTeamsByCompetition,
   type CreateTeamData,
   type AddTeamMemberData,
 } from "@/lib/db/teams";
@@ -108,5 +109,27 @@ export async function removeTeamMemberAction(
   } catch (error: any) {
     console.error("Error removing team member:", error);
     return { success: false, error: error.message || "Failed to remove team member" };
+  }
+}
+
+export async function getTeamsForEventAction(
+  competitionIds: string[]
+): Promise<TeamActionResult> {
+  try {
+    const { user, profile } = await getCurrentUser();
+    if (!user || !profile) return { success: false, error: "Authentication required" };
+    if (!(await isAdminOrExecutive()))
+      return { success: false, error: "Insufficient permissions" };
+
+    const allTeams = [];
+    for (const compId of competitionIds) {
+      const teams = await getTeamsByCompetition(compId);
+      allTeams.push(...teams);
+    }
+    const uniqueTeams = Array.from(new Map(allTeams.map(t => [t.id, t])).values());
+    return { success: true, data: JSON.parse(JSON.stringify(uniqueTeams)) };
+  } catch (error: any) {
+    console.error("Error fetching teams:", error);
+    return { success: false, error: error.message || "Failed to fetch teams" };
   }
 }
