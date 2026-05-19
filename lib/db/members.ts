@@ -13,6 +13,7 @@ export type CreateMemberData = {
   facebook_id_link?: string;
   instagram_id_link?: string;
   linkedin_id_link?: string;
+  user_id?: string;
 };
 
 export type UpdateMemberData = Partial<CreateMemberData>;
@@ -151,4 +152,8 @@ export async function updateMember(
  */
 export async function deleteMember(memberId: string): Promise<void> {
   await prisma.member.delete({ where: { id: memberId } });
+}
+
+export async function getMemberByUserId(userId: string): Promise<Member | null> {
+  return prisma.member.findFirst({ where: { user_id: userId } });
 }

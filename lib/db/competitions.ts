@@ -10,6 +10,7 @@ export interface CreateCompetitionData {
   fee?: number;
   display_order: number;
   is_published?: boolean;
+  is_team_event?: boolean;
 }
 
 // Get all competitions for an event, ordered by display_order ascending
@@ -36,6 +37,7 @@ export async function createCompetition(
       fee: data.fee ?? 0,
       display_order: data.display_order,
       is_published: data.is_published ?? false,
+      is_team_event: data.is_team_event ?? false,
       created_at: now,
       updated_at: now,
     },
@@ -59,6 +61,8 @@ export async function updateCompetition(
     updateData.display_order = data.display_order;
   if (data.is_published !== undefined)
     updateData.is_published = data.is_published;
+  if (data.is_team_event !== undefined)
+    updateData.is_team_event = data.is_team_event;
 
   return prisma.competition.update({
     where: { id: competitionId },
