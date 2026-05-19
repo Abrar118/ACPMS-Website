@@ -40,9 +40,13 @@ import {
   Megaphone,
   ImageIcon,
   MessageSquare,
+  Sun,
+  Moon,
+  Monitor,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import { logout } from "@/actions/auth";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
@@ -95,21 +99,6 @@ const managementItems = [
         url: "/admin/members",
         icon: Users,
       },
-      {
-        title: "Add Member",
-        url: "/admin/members/add",
-        icon: UserPlus,
-      },
-      {
-        title: "Pending Approval",
-        url: "/admin/members/pending",
-        icon: UserCheck,
-      },
-      {
-        title: "Inactive Members",
-        url: "/admin/members/inactive",
-        icon: UserX,
-      },
     ],
   },
   {
@@ -157,6 +146,7 @@ const managementItems = [
 export function AdminSidebar({ user, profile }: AdminSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
 
   const handleLogout = async () => {
     try {
@@ -169,17 +159,23 @@ export function AdminSidebar({ user, profile }: AdminSidebarProps) {
   };
 
   return (
-    <Sidebar variant="inset">
+    <Sidebar variant="inset" collapsible="icon">
       <SidebarHeader>
-        <div className="flex items-center gap-2 px-4 py-2">
-          <Shield className="h-6 w-6 text-primary" />
-          <div className="flex flex-col">
-            <span className="text-lg font-bold">Admin Panel</span>
-            <span className="text-xs text-muted-foreground">
-              ACPSCM Management
-            </span>
-          </div>
-        </div>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild>
+              <Link href="/admin">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                  <Shield className="size-4" />
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">Admin Panel</span>
+                  <span className="truncate text-xs text-muted-foreground">ACPSCM Management</span>
+                </div>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarHeader>
 
       <SidebarContent>
@@ -223,25 +219,6 @@ export function AdminSidebar({ user, profile }: AdminSidebarProps) {
           </SidebarGroup>
         ))}
 
-        {/* Settings */}
-        <SidebarGroup>
-          <SidebarGroupLabel>Settings</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  isActive={pathname === "/admin/settings"}
-                >
-                  <Link href="/admin/settings">
-                    <Settings className="h-4 w-4" />
-                    <span>Admin Settings</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter>
@@ -271,8 +248,8 @@ export function AdminSidebar({ user, profile }: AdminSidebarProps) {
                     <span className="truncate font-semibold">
                       {profile?.name}
                     </span>
-                    <span className="truncate text-xs text-muted-foreground">
-                      Administrator
+                    <span className="truncate text-xs text-muted-foreground capitalize">
+                      {profile?.role || "Admin"}
                     </span>
                   </div>
                 </SidebarMenuButton>
@@ -321,6 +298,25 @@ export function AdminSidebar({ user, profile }: AdminSidebarProps) {
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Account</span>
                   </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel className="text-xs font-normal text-muted-foreground px-2 py-1">
+                  Theme
+                </DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => setTheme("light")}>
+                  <Sun className="mr-2 h-4 w-4" />
+                  <span>Light</span>
+                  {theme === "light" && <span className="ml-auto text-xs text-primary">✓</span>}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("dark")}>
+                  <Moon className="mr-2 h-4 w-4" />
+                  <span>Dark</span>
+                  {theme === "dark" && <span className="ml-auto text-xs text-primary">✓</span>}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("system")}>
+                  <Monitor className="mr-2 h-4 w-4" />
+                  <span>System</span>
+                  {theme === "system" && <span className="ml-auto text-xs text-primary">✓</span>}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>

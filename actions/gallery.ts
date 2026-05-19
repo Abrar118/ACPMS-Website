@@ -30,7 +30,7 @@ export async function createAlbumAction(albumData: CreateAlbumData): Promise<Gal
     const album = await createAlbum(user.id, albumData);
     revalidatePath("/admin/gallery", "page");
     revalidatePath("/gallery", "page");
-    return { success: true, message: "Album created successfully", data: album };
+    return { success: true, message: "Album created successfully", data: JSON.parse(JSON.stringify(album)) };
   } catch (error: any) {
     console.error("Error creating album:", error);
     return { success: false, error: error.message || "Failed to create album" };

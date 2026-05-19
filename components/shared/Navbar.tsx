@@ -86,7 +86,7 @@ export default function Navbar({ user, profile }: NavbarProps) {
 
     return (
         <nav
-            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+            className={`sticky top-0 left-0 right-0 z-50 transition-all duration-300 ${
                 isScrolled
                     ? "bg-background/80 backdrop-blur-xl border-b border-border shadow-sm"
                     : "bg-transparent border-b border-transparent"

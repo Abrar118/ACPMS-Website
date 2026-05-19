@@ -3,6 +3,9 @@
 # brainstorm mockups
 .superpowers/
 
+# hook logs
+.remember/
+
 # dependencies
 /node_modules
 /.pnp

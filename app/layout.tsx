@@ -7,6 +7,8 @@ import { Toaster } from "sonner";
 import { ConditionalNavbar } from "@/components/ConditionalNavbar";
 import { getCurrentUser } from "@/lib/auth-server";
 import { LoadingScreen } from "@/components/ui/loading-screen";
+import AnnouncementBanner from "@/components/announcements/AnnouncementBanner";
+import { getActiveAnnouncements } from "@/lib/db/announcements";
 
 const inter = Inter({
     subsets: ["latin"],
@@ -24,8 +26,11 @@ export default async function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    // Get current user data server-side
-    const { user, profile } = await getCurrentUser();
+    const [{ user, profile }, announcements] = await Promise.all([
+        getCurrentUser(),
+        getActiveAnnouncements(),
+    ]);
+    const topAnnouncement = announcements.length > 0 ? announcements[0] : null;
 
     return (
         <ReactQueryClientProvider>
@@ -40,6 +45,9 @@ export default async function RootLayout({
                         enableSystem
                         disableTransitionOnChange
                     >
+                        <AnnouncementBanner
+                            announcement={topAnnouncement ? JSON.parse(JSON.stringify(topAnnouncement)) : null}
+                        />
                         <ConditionalNavbar user={user} profile={profile ? JSON.parse(JSON.stringify(profile)) : null} />
                         <main className="bg-background flex flex-col min-h-screen">
                             {children}

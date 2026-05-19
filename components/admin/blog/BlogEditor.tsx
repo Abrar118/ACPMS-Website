@@ -80,14 +80,15 @@ export default function BlogEditor({ post }: BlogEditorProps) {
 
   function handleSubmit(publish: boolean) {
     const values = form.getValues();
+    const safeContent = tiptapContent ? JSON.parse(JSON.stringify(tiptapContent)) : undefined;
     const data: CreateBlogPostData = {
       title: values.title,
       slug: values.slug,
       is_published: publish,
       is_featured: values.is_featured ?? false,
-      content: tiptapContent,
-      excerpt: values.excerpt,
-      cover_image: values.cover_image,
+      content: safeContent,
+      excerpt: values.excerpt || undefined,
+      cover_image: values.cover_image || undefined,
       tags: typeof values.tags === "string"
         ? (values.tags as unknown as string).split(",").map((t: string) => t.trim()).filter(Boolean)
         : (values.tags ?? []),

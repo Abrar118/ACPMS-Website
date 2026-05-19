@@ -29,7 +29,7 @@ export async function createBlogPostAction(
     const post = await createBlogPost(user.id, postData);
     revalidatePath("/admin/blog", "page");
     revalidatePath("/blog", "page");
-    return { success: true, message: "Blog post created successfully", data: post };
+    return { success: true, message: "Blog post created successfully" };
   } catch (error: any) {
     console.error("Error creating blog post:", error);
     return { success: false, error: error.message || "Failed to create blog post" };
@@ -50,7 +50,7 @@ export async function updateBlogPostAction(
     revalidatePath("/admin/blog", "page");
     revalidatePath("/blog", "page");
     revalidatePath(`/blog/${post.slug}`, "page");
-    return { success: true, message: "Blog post updated successfully", data: post };
+    return { success: true, message: "Blog post updated successfully" };
   } catch (error: any) {
     console.error("Error updating blog post:", error);
     return { success: false, error: error.message || "Failed to update blog post" };

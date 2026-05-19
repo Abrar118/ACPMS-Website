@@ -297,8 +297,8 @@ export default function AdminGalleryClient({
         description: values.description || undefined,
         cover_image: values.cover_image || undefined,
         event_id: values.event_id || undefined,
-        is_published: values.is_published,
-        display_order: values.display_order,
+        is_published: values.is_published ?? false,
+        display_order: Number(values.display_order) || 0,
       };
 
       const result = editingAlbum
@@ -556,7 +556,11 @@ export default function AdminGalleryClient({
                   <FormItem>
                     <FormLabel>Display Order</FormLabel>
                     <FormControl>
-                      <Input type="number" {...field} />
+                      <Input
+                        type="number"
+                        value={field.value ?? 0}
+                        onChange={(e) => field.onChange(Number(e.target.value) || 0)}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
