@@ -6,6 +6,7 @@ import {
   updateParticipantStatus,
   type EventRegistrationData,
 } from "@/lib/db/participants";
+import { createPayment } from "@/lib/db/payments";
 
 type RegistrationActionResult = {
   success: boolean;
@@ -19,10 +20,20 @@ export async function registerForEventAction(
   registrationData: EventRegistrationData
 ): Promise<RegistrationActionResult> {
   try {
-    // Register for the event (uses Prisma $transaction internally)
     const result = await registerForEvent(registrationData);
 
-    // Revalidate relevant pages
+    if (registrationData.transaction_id) {
+      for (const competitionId of registrationData.competitions) {
+        await createPayment({
+          participant_id: result.participant.id,
+          competition_id: competitionId,
+          amount: 0,
+          payment_provider: registrationData.payment_provider,
+          transaction_id: registrationData.transaction_id,
+        });
+      }
+    }
+
     revalidatePath(`/events/${eventId}`, "page");
     revalidatePath("/events", "page");
 
@@ -45,7 +56,6 @@ export async function updateParticipantStatusAction(
   status: string
 ): Promise<RegistrationActionResult> {
   try {
-    // Update the participant status
     const registration = await updateParticipantStatus(registrationId, status);
 
     return {

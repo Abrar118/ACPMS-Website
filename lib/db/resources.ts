@@ -34,6 +34,7 @@ export async function createResource(
       resource_url: data.resourceUrl ?? null,
       author: data.author ?? null,
       status: data.status ?? "Draft",
+      is_published: data.status === "Published" || false,
       is_featured: data.isFeatured ?? false,
       is_archived: false,
       levels: data.levels?.map((l) => l.value) ?? [],
@@ -59,7 +60,13 @@ export async function getAllResources(): Promise<Resource[]> {
  */
 export async function getPublishedResources(): Promise<Resource[]> {
   return prisma.resource.findMany({
-    where: { status: "Published", is_archived: false },
+    where: {
+      OR: [
+        { status: "Published" },
+        { is_published: true },
+      ],
+      is_archived: false,
+    },
     orderBy: { created_at: "desc" },
   });
 }
@@ -69,7 +76,14 @@ export async function getPublishedResources(): Promise<Resource[]> {
  */
 export async function getFeaturedResources(): Promise<Resource[]> {
   return prisma.resource.findMany({
-    where: { status: "Published", is_featured: true, is_archived: false },
+    where: {
+      OR: [
+        { status: "Published" },
+        { is_published: true },
+      ],
+      is_featured: true,
+      is_archived: false,
+    },
     orderBy: { created_at: "desc" },
   });
 }
@@ -105,7 +119,10 @@ export async function updateResource(
         resource_url: data.resourceUrl ?? null,
       }),
       ...(data.author !== undefined && { author: data.author ?? null }),
-      ...(data.status !== undefined && { status: data.status }),
+      ...(data.status !== undefined && {
+        status: data.status,
+        is_published: data.status === "Published",
+      }),
       ...(data.isFeatured !== undefined && { is_featured: data.isFeatured }),
       ...(data.levels !== undefined && {
         levels: data.levels.map((l) => l.value),
@@ -147,7 +164,14 @@ export async function getResourcesByCategory(
   category: string
 ): Promise<Resource[]> {
   return prisma.resource.findMany({
-    where: { status: "Published", category, is_archived: false },
+    where: {
+      OR: [
+        { status: "Published" },
+        { is_published: true },
+      ],
+      category,
+      is_archived: false,
+    },
     orderBy: { created_at: "desc" },
   });
 }
