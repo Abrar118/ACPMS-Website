@@ -38,3 +38,37 @@ export enum EEventMode {
   InPerson = "In Person",
   Hybrid = "Hybrid",
 }
+
+export enum ETeamRole {
+  Captain = "captain",
+  Member = "member",
+}
+
+export enum EPaymentStatus {
+  Pending = "pending",
+  Verified = "verified",
+  Rejected = "rejected",
+}
+
+export enum EPaymentProvider {
+  BKash = "BKash",
+}
+
+export enum EAnnouncementPriority {
+  Low = "low",
+  Normal = "normal",
+  Urgent = "urgent",
+}
+
+export enum EContactStatus {
+  New = "new",
+  Read = "read",
+  Replied = "replied",
+  Archived = "archived",
+}
+
+export enum ERegistrationStatus {
+  Pending = "pending",
+  Approved = "approved",
+  Rejected = "rejected",
+}
