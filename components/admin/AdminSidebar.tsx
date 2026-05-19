@@ -36,6 +36,10 @@ import {
   UserPlus,
   UserCheck,
   UserX,
+  FileText,
+  Megaphone,
+  ImageIcon,
+  MessageSquare,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -63,6 +67,26 @@ const menuItems = [
 ];
 
 const managementItems = [
+  {
+    title: "Content",
+    items: [
+      {
+        title: "Blog Posts",
+        url: "/admin/blog",
+        icon: FileText,
+      },
+      {
+        title: "Announcements",
+        url: "/admin/announcements",
+        icon: Megaphone,
+      },
+      {
+        title: "Gallery",
+        url: "/admin/gallery",
+        icon: ImageIcon,
+      },
+    ],
+  },
   {
     title: "Members",
     items: [
@@ -98,21 +122,16 @@ const managementItems = [
       },
     ],
   },
-  // {
-  //   title: "Magazines",
-  //   items: [
-  //     {
-  //       title: "All Magazines",
-  //       url: "/admin/magazines",
-  //       icon: BookOpen,
-  //     },
-  //     {
-  //       title: "Add Magazine",
-  //       url: "/admin/magazines/create",
-  //       icon: BookOpen,
-  //     },
-  //   ],
-  // },
+  {
+    title: "Magazines",
+    items: [
+      {
+        title: "All Magazines",
+        url: "/admin/magazines",
+        icon: BookOpen,
+      },
+    ],
+  },
   {
     title: "Resources",
     items: [
@@ -120,6 +139,16 @@ const managementItems = [
         title: "All Resources",
         url: "/admin/resources",
         icon: FolderOpen,
+      },
+    ],
+  },
+  {
+    title: "Communications",
+    items: [
+      {
+        title: "Contact Submissions",
+        url: "/admin/contact",
+        icon: MessageSquare,
       },
     ],
   },
