@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { ReactQueryClientProvider } from "@/components/ReactQueryClientProvider";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -7,10 +7,10 @@ import { Toaster } from "sonner";
 import { ConditionalNavbar } from "@/components/ConditionalNavbar";
 import { getCurrentUser } from "@/lib/auth-server";
 
-const poppins = Poppins({
+const inter = Inter({
     subsets: ["latin"],
-    variable: "--font-poppins",
-    weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+    variable: "--font-sans",
+    weight: ["300", "400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -28,21 +28,32 @@ export default async function RootLayout({
 
     return (
         <ReactQueryClientProvider>
-            <html lang="en">
+            <html lang="en" className="dark">
                 <body
-                    className={`${poppins.variable} font-poppins antialiased`}
+                    className={`${inter.variable} font-sans antialiased`}
                 >
                     <ThemeProvider
                         attribute="class"
-                        defaultTheme="system"
-                        enableSystem
+                        defaultTheme="dark"
+                        forcedTheme="dark"
                         disableTransitionOnChange
                     >
                         <ConditionalNavbar user={user} profile={profile ? JSON.parse(JSON.stringify(profile)) : null} />
                         <main className="bg-background flex flex-col min-h-screen">
                             {children}
                         </main>
-                        <Toaster richColors position="top-right" />
+                        <Toaster
+                            richColors
+                            position="top-right"
+                            toastOptions={{
+                                style: {
+                                    background: "rgba(255, 255, 255, 0.03)",
+                                    backdropFilter: "blur(24px)",
+                                    border: "1px solid rgba(255, 255, 255, 0.08)",
+                                    color: "#f5f5f5",
+                                },
+                            }}
+                        />
                     </ThemeProvider>
                 </body>
             </html>
