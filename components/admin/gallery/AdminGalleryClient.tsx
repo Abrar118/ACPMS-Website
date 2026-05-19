@@ -508,8 +508,8 @@ export default function AdminGalleryClient({
                   <FormItem>
                     <FormLabel>Event (optional)</FormLabel>
                     <Select
-                      onValueChange={field.onChange}
-                      value={field.value ?? ""}
+                      onValueChange={(val) => field.onChange(val === "none" ? "" : val)}
+                      value={field.value || "none"}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -517,7 +517,7 @@ export default function AdminGalleryClient({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">None</SelectItem>
+                        <SelectItem value="none">None</SelectItem>
                         {events.map((event) => (
                           <SelectItem key={event.id} value={event.id}>
                             {event.title}
