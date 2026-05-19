@@ -27,7 +27,7 @@ No test framework is configured.
 
 ### Authentication
 
-Supabase Auth manages sessions via `@supabase/ssr` cookies. The middleware (`middleware.ts`) refreshes tokens on every request and redirects unauthenticated users away from protected routes. Public paths: `/`, `/auth`, `/events`, `/about`, `/magazine`.
+Supabase Auth manages sessions via `@supabase/ssr` cookies. The middleware (`middleware.ts`) refreshes tokens on every request and redirects unauthenticated users away from protected routes. Public path prefixes: `/`, `/auth`, `/events`, `/about`, `/magazine`, `/blog`, `/resources`, `/gallery`.
 
 - `lib/auth-server.ts` — `getCurrentUser()` returns `{ user, profile }` server-side
 - `isAdminOrExecutive()` — role check used by all admin server actions
