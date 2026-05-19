@@ -23,11 +23,11 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import AddEventDialog from "@/components/events/admin/addEventForm/addEventDialog";
 import { EEventMode } from "@/components/shared/enums";
-import { type EventRow } from "@/queries/events";
+import type { Event } from "@/lib/db/events";
 import { EventActions } from "@/components/events/admin/EventActions";
 
 interface AdminEventsClientProps {
-  events: EventRow[];
+  events: Event[];
   error?: string;
 }
 
@@ -70,7 +70,7 @@ function getTypeBadge(eventMode: string | undefined) {
   }
 }
 
-function EventRow({ event }: { event: EventRow }) {
+function EventTableRow({ event }: { event: Event }) {
   return (
     <TableRow>
       <TableCell className="font-medium max-w-[200px]">
@@ -258,7 +258,7 @@ export default function AdminEventsClient({ events, error }: AdminEventsClientPr
               </TableRow>
             ) : (
               filteredEvents.map((event) => (
-                <EventRow key={event.id} event={event} />
+                <EventTableRow key={event.id} event={event} />
               ))
             )}
           </TableBody>

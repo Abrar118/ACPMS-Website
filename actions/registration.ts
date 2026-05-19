@@ -1,13 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import createSupabaseServer from "@/utils/supabase/supabase-server";
 import {
   registerForEvent,
-  checkExistingParticipant,
   updateParticipantStatus,
   type EventRegistrationData,
-} from "@/queries/participants";
+} from "@/lib/db/participants";
+import { createPayment } from "@/lib/db/payments";
 
 type RegistrationActionResult = {
   success: boolean;
@@ -21,38 +20,27 @@ export async function registerForEventAction(
   registrationData: EventRegistrationData
 ): Promise<RegistrationActionResult> {
   try {
-    const supabase = await createSupabaseServer();
+    const result = await registerForEvent(registrationData);
 
-    // // Check if participant already exists
-    // const existingParticipantResult = await checkExistingParticipant(
-    //   supabase,
-    //   registrationData.email,
-    //   registrationData.id_at_institution,
-    //   registrationData.institution
-    // );
-
-    // if (existingParticipantResult.success && existingParticipantResult.data) {
-    //   return {
-    //     success: false,
-    //     error: "A participant with this email or student ID already exists for this institution",
-    //   };
-    // }
-
-    // Register for the event
-    const result = await registerForEvent(supabase, registrationData);
-
-    if (!result.success || result.error) {
-      return { success: false, error: result.error || "Failed to register for event" };
+    if (registrationData.transaction_id) {
+      for (const competitionId of registrationData.competitions) {
+        await createPayment({
+          participant_id: result.participant.id,
+          competition_id: competitionId,
+          amount: 0,
+          payment_provider: registrationData.payment_provider,
+          transaction_id: registrationData.transaction_id,
+        });
+      }
     }
 
-    // Revalidate relevant pages
     revalidatePath(`/events/${eventId}`, "page");
     revalidatePath("/events", "page");
 
     return {
       success: true,
       message: "Registration successful, organizers will verify and reach out to you shortly",
-      data: result.data,
+      data: result,
     };
   } catch (error: any) {
     console.error("Error processing registration:", error);
@@ -68,19 +56,12 @@ export async function updateParticipantStatusAction(
   status: string
 ): Promise<RegistrationActionResult> {
   try {
-    const supabase = await createSupabaseServer();
-
-    // Update the participant status
-    const result = await updateParticipantStatus(supabase, registrationId, status);
-
-    if (!result.success || result.error) {
-      return { success: false, error: result.error || "Failed to update participant status" };
-    }
+    const registration = await updateParticipantStatus(registrationId, status);
 
     return {
       success: true,
       message: `Participant status updated to ${status}`,
-      data: result.data,
+      data: registration,
     };
   } catch (error: any) {
     console.error("Error updating participant status:", error);

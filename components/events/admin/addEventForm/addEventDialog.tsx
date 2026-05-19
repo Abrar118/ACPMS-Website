@@ -36,7 +36,6 @@ import {
   EEventType,
   EResourceCategory,
   EResourceLevel,
-  EResourceStatus,
   EResourceType,
 } from "@/components/shared/enums";
 import MultipleSelector from "@/components/shared/multiselect";

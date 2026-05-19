@@ -9,18 +9,15 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import createSupabaseServer from "@/utils/supabase/supabase-server";
-import { getAllResources } from "@/queries/resources";
+import { getAllResources } from "@/lib/db/resources";
 import AdminResourcesClient from "@/components/resources/admin/AdminResourcesClient";
 
 async function ResourcesTable() {
-  const supabase = await createSupabaseServer();
-  const result = await getAllResources(supabase);
+  const resources = await getAllResources();
 
   return (
-    <AdminResourcesClient 
-      resources={result.data || []} 
-      error={result.error || undefined}
+    <AdminResourcesClient
+      resources={JSON.parse(JSON.stringify(resources))}
     />
   );
 }

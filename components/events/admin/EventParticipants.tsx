@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import {
   Table,
   TableBody,
@@ -23,13 +22,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { updateParticipantStatusAction } from "@/actions/registration";
-import createSupabaseBrowser from "@/utils/supabase/supabase-browser";
-import { getEventParticipants } from "@/queries/participants";
 import { Search, Download, Users, CheckCircle, XCircle, Clock } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface EventParticipantsProps {
   eventId: string;
   eventTitle: string;
+  initialParticipants?: any[];
 }
 
 const statusColors = {
@@ -44,23 +43,13 @@ const statusIcons = {
   rejected: XCircle,
 };
 
-export default function EventParticipants({ eventId, eventTitle }: EventParticipantsProps) {
+export default function EventParticipants({ eventId, eventTitle, initialParticipants = [] }: EventParticipantsProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
+  const router = useRouter();
 
-  const supabase = createSupabaseBrowser();
-
-  const { data: participants = [], isLoading, refetch } = useQuery({
-    queryKey: ["event-participants", eventId],
-    queryFn: async () => {
-      const result = await getEventParticipants(supabase, eventId);
-      if (result.success) {
-        return result.data || [];
-      }
-      throw new Error(result.error || "Failed to fetch participants");
-    },
-  });
+  const participants = initialParticipants;
 
   const filteredParticipants = participants.filter((registration: any) => {
     const matchesSearch = 
@@ -81,7 +70,7 @@ export default function EventParticipants({ eventId, eventTitle }: EventParticip
       
       if (result.success) {
         toast.success(`Status updated to ${newStatus}`);
-        refetch();
+        router.refresh();
       } else {
         toast.error(result.error || "Failed to update status");
       }
@@ -152,18 +141,6 @@ export default function EventParticipants({ eventId, eventTitle }: EventParticip
   };
 
   const stats = getStatusStats();
-
-  if (isLoading) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <div className="space-y-6">

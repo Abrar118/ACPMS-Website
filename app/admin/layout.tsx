@@ -1,44 +1,32 @@
 import { redirect } from "next/navigation";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import createSupabaseServer from "@/utils/supabase/supabase-server";
-import { getUserById } from "@/queries/auth";
+import { getCurrentUser } from "@/lib/auth-server";
 
 export default async function AdminLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
-    const supabase = await createSupabaseServer();
-
-    // Get current user
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
+    const { user, profile } = await getCurrentUser();
 
     // Redirect if not authenticated
     if (!user) {
         redirect("/auth");
     }
 
-    // Get user profile
-    const profileResponse = await getUserById(supabase, user.id);
-
-    if (!profileResponse.success || !profileResponse.data) {
+    if (!profile) {
         redirect("/auth");
     }
 
-    const profile = profileResponse.data;
-
-    // Check if user is admin
-    if (profile.role !== "admin") {
+    if (profile.role !== "admin" && profile.role !== "executive") {
         redirect("/");
     }
 
     return (
         <SidebarProvider>
             <div className="flex min-h-screen w-full bg-background">
-                <AdminSidebar user={user} profile={profile} />
+                <AdminSidebar user={user} profile={JSON.parse(JSON.stringify(profile))} />
                 <SidebarInset className="flex-1">
                     <main className="flex-1">{children}</main>
                 </SidebarInset>

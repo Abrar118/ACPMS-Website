@@ -1,11 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import createSupabaseServer from "@/utils/supabase/supabase-server";
 import {
   updateParticipantStatus,
   updateAllParticipantStatuses,
-} from "@/queries/participants";
+} from "@/lib/db/participants";
 import { getCurrentUser, isAdminOrExecutive } from "@/lib/auth-server";
 
 type ParticipantActionResult = {
@@ -36,14 +35,8 @@ export async function updateParticipantStatusAction(
       };
     }
 
-    const supabase = await createSupabaseServer();
-
     // Update the participant status
-    const result = await updateParticipantStatus(supabase, registrationId, status);
-
-    if (result.error) {
-      return { success: false, error: result.error };
-    }
+    const registration = await updateParticipantStatus(registrationId, status);
 
     // Revalidate relevant pages
     revalidatePath(`/admin/events/${eventId}/participants`, "page");
@@ -51,7 +44,7 @@ export async function updateParticipantStatusAction(
     return {
       success: true,
       message: `Participant status updated to ${status}`,
-      data: result.data,
+      data: registration,
     };
   } catch (error: any) {
     console.error("Error updating participant status:", error);
@@ -83,14 +76,8 @@ export async function updateAllParticipantStatusesAction(
       };
     }
 
-    const supabase = await createSupabaseServer();
-
-    // Update all participant statuses for this event
-    const result = await updateAllParticipantStatuses(supabase, participantId, eventId, status);
-
-    if (result.error) {
-      return { success: false, error: result.error };
-    }
+    // Update all participant statuses for this event (returns count)
+    const count = await updateAllParticipantStatuses(participantId, eventId, status);
 
     // Revalidate relevant pages
     revalidatePath(`/admin/events/${eventId}/participants`, "page");
@@ -98,7 +85,7 @@ export async function updateAllParticipantStatusesAction(
     return {
       success: true,
       message: `All registrations for participant updated to ${status}`,
-      data: result.data,
+      data: { count },
     };
   } catch (error: any) {
     console.error("Error updating all participant statuses:", error);

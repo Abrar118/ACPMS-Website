@@ -2,38 +2,40 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ViewerModal from "@/components/shared/ViewerModal";
-import { 
-    BookOpen, 
-    ExternalLink, 
-    FileText, 
-    Video, 
+import {
+    BookOpen,
+    ExternalLink,
+    FileText,
+    Video,
     Calculator,
     Search,
     Eye,
     ArrowLeft,
-    Filter
+    Filter,
+    Star
 } from "lucide-react";
 import { EResourceCategory, EResourceType, EResourceLevel } from "@/components/shared/enums";
-import type { ResourceRow } from "@/queries/resources";
+import type { Resource } from "@/lib/db/resources";
 import { incrementViewCount } from "@/actions/resources";
+import { GlassCard } from "@/components/ui/glass-card";
+import { SectionHeader } from "@/components/ui/section-header";
 
 interface CategoryResourcesClientProps {
-    resources: ResourceRow[];
+    resources: Resource[];
     category: string;
     categoryName: string;
 }
 
-export default function CategoryResourcesClient({ 
-    resources, 
-    category, 
-    categoryName 
+export default function CategoryResourcesClient({
+    resources,
+    category,
+    categoryName
 }: CategoryResourcesClientProps) {
     const router = useRouter();
     const [searchTerm, setSearchTerm] = useState("");
@@ -87,12 +89,12 @@ export default function CategoryResourcesClient({
 
     const handleViewResource = (url: string, resourceId?: string) => {
         if (!url) return;
-        
+
         // Increment view count
         if (resourceId) {
             incrementViewCount(resourceId).catch(console.error);
         }
-        
+
         setCurrentViewUrl(url);
         setViewerModal(true);
     };
@@ -109,7 +111,7 @@ export default function CategoryResourcesClient({
             resource.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             resource.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
 
-        const matchesLevel = selectedLevel === "all" || 
+        const matchesLevel = selectedLevel === "all" ||
             resource.levels?.some(level => level === selectedLevel);
 
         return matchesSearch && matchesLevel;
@@ -125,23 +127,23 @@ export default function CategoryResourcesClient({
     return (
         <>
             {/* Header Section */}
-            <section className="pt-24 pb-8 px-4 bg-gradient-to-br from-primary/10 via-background to-secondary/5">
-                <div className="max-w-6xl mx-auto">
+            <section className="py-24 px-4">
+                <div className="max-w-7xl mx-auto">
                     {/* Breadcrumb */}
                     <Breadcrumb className="mb-6">
                         <BreadcrumbList>
                             <BreadcrumbItem>
-                                <BreadcrumbLink 
+                                <BreadcrumbLink
                                     href="/resources"
-                                    className="flex items-center gap-1"
+                                    className="flex items-center gap-1 text-muted-foreground hover:text-foreground"
                                 >
                                     <BookOpen className="w-4 h-4" />
                                     Resources
                                 </BreadcrumbLink>
                             </BreadcrumbItem>
-                            <BreadcrumbSeparator />
+                            <BreadcrumbSeparator className="text-muted-foreground" />
                             <BreadcrumbItem>
-                                <span className="flex items-center gap-1">
+                                <span className="flex items-center gap-1 text-foreground">
                                     <CategoryIcon className="w-4 h-4" />
                                     {categoryName}
                                 </span>
@@ -150,9 +152,9 @@ export default function CategoryResourcesClient({
                     </Breadcrumb>
 
                     {/* Back Button */}
-                    <Button 
-                        variant="ghost" 
-                        className="mb-4 p-2 h-auto"
+                    <Button
+                        variant="ghost"
+                        className="mb-4 p-2 h-auto text-muted-foreground hover:text-foreground"
                         onClick={() => router.back()}
                     >
                         <ArrowLeft className="w-4 h-4 mr-2" />
@@ -163,15 +165,13 @@ export default function CategoryResourcesClient({
                     <div className="text-center">
                         <div className="flex items-center justify-center gap-2 mb-4">
                             <CategoryIcon className="w-8 h-8 text-primary" />
-                            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                                {categoryName}
-                            </h1>
                         </div>
-                        <p className="text-xl text-muted-foreground mb-6 max-w-2xl mx-auto">
-                            {getCategoryDescription(category)}
-                        </p>
-                        
-                        <Badge variant="secondary" className="mb-4">
+                        <SectionHeader
+                            title={categoryName}
+                            subtitle={getCategoryDescription(category)}
+                        />
+
+                        <Badge variant="secondary" className="mt-4 border-white/[0.08] bg-white/[0.04] text-muted-foreground">
                             {resources.length} resources available
                         </Badge>
                     </div>
@@ -179,15 +179,15 @@ export default function CategoryResourcesClient({
             </section>
 
             {/* Filters Section */}
-            <section className="py-6 px-4 border-b">
-                <div className="max-w-6xl mx-auto">
+            <section className="py-6 px-4 border-b border-white/[0.08]">
+                <div className="max-w-7xl mx-auto">
                     <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
                         {/* Search */}
                         <div className="relative flex-1 max-w-md">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                            <Input 
-                                placeholder="Search resources..." 
-                                className="pl-10 pr-4 py-2"
+                            <Input
+                                placeholder="Search resources..."
+                                className="pl-10 pr-4 py-2 bg-white/[0.03] border-white/[0.08] text-foreground placeholder:text-muted-foreground focus:border-white/[0.15]"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
@@ -200,7 +200,7 @@ export default function CategoryResourcesClient({
                                 value={selectedLevel}
                                 onValueChange={setSelectedLevel}
                             >
-                                <SelectTrigger className="w-[180px]">
+                                <SelectTrigger className="w-[180px] bg-white/[0.03] border-white/[0.08] text-foreground">
                                     <SelectValue placeholder="All Levels" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -216,14 +216,14 @@ export default function CategoryResourcesClient({
             </section>
 
             {/* Resources Grid */}
-            <section className="py-8 px-4 min-h-[60vh]">
-                <div className="max-w-6xl mx-auto">
+            <section className="py-24 px-4 min-h-[60vh]">
+                <div className="max-w-7xl mx-auto">
                     {filteredResources.length === 0 ? (
                         <div className="text-center py-16">
                             <CategoryIcon className="w-16 h-16 mx-auto text-muted-foreground/50 mb-4" />
-                            <h3 className="text-xl font-semibold mb-2">No resources found</h3>
+                            <h3 className="text-xl font-semibold text-foreground mb-2">No resources found</h3>
                             <p className="text-muted-foreground">
-                                {searchTerm || selectedLevel !== "all" 
+                                {searchTerm || selectedLevel !== "all"
                                     ? "Try adjusting your search or filter criteria."
                                     : "No resources are available in this category yet."
                                 }
@@ -234,27 +234,36 @@ export default function CategoryResourcesClient({
                             {filteredResources.map((resource) => {
                                 const TypeIcon = getTypeIcon(resource.resource_type);
                                 return (
-                                    <Card key={resource.id} className="hover:shadow-lg transition-shadow h-full">
-                                        <CardHeader>
+                                    <GlassCard
+                                        key={resource.id}
+                                        className={`p-0 h-full ${resource.is_featured ? 'border-primary/30' : ''}`}
+                                    >
+                                        <div className="p-6 pb-4">
                                             <div className="flex items-start justify-between">
-                                                <Badge variant={resource.resource_type === EResourceType.Pdf ? 'default' : 'secondary'}>
+                                                <Badge
+                                                    variant={resource.resource_type === EResourceType.Pdf ? 'default' : 'secondary'}
+                                                    className="bg-white/[0.04] border border-white/[0.08] text-muted-foreground"
+                                                >
                                                     <TypeIcon className="w-3 h-3 mr-1" />
                                                     {resource.resource_type.charAt(0).toUpperCase() + resource.resource_type.slice(1)}
                                                 </Badge>
                                                 {resource.is_featured && (
-                                                    <Badge variant="destructive" className="text-xs">
+                                                    <Badge className="text-xs bg-primary/20 text-primary border-primary/30">
+                                                        <Star className="w-3 h-3 mr-1" />
                                                         Featured
                                                     </Badge>
                                                 )}
                                             </div>
-                                            <CardTitle className="text-lg line-clamp-1">{resource.title}</CardTitle>
+                                            <h3 className="text-lg font-semibold text-foreground line-clamp-1 mt-3">
+                                                {resource.title}
+                                            </h3>
                                             {resource.description && (
-                                                <CardDescription className="line-clamp-3">
+                                                <p className="text-sm text-muted-foreground line-clamp-3 mt-1">
                                                     {resource.description}
-                                                </CardDescription>
+                                                </p>
                                             )}
-                                        </CardHeader>
-                                        <CardContent className="flex flex-col h-full">
+                                        </div>
+                                        <div className="px-6 pb-6 flex flex-col h-full">
                                             {/* Metadata */}
                                             <div className="flex items-center justify-between mb-4 text-sm text-muted-foreground">
                                                 <div className="flex items-center gap-1">
@@ -272,7 +281,7 @@ export default function CategoryResourcesClient({
                                             {resource.levels && resource.levels.length > 0 && (
                                                 <div className="flex flex-wrap gap-1 mb-4">
                                                     {resource.levels.map((level, idx) => (
-                                                        <Badge key={idx} variant="outline" className="text-xs">
+                                                        <Badge key={idx} variant="outline" className="text-xs border-white/[0.08] text-muted-foreground">
                                                             {level}
                                                         </Badge>
                                                     ))}
@@ -283,12 +292,12 @@ export default function CategoryResourcesClient({
                                             {resource.tags && resource.tags.length > 0 && (
                                                 <div className="flex flex-wrap gap-1 mb-4">
                                                     {resource.tags.slice(0, 3).map((tag, idx) => (
-                                                        <Badge key={idx} variant="secondary" className="text-xs">
+                                                        <Badge key={idx} variant="secondary" className="text-xs bg-white/[0.04] border border-white/[0.08] text-muted-foreground">
                                                             {tag}
                                                         </Badge>
                                                     ))}
                                                     {resource.tags.length > 3 && (
-                                                        <Badge variant="secondary" className="text-xs">
+                                                        <Badge variant="secondary" className="text-xs bg-white/[0.04] border border-white/[0.08] text-muted-foreground">
                                                             +{resource.tags.length - 3}
                                                         </Badge>
                                                     )}
@@ -297,25 +306,26 @@ export default function CategoryResourcesClient({
 
                                             {/* Actions */}
                                             <div className="flex gap-2 mt-auto">
-                                                <Button 
-                                                    className="flex-1"
+                                                <Button
+                                                    className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
                                                     onClick={() => handleViewResource(resource.resource_url || "", resource.id)}
                                                     disabled={!resource.resource_url}
                                                 >
                                                     <Eye className="w-4 h-4 mr-2" />
                                                     View
                                                 </Button>
-                                                <Button 
-                                                    variant="outline" 
+                                                <Button
+                                                    variant="outline"
                                                     size="icon"
+                                                    className="border-white/[0.08] bg-white/[0.03] text-foreground hover:bg-white/[0.06] hover:border-white/[0.15]"
                                                     onClick={() => window.open(resource.resource_url || "", '_blank')}
                                                     disabled={!resource.resource_url}
                                                 >
                                                     <ExternalLink className="w-4 h-4" />
                                                 </Button>
                                             </div>
-                                        </CardContent>
-                                    </Card>
+                                        </div>
+                                    </GlassCard>
                                 );
                             })}
                         </div>
@@ -323,7 +333,7 @@ export default function CategoryResourcesClient({
                 </div>
             </section>
 
-            <ViewerModal 
+            <ViewerModal
                 state={viewerModal}
                 setState={setViewerModal}
                 link={currentViewUrl}

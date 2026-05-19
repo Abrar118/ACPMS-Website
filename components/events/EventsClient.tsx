@@ -1,20 +1,11 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import useSupabaseBrowser from "@/utils/supabase/supabase-browser";
-import { useQuery } from "@supabase-cache-helpers/postgrest-react-query";
-import { getEventsQuery } from "@/queries/events";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { GlassCard } from "@/components/ui/glass-card";
+import { SectionHeader } from "@/components/ui/section-header";
 import {
   Calendar,
   MapPin,
@@ -53,7 +44,11 @@ interface EventWithType {
   tags: string[] | null;
 }
 
-export default function EventsClient() {
+interface EventsClientProps {
+  events: EventWithType[];
+}
+
+export default function EventsClient({ events: allEvents }: EventsClientProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -68,8 +63,6 @@ export default function EventsClient() {
   // Registration dialog state
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  const supabase = useSupabaseBrowser();
 
   // Function to update URL parameters
   const updateSearchParams = (params: {
@@ -98,13 +91,6 @@ export default function EventsClient() {
     const query = search ? `?${search}` : "";
     router.push(`${pathname}${query}`, { scroll: false });
   };
-
-  // Get all published events
-  const {
-    data: allEvents,
-    isLoading: eventsLoading,
-    isError: eventsError,
-  } = useQuery(getEventsQuery(supabase));
 
   // Filter and sort events
   const filteredAndSortedEvents = useMemo(() => {
@@ -174,12 +160,14 @@ export default function EventsClient() {
   };
 
   // Utility functions
-  const formatDate = (dateString: string) => {
-    return format(parseISO(dateString), "PPP");
+  const formatDate = (date: Date | string) => {
+    const d = typeof date === "string" ? parseISO(date) : date;
+    return format(d, "PPP");
   };
 
-  const formatTime = (dateString: string) => {
-    return format(parseISO(dateString), "p");
+  const formatTime = (date: Date | string) => {
+    const d = typeof date === "string" ? parseISO(date) : date;
+    return format(d, "p");
   };
 
   const getCategoryIcon = (category: string) => {
@@ -231,26 +219,6 @@ export default function EventsClient() {
     return isAfter(eventDay, today) && isBefore(eventDay, nextWeek);
   };
 
-  if (eventsLoading) {
-    return (
-      <div className="flex items-center justify-center py-16">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2 text-muted-foreground">Loading events...</span>
-      </div>
-    );
-  }
-
-  if (eventsError) {
-    console.log("Error loading events:", eventsError);
-    return (
-      <div className="text-center py-16">
-        <p className="text-muted-foreground">
-          Error loading events. Please try again later.
-        </p>
-      </div>
-    );
-  }
-
   // Create dynamic categories from event enum
   const dynamicCategories = ["All Events", ...Object.values(EEventType)];
 
@@ -261,31 +229,31 @@ export default function EventsClient() {
     event: EventWithType;
     isUpcomingEvent?: boolean;
   }) => (
-    <Card
-      className={`hover:shadow-lg transition-all duration-300 overflow-hidden group ${
-        isUpcomingEvent ? "ring-2 ring-primary/50 scale-[1.02]" : ""
+    <GlassCard
+      className={`overflow-hidden group ${
+        isUpcomingEvent ? "ring-1 ring-primary/30" : ""
       }`}
     >
       {/* Event Image */}
       <div
         className={`${
           isUpcomingEvent ? "h-56" : "h-48"
-        } bg-gradient-to-br from-slate-800 to-slate-900 relative overflow-hidden`}
+        } relative overflow-hidden rounded-t-2xl`}
       >
         {event.poster_url ? (
           <img
             src={event.poster_url}
             alt={event.title}
-            className={`w-full h-full object-cover transition-transform group-hover:scale-105 ${
+            className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${
               !isUpcomingEvent &&
               !isAfter(parseISO(event.event_date || ""), new Date())
-                ? "grayscale opacity-75"
+                ? "grayscale opacity-60"
                 : ""
             }`}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
-            <div className="text-center text-white">
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-white/[0.06] to-white/[0.02]">
+            <div className="text-center text-muted-foreground">
               {getCategoryIcon(event.event_type || "")}
               <div className="mt-2 text-sm opacity-75">
                 {event.event_type || "Event"}
@@ -294,81 +262,62 @@ export default function EventsClient() {
           </div>
         )}
 
-        {/* Badges */}
-        <div className="absolute top-3 left-3 flex gap-2">
-          <Badge
-            variant={getBadgeVariant(event.event_type || "")}
-            className="bg-white/90 text-slate-800 hover:bg-white"
-          >
+        {/* Date badge */}
+        {event.event_date && (
+          <div className="absolute top-4 right-4 bg-primary/90 text-white text-xs font-medium px-3 py-1 rounded-full">
+            {format(parseISO(event.event_date), "MMM d")}
+          </div>
+        )}
+
+        {/* Event type badge */}
+        <div className="absolute top-4 left-4 flex gap-2">
+          <span className="bg-white/[0.12] backdrop-blur-md text-white text-xs font-medium px-3 py-1 rounded-full border border-white/[0.1]">
             {event.event_type || "Event"}
-          </Badge>
+          </span>
           {isUpcomingEvent && (
-            <Badge variant="destructive" className="animate-pulse">
-              <Star className="w-3 h-3 mr-1" />
+            <span className="bg-primary/90 text-white text-xs font-medium px-3 py-1 rounded-full animate-pulse">
+              <Star className="w-3 h-3 inline mr-1" />
               Soon
-            </Badge>
+            </span>
           )}
         </div>
 
         {/* Event Mode */}
-        <div className="absolute top-3 right-3">
-          <Badge
-            variant="outline"
-            className="bg-black/50 text-white border-white/20"
-          >
+        <div className="absolute bottom-3 left-3">
+          <span className="bg-black/60 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full border border-white/[0.1]">
             {event.event_mode}
-          </Badge>
+          </span>
         </div>
 
         {/* Past Event Overlay */}
         {!isAfter(parseISO(event.event_date || ""), new Date()) && (
-          <div className="absolute bottom-3 left-3">
-            <Badge
-              variant="outline"
-              className="bg-black/50 text-white border-white/20"
-            >
+          <div className="absolute bottom-3 right-3">
+            <span className="bg-black/60 backdrop-blur-sm text-white/70 text-xs px-2.5 py-1 rounded-full border border-white/[0.1]">
               Completed
-            </Badge>
+            </span>
           </div>
         )}
       </div>
 
       {/* Event Content */}
-      <CardHeader className={`${isUpcomingEvent ? "pt-6" : ""}`}>
-        <CardTitle
+      <div className="p-6">
+        <h3
           className={`${
             isUpcomingEvent ? "text-xl" : "text-lg"
-          } line-clamp-2 group-hover:text-primary transition-colors`}
+          } font-semibold text-foreground line-clamp-2 group-hover:text-primary transition-colors`}
         >
           {event.title}
-        </CardTitle>
-        {/* {event.description && (
-                    <CardDescription className="text-sm text-muted-foreground">
-                        <div className="line-clamp-2">
-                            <MinimalTiptapEditor
-                                value={event.description as JSONContent}
-                                className="w-full border-0 p-0 m-0"
-                                output="text"
-                                autofocus={false}
-                                editable={false}
-                                editorClassName="focus:outline-none text-sm max-h-22 overflow-hidden"
-                                hideToolbar={true}
-                            />
-                        </div>
-                    </CardDescription>
-                )} */}
-      </CardHeader>
+        </h3>
 
-      <CardContent className="pt-0 space-y-4">
         {/* Event Details */}
-        <div className="space-y-2 text-sm text-muted-foreground">
+        <div className="mt-4 space-y-2 text-sm text-muted-foreground">
           {event.event_date && (
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
+              <Calendar className="w-4 h-4 text-primary/60" />
               <span>{formatDate(event.event_date)}</span>
               {event.event_date && (
                 <>
-                  <Clock className="w-4 h-4 ml-2" />
+                  <Clock className="w-4 h-4 ml-2 text-primary/60" />
                   <span>{formatTime(event.event_date)}</span>
                 </>
               )}
@@ -376,13 +325,13 @@ export default function EventsClient() {
           )}
           {event.venue && (
             <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4" />
+              <MapPin className="w-4 h-4 text-primary/60" />
               <span className="line-clamp-1">{event.venue}</span>
             </div>
           )}
           {event.registration_deadline &&
             isAfter(parseISO(event.event_date || ""), new Date()) && (
-              <div className="flex items-center gap-2 text-orange-600 dark:text-orange-400">
+              <div className="flex items-center gap-2 text-primary/80">
                 <Clock className="w-4 h-4" />
                 <span className="text-xs">
                   Registration closes: {formatDate(event.registration_deadline)}
@@ -391,41 +340,31 @@ export default function EventsClient() {
             )}
         </div>
 
-        {/* Tags */}
-        {/* {event.tags && event.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                        {event.tags.slice(0, 3).map((tag, index) => (
-                            <Badge key={index} variant="outline" className="text-xs">
-                                {tag}
-                            </Badge>
-                        ))}
-                        {event.tags.length > 3 && (
-                            <Badge variant="outline" className="text-xs">
-                                +{event.tags.length - 3}
-                            </Badge>
-                        )}
-                    </div>
-                )} */}
-
         {/* Action Buttons */}
-        <div className="flex gap-2 pt-2">
+        <div className="flex gap-2 pt-4 mt-4 border-t border-white/[0.06]">
           <Button
             variant="outline"
-            className="flex-1"
+            className="flex-1 bg-white/[0.04] border-white/[0.08] text-foreground hover:bg-white/[0.08] hover:border-white/[0.15] rounded-xl"
             onClick={() => window.open(`/events/${event.id}`, "_blank")}
           >
             <ExternalLink className="h-4 w-4 mr-2" />
             View Details
           </Button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </GlassCard>
   );
 
   return (
-    <div className="space-y-12">
-      {/* Search and Filter Section */}
-      <section className="px-4">
+    <div className="min-h-screen py-24 px-4">
+      <div className="max-w-7xl mx-auto space-y-12">
+        {/* Header */}
+        <SectionHeader
+          title="Events"
+          subtitle="Join our exciting mathematics competitions, workshops, and educational events designed to challenge and inspire young mathematical minds."
+        />
+
+        {/* Search and Filter Section */}
         <div className="max-w-6xl mx-auto space-y-6">
           {/* Search Bar */}
           <div className="relative max-w-md mx-auto">
@@ -434,116 +373,122 @@ export default function EventsClient() {
               placeholder="Search events by title, venue, or tags..."
               value={searchTerm}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="pl-10"
+              className="pl-10 bg-white/[0.04] border border-white/[0.08] rounded-xl text-foreground placeholder:text-muted-foreground focus:ring-primary/50 focus:border-primary/50"
             />
           </div>
 
-          {/* Category Tabs */}
-          <Tabs
-            value={activeCategory}
-            onValueChange={handleCategoryChange}
-            className="w-full"
-          >
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-1">
-              {dynamicCategories.slice(0, 6).map((category) => (
-                <TabsTrigger
-                  key={category}
-                  value={category}
-                  className="text-sm font-medium"
-                >
-                  {category === "All Events" ? "All" : category}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
+          {/* Category Filter Pills */}
+          <div className="flex flex-wrap justify-center gap-2">
+            {dynamicCategories.slice(0, 8).map((category) => (
+              <button
+                key={category}
+                onClick={() => handleCategoryChange(category)}
+                className={`px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 ${
+                  activeCategory === category
+                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                    : "bg-white/[0.04] border border-white/[0.08] text-muted-foreground hover:bg-white/[0.08] hover:text-foreground hover:border-white/[0.15]"
+                }`}
+              >
+                {category === "All Events" ? "All" : category}
+              </button>
+            ))}
+          </div>
         </div>
-      </section>
 
-      {/* Upcoming Events */}
-      {filteredAndSortedEvents.upcoming.length > 0 && (
-        <section className="px-4">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold mb-8 flex items-center gap-2">
-              <Star className="h-8 w-8 text-primary" />
-              {activeCategory === "All Events"
-                ? "Upcoming Events"
-                : `Upcoming ${activeCategory}`}
-            </h2>
-
-            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-              {filteredAndSortedEvents.upcoming.map((event) => (
-                <EventCard
-                  key={event.id}
-                  event={event}
-                  isUpcomingEvent={
-                    event.event_date ? isUpcoming(event.event_date) : false
-                  }
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Past Events */}
-      {filteredAndSortedEvents.past.length > 0 && (
-        <section className="px-4 bg-muted/30 py-12">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold mb-8">
-              {activeCategory === "All Events"
-                ? "Past Events"
-                : `Past ${activeCategory}`}
-            </h2>
-
-            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-              {filteredAndSortedEvents.past.slice(0, 9).map((event) => (
-                <EventCard key={event.id} event={event} />
-              ))}
-            </div>
-
-            {filteredAndSortedEvents.past.length > 9 && (
-              <div className="text-center mt-8">
-                <Button variant="outline">View More Past Events</Button>
-              </div>
-            )}
-          </div>
-        </section>
-      )}
-
-      {/* No Events Found */}
-      {filteredAndSortedEvents.upcoming.length === 0 &&
-        filteredAndSortedEvents.past.length === 0 && (
-          <section className="px-4">
+        {/* Upcoming Events */}
+        {filteredAndSortedEvents.upcoming.length > 0 && (
+          <section>
             <div className="max-w-6xl mx-auto">
-              <Card className="p-12 text-center">
-                <Calendar className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-xl font-semibold mb-2">No Events Found</h3>
-                <p className="text-muted-foreground mb-4">
-                  {searchTerm
-                    ? `No events match your search "${searchTerm}"`
-                    : activeCategory === "All Events"
-                    ? "No events are currently available."
-                    : `No ${activeCategory.toLowerCase()} events are currently available.`}
-                </p>
-                {(searchTerm || activeCategory !== "All Events") && (
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setSearchTerm("");
-                      setActiveCategory("All Events");
-                      updateSearchParams({
-                        search: "",
-                        category: "All Events",
-                      });
-                    }}
-                  >
-                    Clear Filters
-                  </Button>
-                )}
-              </Card>
+              <h2 className="text-2xl font-bold mb-8 flex items-center gap-2 text-foreground">
+                <Star className="h-6 w-6 text-primary" />
+                {activeCategory === "All Events"
+                  ? "Upcoming Events"
+                  : `Upcoming ${activeCategory}`}
+              </h2>
+
+              <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                {filteredAndSortedEvents.upcoming.map((event) => (
+                  <EventCard
+                    key={event.id}
+                    event={event}
+                    isUpcomingEvent={
+                      event.event_date ? isUpcoming(event.event_date) : false
+                    }
+                  />
+                ))}
+              </div>
             </div>
           </section>
         )}
+
+        {/* Past Events */}
+        {filteredAndSortedEvents.past.length > 0 && (
+          <section className="py-12 -mx-4 px-4 border-t border-white/[0.06]">
+            <div className="max-w-6xl mx-auto">
+              <h2 className="text-2xl font-bold mb-8 text-foreground">
+                {activeCategory === "All Events"
+                  ? "Past Events"
+                  : `Past ${activeCategory}`}
+              </h2>
+
+              <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                {filteredAndSortedEvents.past.slice(0, 9).map((event) => (
+                  <EventCard key={event.id} event={event} />
+                ))}
+              </div>
+
+              {filteredAndSortedEvents.past.length > 9 && (
+                <div className="text-center mt-8">
+                  <Button
+                    variant="outline"
+                    className="bg-white/[0.04] border-white/[0.08] text-muted-foreground hover:bg-white/[0.08] hover:text-foreground rounded-full px-8"
+                  >
+                    View More Past Events
+                  </Button>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* No Events Found */}
+        {filteredAndSortedEvents.upcoming.length === 0 &&
+          filteredAndSortedEvents.past.length === 0 && (
+            <section>
+              <div className="max-w-6xl mx-auto">
+                <GlassCard className="p-12 text-center">
+                  <Calendar className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-xl font-semibold mb-2 text-foreground">
+                    No Events Found
+                  </h3>
+                  <p className="text-muted-foreground mb-4">
+                    {searchTerm
+                      ? `No events match your search "${searchTerm}"`
+                      : activeCategory === "All Events"
+                      ? "No events are currently available."
+                      : `No ${activeCategory.toLowerCase()} events are currently available.`}
+                  </p>
+                  {(searchTerm || activeCategory !== "All Events") && (
+                    <Button
+                      variant="outline"
+                      className="bg-white/[0.04] border-white/[0.08] text-muted-foreground hover:bg-white/[0.08] hover:text-foreground rounded-full"
+                      onClick={() => {
+                        setSearchTerm("");
+                        setActiveCategory("All Events");
+                        updateSearchParams({
+                          search: "",
+                          category: "All Events",
+                        });
+                      }}
+                    >
+                      Clear Filters
+                    </Button>
+                  )}
+                </GlassCard>
+              </div>
+            </section>
+          )}
+      </div>
     </div>
   );
 }

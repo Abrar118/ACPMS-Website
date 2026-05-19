@@ -1,7 +1,7 @@
 import createSupabaseServer from "@/utils/supabase/supabase-server";
-import { getUserById } from "@/queries/auth";
+import { getUserById } from "@/lib/db/users";
 import type { User } from "@supabase/supabase-js";
-import type { UserProfile } from "@/queries/auth";
+import type { UserProfile } from "@/lib/generated/prisma";
 import { printIfDev } from "./utils";
 
 export interface AuthData {
@@ -29,16 +29,16 @@ export async function getCurrentUser(): Promise<AuthData> {
         printIfDev("Current user: " + JSON.stringify(user));
 
         // Get user profile from database
-        const profileResponse = await getUserById(supabase, user.id);
+        const profile = await getUserById(user.id);
 
-        if (profileResponse.error) {
-            printIfDev("Error fetching user profile: " + profileResponse.error);
+        if (!profile) {
+            printIfDev("User profile not found for id: " + user.id);
             return { user, profile: null };
         }
 
         return {
             user,
-            profile: profileResponse.data,
+            profile,
         };
     } catch (error) {
         printIfDev("Error getting current user: " + error);

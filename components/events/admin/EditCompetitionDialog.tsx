@@ -27,7 +27,7 @@ import { MinimalTiptapEditor } from "@/components/ui/minimal-tiptap";
 import { Content } from "@tiptap/react";
 import { toast } from "sonner";
 import { updateCompetitionAction } from "@/actions/competitions";
-import { type CompetitionRow } from "@/queries/competitions";
+import type { Competition } from "@/lib/db/competitions";
 
 const competitionSchema = z.object({
   title: z.string().min(1, "Title is required").max(255, "Title is too long"),
@@ -39,10 +39,10 @@ const competitionSchema = z.object({
 type CompetitionFormValues = z.infer<typeof competitionSchema>;
 
 interface EditCompetitionDialogProps {
-  competition: CompetitionRow | null;
+  competition: Competition | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onUpdate?: (updatedCompetition: CompetitionRow) => void;
+  onUpdate?: (updatedCompetition: Competition) => void;
 }
 
 export default function EditCompetitionDialog({

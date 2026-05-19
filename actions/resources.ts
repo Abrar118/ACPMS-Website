@@ -1,15 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import createSupabaseServer from "@/utils/supabase/supabase-server";
 import {
-  createOneResource,
+  createResource,
   updateResource,
   deleteResource,
   incrementResourceViewCount,
-} from "@/queries/resources";
+} from "@/lib/db/resources";
 import { addResourceSchema } from "@/components/resources/admin/addResourceForm/AddResourceHelper";
-import { EResourceStatus } from "@/components/shared/enums";
 import { getCurrentUser, isAdminOrExecutive } from "@/lib/auth-server";
 import { z } from "zod";
 
@@ -20,7 +18,7 @@ type ResourceActionResult = {
   data?: any;
 };
 
-export async function createResource(
+export async function createResourceAction(
   resourceData: z.infer<typeof addResourceSchema>
 ): Promise<ResourceActionResult> {
   try {
@@ -42,14 +40,8 @@ export async function createResource(
       };
     }
 
-    const supabase = await createSupabaseServer();
-
     // Create the resource
-    const result = await createOneResource(supabase, user.id, validatedData);
-
-    if (result.error) {
-      return { success: false, error: result.error };
-    }
+    const resource = await createResource(user.id, validatedData);
 
     // Revalidate relevant pages
     revalidatePath("/admin/resources", "page");
@@ -58,7 +50,7 @@ export async function createResource(
     return {
       success: true,
       message: "Resource created successfully",
-      data: result.data,
+      data: resource,
     };
   } catch (error: any) {
     console.error("Error creating resource:", error);
@@ -99,14 +91,8 @@ export async function updateResourceAction(
       };
     }
 
-    const supabase = await createSupabaseServer();
-
     // Update the resource
-    const result = await updateResource(supabase, resourceId, resourceData);
-
-    if (result.error) {
-      return { success: false, error: result.error };
-    }
+    const resource = await updateResource(resourceId, resourceData);
 
     // Revalidate relevant pages
     revalidatePath("/admin/resources", "page");
@@ -115,7 +101,7 @@ export async function updateResourceAction(
     return {
       success: true,
       message: "Resource updated successfully",
-      data: result.data,
+      data: resource,
     };
   } catch (error: any) {
     console.error("Error updating resource:", error);
@@ -145,14 +131,8 @@ export async function deleteResourceAction(
       };
     }
 
-    const supabase = await createSupabaseServer();
-
     // Delete (archive) the resource
-    const result = await deleteResource(supabase, resourceId);
-
-    if (result.error) {
-      return { success: false, error: result.error };
-    }
+    await deleteResource(resourceId);
 
     // Revalidate relevant pages
     revalidatePath("/admin/resources", "page");
@@ -171,19 +151,17 @@ export async function deleteResourceAction(
   }
 }
 
-export async function toggleResourceStatus(
+export async function toggleResourcePublished(
   resourceId: string,
-  newStatus: EResourceStatus
+  isPublished: boolean
 ): Promise<ResourceActionResult> {
   try {
-    // Get current user and verify authentication
     const { user, profile } = await getCurrentUser();
 
     if (!user || !profile) {
       return { success: false, error: "Authentication required" };
     }
 
-    // Check if user has permission to change resource status (admin or executive)
     if (!(await isAdminOrExecutive())) {
       return {
         success: false,
@@ -191,25 +169,17 @@ export async function toggleResourceStatus(
       };
     }
 
-    const supabase = await createSupabaseServer();
-
-    // Update the resource status
-    const result = await updateResource(supabase, resourceId, {
-      status: newStatus,
+    const resource = await updateResource(resourceId, {
+      isPublished,
     });
 
-    if (result.error) {
-      return { success: false, error: result.error };
-    }
-
-    // Revalidate relevant pages
     revalidatePath("/admin/resources", "page");
     revalidatePath("/resources", "page");
 
     return {
       success: true,
-      message: `Resource ${newStatus.toLowerCase()} successfully`,
-      data: result.data,
+      message: `Resource ${isPublished ? "published" : "unpublished"} successfully`,
+      data: resource,
     };
   } catch (error: any) {
     console.error("Error updating resource status:", error);
@@ -240,14 +210,8 @@ export async function toggleResourceFeatured(
       };
     }
 
-    const supabase = await createSupabaseServer();
-
     // Update the resource featured status
-    const result = await updateResource(supabase, resourceId, { isFeatured });
-
-    if (result.error) {
-      return { success: false, error: result.error };
-    }
+    const resource = await updateResource(resourceId, { isFeatured });
 
     // Revalidate relevant pages
     revalidatePath("/admin/resources", "page");
@@ -258,7 +222,7 @@ export async function toggleResourceFeatured(
       message: `Resource ${
         isFeatured ? "featured" : "unfeatured"
       } successfully`,
-      data: result.data,
+      data: resource,
     };
   } catch (error: any) {
     console.error("Error updating resource featured status:", error);
@@ -271,13 +235,7 @@ export async function toggleResourceFeatured(
 
 export async function incrementViewCount(resourceId: string): Promise<ResourceActionResult> {
   try {
-    const supabase = await createSupabaseServer();
-    
-    const result = await incrementResourceViewCount(supabase, resourceId);
-    
-    if (result.error) {
-      return { success: false, error: result.error };
-    }
+    await incrementResourceViewCount(resourceId);
 
     return { success: true };
   } catch (error: any) {

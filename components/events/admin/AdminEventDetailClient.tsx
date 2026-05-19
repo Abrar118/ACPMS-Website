@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -13,17 +12,26 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Plus, Calendar, MapPin, Clock, User, Tag, FileText } from "lucide-react";
-import { type EventRow } from "@/queries/events";
-import { type CompetitionRow } from "@/queries/competitions";
+import type { Event } from "@/lib/db/events";
+import type { Competition } from "@/lib/db/competitions";
+import type { ParticipantWithRegistrations } from "@/lib/db/participants";
+import type { PaymentWithDetails } from "@/lib/db/payments";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AddCompetitionDialog from "./AddCompetitionDialog";
 import CompetitionsList from "./CompetitionsList";
+import EventParticipantsClient from "./EventParticipantsClient";
+import ResultsTab from "./tabs/ResultsTab";
+import TeamsTab from "./tabs/TeamsTab";
+import PaymentsTab from "./tabs/PaymentsTab";
 import { format } from "date-fns";
 import { MinimalTiptapEditor } from "@/components/ui/minimal-tiptap";
 import { JSONContent } from "@tiptap/react";
 
 interface AdminEventDetailClientProps {
-  event: EventRow;
-  competitions: CompetitionRow[];
+  event: Event;
+  competitions: Competition[];
+  participants: ParticipantWithRegistrations[];
+  payments: PaymentWithDetails[];
   error?: string;
 }
 
@@ -56,12 +64,13 @@ function formatRichTextToPlainText(richText: any): string {
   }
 }
 
-export default function AdminEventDetailClient({ 
-  event, 
-  competitions, 
-  error 
+export default function AdminEventDetailClient({
+  event,
+  competitions,
+  participants,
+  payments,
+  error
 }: AdminEventDetailClientProps) {
-  const router = useRouter();
   const [isAddCompetitionOpen, setIsAddCompetitionOpen] = useState(false);
 
   const getStatusBadge = (isPublished: boolean) => {
@@ -88,7 +97,16 @@ export default function AdminEventDetailClient({
   };
 
   return (
-    <div className="space-y-6">
+    <Tabs defaultValue="overview" className="space-y-6">
+      <TabsList className="grid w-full grid-cols-5">
+        <TabsTrigger value="overview">Overview</TabsTrigger>
+        <TabsTrigger value="results">Results</TabsTrigger>
+        <TabsTrigger value="teams">Teams</TabsTrigger>
+        <TabsTrigger value="payments">Payments</TabsTrigger>
+        <TabsTrigger value="participants">Participants</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="overview" className="space-y-6">
       {/* Event Details Card */}
       <Card>
         <CardHeader>
@@ -102,18 +120,12 @@ export default function AdminEventDetailClient({
             </div>
             <div className="flex items-center gap-4">
               <Button
-              className="flex items-center gap-2"
-              onClick={() => router.push(`/admin/events/${event.id}/participants`)}
-            >
-              View Participants
-            </Button>
-            <Button
-              onClick={() => setIsAddCompetitionOpen(true)}
-              className="flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              Add Competition
-            </Button>
+                onClick={() => setIsAddCompetitionOpen(true)}
+                className="flex items-center gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Add Competition
+              </Button>
             </div>
           </div>
         </CardHeader>
@@ -254,6 +266,23 @@ export default function AdminEventDetailClient({
         onOpenChange={setIsAddCompetitionOpen}
         eventId={event.id}
       />
-    </div>
+      </TabsContent>
+
+      <TabsContent value="results">
+        <ResultsTab competitions={competitions} eventId={event.id} participants={participants} />
+      </TabsContent>
+
+      <TabsContent value="teams">
+        <TeamsTab competitions={competitions} eventId={event.id} participants={participants} />
+      </TabsContent>
+
+      <TabsContent value="payments">
+        <PaymentsTab payments={payments} />
+      </TabsContent>
+
+      <TabsContent value="participants">
+        <EventParticipantsClient event={event} competitions={competitions} participants={participants} />
+      </TabsContent>
+    </Tabs>
   );
 }

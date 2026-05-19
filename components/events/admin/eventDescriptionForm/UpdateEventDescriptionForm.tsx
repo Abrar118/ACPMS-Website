@@ -16,7 +16,8 @@ import { Content } from "@tiptap/react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { updateEventAction } from "@/actions/events";
-import { Json } from "@/queries/events";
+// Json type for event description (compatible with Prisma's JsonValue)
+type Json = any;
 
 interface UpdateEventDescriptionFormProps {
   state: boolean;

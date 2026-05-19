@@ -1,88 +1,54 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { GlassCard } from "@/components/ui/glass-card";
+import { SectionHeader } from "@/components/ui/section-header";
 import Image from "next/image";
-import { useQuery } from "@tanstack/react-query";
-import useSupabaseBrowser from "@/utils/supabase/supabase-browser";
-import { getHighlights } from "@/queries/events";
-import { Calendar, BookOpen, FileText, Clock, MapPin } from "lucide-react";
+import { Calendar, BookOpen, FileText, ArrowRight } from "lucide-react";
 import dynamic from "next/dynamic";
 import { EResourceType } from "../shared/enums";
-import { format, isAfter, parseISO } from "date-fns";
+import { format, parseISO } from "date-fns";
+import Link from "next/link";
+import { MinimalTiptapEditor } from "@/components/ui/minimal-tiptap";
+import { JSONContent } from "@tiptap/react";
+import { motion } from "framer-motion";
+import { StickyNote, MiniNotebook } from "@/components/ui/peeking-card";
 
-export default function ClubHighlights() {
-  const supabase = useSupabaseBrowser();
+interface HighlightsData {
+  event: any;
+  resource: any;
+  magazine: any;
+}
+
+interface ClubHighlightsProps {
+  highlights: HighlightsData | null;
+}
+
+export default function ClubHighlights({ highlights }: ClubHighlightsProps) {
   const PdfThumbnail = dynamic(
     () => import("@/components/client-only/PdfThumbnail"),
     { ssr: false }
   );
 
-  const {
-    data: highlights,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["highlights"],
-    queryFn: () => getHighlights(supabase),
-  });
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+  const formatDate = (date: Date | string) => {
+    const d = typeof date === "string" ? new Date(date) : date;
+    return d.toLocaleDateString("en-US", {
       month: "long",
       day: "numeric",
       year: "numeric",
     });
   };
 
-  const formatTime = (dateString: string) => {
-    return format(parseISO(dateString), "p");
-  };  
+  const formatTime = (date: Date | string) => {
+    const d = typeof date === "string" ? parseISO(date) : date;
+    return format(d, "p");
+  };
 
-  if (isLoading) {
+  if (!highlights) {
     return (
-      <section className="py-20 px-4 bg-muted/30">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center text-foreground mb-16">
-            Club Highlights
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[1, 2, 3].map((i) => (
-              <Card key={i}>
-                <Skeleton className="h-48 w-full" />
-                <CardHeader>
-                  <Skeleton className="h-6 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-4 w-full mb-2" />
-                  <Skeleton className="h-4 w-2/3 mb-4" />
-                  <Skeleton className="h-9 w-full" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (error || !highlights) {
-    return (
-      <section className="py-20 px-4 bg-muted/30">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center text-foreground mb-16">
-            Club Highlights
-          </h2>
-          <div className="text-center">
+      <section className="py-24 px-4">
+        <div className="max-w-7xl mx-auto">
+          <SectionHeader title="Club Highlights" />
+          <div className="text-center mt-8">
             <p className="text-muted-foreground">
               Unable to load highlights at the moment.
             </p>
@@ -93,224 +59,227 @@ export default function ClubHighlights() {
   }
 
   return (
-    <section className="py-20 px-4 bg-muted/30">
-      <div className="max-w-6xl mx-auto">
-        <h2 className="text-4xl md:text-5xl font-bold text-center text-foreground mb-16">
-          Club Highlights
-        </h2>
+    <section className="relative py-24 px-4 overflow-hidden">
+      <StickyNote
+        text="Did you know? 111,111,111 × 111,111,111 = 12345678987654321"
+        className="top-10 -right-4"
+        rotate="4deg"
+        delay={0.3}
+        color="green"
+      />
+      <MiniNotebook
+        title="Reading List"
+        lines={["The Art of Problem Solving", "Mathematical Circles", "Problem Solving Strategies"]}
+        className="bottom-16 -left-6"
+        rotate="-3deg"
+        delay={0.5}
+      />
+      <div className="max-w-7xl mx-auto relative">
+        <SectionHeader title="Club Highlights" />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16">
           {/* Latest Event */}
           {highlights.event && (
-            <Card className="hover:shadow-xl transition-all duration-300 hover:scale-105">
-              <div className="relative h-48 w-full overflow-hidden">
-                {highlights.event.poster_url ? (
-                  <Image
-                    src={highlights.event.poster_url}
-                    alt={highlights.event.title}
-                    fill
-                    className="object-cover transition-transform duration-300 hover:scale-110"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
-                    <Calendar className="w-16 h-16 text-white opacity-50" />
-                  </div>
-                )}
-                <Badge className="absolute top-3 left-3" variant="secondary">
-                  Latest Event
-                </Badge>
-              </div>
-              <CardHeader>
-                <CardTitle className="text-xl text-foreground">
-                  {highlights.event.title}
-                </CardTitle>
-                <CardDescription className="font-medium">
-                  {highlights.event.event_date
-                    ? formatDate(highlights.event.event_date)
-                    : "Date TBD"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex-1 flex flex-col">
-                {/* <p className="text-muted-foreground mb-4 leading-relaxed line-clamp-3">
-                  {highlights.event.description ||
-                    "Join us for this exciting event!"}
-                </p> */}
-                <div className="space-y-2 text-sm text-muted-foreground">
-                  {highlights.event.event_date && (
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4" />
-                      <span>{formatDate(highlights.event.event_date)}</span>
-                      {highlights.event.event_date && (
-                        <>
-                          <Clock className="w-4 h-4 ml-2" />
-                          <span>{formatTime(highlights.event.event_date)}</span>
-                        </>
-                      )}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{
+                duration: 0.5,
+                delay: 0,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+            >
+              <GlassCard glow className="overflow-hidden h-full flex flex-col">
+                <div className="relative h-48 w-full overflow-hidden rounded-t-2xl">
+                  {highlights.event.poster_url ? (
+                    <Image
+                      src={highlights.event.poster_url}
+                      alt={highlights.event.title}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                      <Calendar className="w-16 h-16 text-primary opacity-50" />
                     </div>
                   )}
-                  {highlights.event.venue && (
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4" />
-                      <span className="line-clamp-1">
-                        {highlights.event.venue}
-                      </span>
-                    </div>
-                  )}
-                  {highlights.event.registration_deadline &&
-                    isAfter(
-                      parseISO(highlights.event.event_date || ""),
-                      new Date()
-                    ) && (
-                      <div className="flex items-center gap-2 text-orange-600 dark:text-orange-400">
-                        <Clock className="w-4 h-4" />
-                        <span className="text-xs">
-                          Registration closes:{" "}
-                          {formatDate(highlights.event.registration_deadline)}
-                        </span>
-                      </div>
-                    )}
                 </div>
-                <Button size="sm" className="w-full mt-auto">
-                  Learn More
-                </Button>
-              </CardContent>
-            </Card>
+                <div className="p-6 flex flex-col flex-1">
+                  <span className="inline-flex items-center rounded-full bg-primary/10 text-primary text-xs font-medium px-2.5 py-0.5 w-fit">
+                    Event
+                  </span>
+                  <h3 className="text-lg font-semibold text-foreground mt-3">
+                    {highlights.event.title}
+                  </h3>
+                  <div className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                    <MinimalTiptapEditor
+                      value={highlights.event.description as JSONContent}
+                      output="text"
+                      editable={false}
+                      hideToolbar={true}
+                    />
+                  </div>
+                  <Link
+                    href={`/events/${highlights.event.id}`}
+                    className="text-primary text-sm font-medium hover:underline mt-4 inline-flex items-center gap-1"
+                  >
+                    Learn More
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </GlassCard>
+            </motion.div>
           )}
 
           {/* Most Popular Resource */}
           {highlights.resource && (
-            <Card className="hover:shadow-xl transition-all duration-300 hover:scale-105 flex flex-col">
-              <div className="relative h-48 w-full overflow-hidden">
-                {highlights.resource.resource_url ? (
-                  (() => {
-                    const url = highlights.resource.resource_url;
-                    const isYoutube =
-                      url.includes("youtube.com") || url.includes("youtu.be");
-                    const isPdf =
-                      highlights.resource.resource_type === EResourceType.Pdf;
-                    const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url);
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{
+                duration: 0.5,
+                delay: 0.1,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+            >
+              <GlassCard className="overflow-hidden h-full flex flex-col">
+                <div className="relative h-48 w-full overflow-hidden rounded-t-2xl">
+                  {highlights.resource.resource_url ? (
+                    (() => {
+                      const url = highlights.resource.resource_url;
+                      const isYoutube =
+                        url.includes("youtube.com") || url.includes("youtu.be");
+                      const isPdf =
+                        highlights.resource.resource_type === EResourceType.Pdf;
+                      const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(
+                        url
+                      );
 
-                    if (isYoutube) {
-                      // Extract YouTube video ID and show thumbnail
-                      let videoId = "";
-                      if (url.includes("youtu.be/")) {
-                        videoId =
-                          url.split("youtu.be/")[1]?.split("?")[0] || "";
-                      } else if (url.includes("youtube.com/embed/")) {
-                        videoId = url.split("embed/")[1]?.split("?")[0] || "";
-                      }
-
-                      const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-
-                      return (
-                        <div className="relative w-full h-full">
+                      if (isYoutube) {
+                        let videoId = "";
+                        if (url.includes("youtu.be/")) {
+                          videoId =
+                            url.split("youtu.be/")[1]?.split("?")[0] || "";
+                        } else if (url.includes("youtube.com/embed/")) {
+                          videoId =
+                            url.split("embed/")[1]?.split("?")[0] || "";
+                        }
+                        const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+                        return (
+                          <div className="relative w-full h-full">
+                            <Image
+                              src={thumbnailUrl}
+                              alt={highlights.resource.title}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        );
+                      } else if (isPdf) {
+                        return (
+                          <PdfThumbnail url={url} className="w-full h-full" />
+                        );
+                      } else if (isImage) {
+                        return (
                           <Image
-                            src={thumbnailUrl}
+                            src={url}
                             alt={highlights.resource.title}
                             fill
                             className="object-cover"
                           />
-                        </div>
-                      );
-                    } else if (isPdf) {
-                      return (
-                        <PdfThumbnail url={url} className="w-full h-full" />
-                      );
-                    } else if (isImage) {
-                      return (
-                        <Image
-                          src={url}
-                          alt={highlights.resource.title}
-                          fill
-                          className="object-cover transition-transform duration-300 hover:scale-110"
-                        />
-                      );
-                    } else {
-                      // Generic resource - try as image first, fallback to icon
-                      return (
-                        <Image
-                          src={url}
-                          alt={highlights.resource.title}
-                          fill
-                          className="object-cover transition-transform duration-300 hover:scale-110"
-                          onError={(e) => {
-                            // Replace with fallback if image fails to load
-                            (e.target as HTMLImageElement).style.display =
-                              "none";
-                          }}
-                        />
-                      );
-                    }
-                  })()
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center">
-                    <BookOpen className="w-16 h-16 text-white opacity-50" />
-                  </div>
-                )}
-                <Badge className="absolute top-3 left-3" variant="secondary">
-                  Top Resource
-                </Badge>
-              </div>
-              <CardHeader>
-                <CardTitle className="text-xl text-foreground">
-                  {highlights.resource.title}
-                </CardTitle>
-                <CardDescription className="font-medium">
-                  {highlights.resource.view_count} views
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex-1 flex flex-col">
-                <p className="text-muted-foreground mb-4 leading-relaxed line-clamp-3 flex-1">
-                  {highlights.resource.description ||
-                    "Explore this valuable resource"}
-                </p>
-                <Button size="sm" className="w-full mt-auto">
-                  View Resource
-                </Button>
-              </CardContent>
-            </Card>
+                        );
+                      } else {
+                        return (
+                          <Image
+                            src={url}
+                            alt={highlights.resource.title}
+                            fill
+                            className="object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display =
+                                "none";
+                            }}
+                          />
+                        );
+                      }
+                    })()
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
+                      <BookOpen className="w-16 h-16 text-muted-foreground opacity-50" />
+                    </div>
+                  )}
+                </div>
+                <div className="p-6 flex flex-col flex-1">
+                  <span className="inline-flex items-center rounded-full bg-primary/10 text-primary text-xs font-medium px-2.5 py-0.5 w-fit">
+                    Resource
+                  </span>
+                  <h3 className="text-lg font-semibold text-foreground mt-3">
+                    {highlights.resource.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                    {highlights.resource.description}
+                  </p>
+                  <Link
+                    href={`/resources/${highlights.resource.id}`}
+                    className="text-primary text-sm font-medium hover:underline mt-4 inline-flex items-center gap-1"
+                  >
+                    Learn More
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </GlassCard>
+            </motion.div>
           )}
 
           {/* Latest Magazine */}
           {highlights.magazine && (
-            <Card className="hover:shadow-xl transition-all duration-300 hover:scale-105">
-              <div className="relative h-48 w-full overflow-hidden">
-                {highlights.magazine.cover_image ? (
-                  <Image
-                    src={highlights.magazine.cover_image}
-                    alt={highlights.magazine.title}
-                    fill
-                    className="object-cover transition-transform duration-300 hover:scale-110"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center">
-                    <FileText className="w-16 h-16 text-white opacity-50" />
-                  </div>
-                )}
-                <Badge className="absolute top-3 left-3" variant="secondary">
-                  Latest Edition
-                </Badge>
-              </div>
-              <CardHeader>
-                <CardTitle className="text-xl text-foreground">
-                  {highlights.magazine.title}
-                </CardTitle>
-                <CardDescription className="font-medium">
-                  {highlights.magazine.published_date
-                    ? formatDate(highlights.magazine.published_date)
-                    : "Recently Published"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex flex-col flex-1">
-                <p className="text-muted-foreground mb-4 leading-relaxed line-clamp-3">
-                  {highlights.magazine.summary ||
-                    "Read our latest magazine edition"}
-                </p>
-                <Button size="sm" className="w-full mt-auto">
-                  Read Now
-                </Button>
-              </CardContent>
-            </Card>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{
+                duration: 0.5,
+                delay: 0.2,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+            >
+              <GlassCard className="overflow-hidden h-full flex flex-col">
+                <div className="relative h-48 w-full overflow-hidden rounded-t-2xl">
+                  {highlights.magazine.cover_image ? (
+                    <Image
+                      src={highlights.magazine.cover_image}
+                      alt={highlights.magazine.title}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
+                      <FileText className="w-16 h-16 text-muted-foreground opacity-50" />
+                    </div>
+                  )}
+                </div>
+                <div className="p-6 flex flex-col flex-1">
+                  <span className="inline-flex items-center rounded-full bg-primary/10 text-primary text-xs font-medium px-2.5 py-0.5 w-fit">
+                    Magazine
+                  </span>
+                  <h3 className="text-lg font-semibold text-foreground mt-3">
+                    {highlights.magazine.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                    {highlights.magazine.summary}
+                  </p>
+                  <Link
+                    href={`/magazine/${highlights.magazine.id}`}
+                    className="text-primary text-sm font-medium hover:underline mt-4 inline-flex items-center gap-1"
+                  >
+                    Learn More
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </GlassCard>
+            </motion.div>
           )}
         </div>
       </div>

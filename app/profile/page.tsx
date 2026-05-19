@@ -14,7 +14,7 @@ export default async function ProfilePage() {
         <main className="min-h-screen bg-background">
             <section className="pt-24 pb-16 px-4">
                 <div className="max-w-6xl mx-auto">
-                    <ProfileClient user={user} profile={profile} />
+                    <ProfileClient user={user} profile={profile ? JSON.parse(JSON.stringify(profile)) : null} />
                 </div>
             </section>
             <Footer />

@@ -5,7 +5,28 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { CalendarDays, MapPin, Clock, Users } from "lucide-react";
 import Image from "next/image";
-import type { EventRegistrationWithEvent } from "@/queries/profile";
+// EventRegistrationWithEvent type - to be defined when event registration feature is fully migrated
+interface EventRegistrationWithEvent {
+    id: string;
+    event_id: string | null;
+    user_id: string | null;
+    registered_at: string | null;
+    registration_status: string | null;
+    payment_status: string | null;
+    certificate_url: string | null;
+    notes: string | null;
+    event: {
+        id: string;
+        title: string;
+        description: string | null;
+        event_date: string | null;
+        location: string | null;
+        poster_url: string | null;
+        event_type: {
+            event_type_name: string;
+        } | null;
+    } | null;
+}
 
 interface RegisteredEventsProps {
     events: EventRegistrationWithEvent[];
@@ -14,8 +35,9 @@ interface RegisteredEventsProps {
 }
 
 export default function RegisteredEvents({ events, isLoading, error }: RegisteredEventsProps) {
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString("en-US", {
+    const formatDate = (date: Date | string) => {
+        const d = typeof date === "string" ? new Date(date) : date;
+        return d.toLocaleDateString("en-US", {
             weekday: "long",
             year: "numeric",
             month: "long",

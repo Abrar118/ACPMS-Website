@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
     DropdownMenu,
@@ -12,16 +11,16 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { Menu, User, LogOut, Settings, UserPlus, Shield } from "lucide-react";
+import { Menu, User, LogOut, Settings, Shield, Sun, Moon } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { logout } from "@/actions/auth";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
-import type { UserProfile } from "@/queries/auth";
+import type { UserProfile } from "@/lib/db/users";
 
 interface NavbarProps {
     user: SupabaseUser | null;
@@ -33,6 +32,8 @@ export default function Navbar({ user, profile }: NavbarProps) {
     const [avatarKey, setAvatarKey] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+    const pathname = usePathname();
+    const { theme, setTheme } = useTheme();
 
     useEffect(() => {
         // Force avatar refresh when profile changes
@@ -73,9 +74,11 @@ export default function Navbar({ user, profile }: NavbarProps) {
     const navigationItems = [
         { href: "/", label: "Home" },
         { href: "/events", label: "Events" },
-        // { href: "/magazine", label: "Magazine" },
+        { href: "/blog", label: "Blog" },
         { href: "/resources", label: "Resources" },
+        { href: "/gallery", label: "Gallery" },
         { href: "/about", label: "About" },
+        { href: "/contact", label: "Contact" },
         ...(profile?.role === "admin" || profile?.role === "executive"
             ? [{ href: "/admin", label: "Admin" }]
             : []),
@@ -83,13 +86,13 @@ export default function Navbar({ user, profile }: NavbarProps) {
 
     return (
         <nav
-            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+            className={`sticky top-0 left-0 right-0 z-50 transition-all duration-300 ${
                 isScrolled
-                    ? "bg-background/50 backdrop-blur-md border-b shadow-md"
-                    : "bg-background/70 backdrop-blur-sm border-b"
+                    ? "bg-background/80 backdrop-blur-xl border-b border-border shadow-sm"
+                    : "bg-transparent border-b border-transparent"
             }`}
         >
-            <div className="mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-20 2xl:px-32 3xl:px-40">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
                     <Link className="flex items-center space-x-2" href={"/"}>
@@ -108,31 +111,38 @@ export default function Navbar({ user, profile }: NavbarProps) {
                     </Link>
 
                     {/* Desktop Navigation */}
-                    <div className="hidden md:flex items-center space-x-8">
-                        {navigationItems.map((item) => (
-                            <div key={item.href} className="relative">
+                    <div className="hidden md:flex items-center space-x-1">
+                        {navigationItems.map((item) => {
+                            const isActive =
+                                item.href === "/"
+                                    ? pathname === "/"
+                                    : pathname.startsWith(item.href);
+                            return (
                                 <Link
+                                    key={item.href}
                                     href={item.href}
-                                    className="text-foreground hover:text-primary transition-colors font-medium"
+                                    className={`text-sm font-medium px-3 py-2 rounded-lg transition-colors ${
+                                        isActive
+                                            ? "text-foreground"
+                                            : "text-muted-foreground hover:text-foreground"
+                                    }`}
                                 >
                                     {item.label}
                                 </Link>
-                                {/* {item.badge && (
-                                    <Badge
-                                        variant="destructive"
-                                        className="absolute -top-2 -right-3 text-xs px-1"
-                                    >
-                                        {item.badge}
-                                    </Badge>
-                                )} */}
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center space-x-2">
-                        <ThemeToggle />
-
+                    <div className="flex items-center space-x-3">
+                        <button
+                            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                            className="hidden md:flex w-9 h-9 rounded-lg border border-border bg-secondary items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                            aria-label="Toggle theme"
+                        >
+                            <Sun className="w-4 h-4 hidden dark:block" />
+                            <Moon className="w-4 h-4 block dark:hidden" />
+                        </button>
                         {!isLoading &&
                             (user ? (
                                 // Authenticated user dropdown
@@ -140,9 +150,9 @@ export default function Navbar({ user, profile }: NavbarProps) {
                                     <DropdownMenuTrigger asChild>
                                         <Button
                                             variant="ghost"
-                                            className="relative h-8 w-8 rounded-full"
+                                            className="relative h-9 w-9 rounded-full p-0"
                                         >
-                                            <Avatar className="h-8 w-8">
+                                            <Avatar className="h-9 w-9 ring-2 ring-transparent hover:ring-primary/50 transition-all">
                                                 <AvatarImage
                                                     key={avatarKey}
                                                     src={
@@ -177,13 +187,13 @@ export default function Navbar({ user, profile }: NavbarProps) {
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent
-                                        className="w-56"
+                                        className="w-56 bg-[#0f0f10] border border-white/[0.08] rounded-xl"
                                         align="end"
                                         forceMount
                                     >
                                         <DropdownMenuLabel className="font-normal">
                                             <div className="flex flex-col space-y-1">
-                                                <p className="text-sm font-medium leading-none">
+                                                <p className="text-sm font-medium leading-none text-foreground">
                                                     {profile?.name ||
                                                         user?.email?.split(
                                                             "@"
@@ -197,7 +207,7 @@ export default function Navbar({ user, profile }: NavbarProps) {
                                                 </p>
                                             </div>
                                         </DropdownMenuLabel>
-                                        <DropdownMenuSeparator />
+                                        <DropdownMenuSeparator className="bg-white/[0.08]" />
                                         <DropdownMenuItem asChild>
                                             <Link href="/profile">
                                                 <User className="mr-2 h-4 w-4" />
@@ -212,7 +222,7 @@ export default function Navbar({ user, profile }: NavbarProps) {
                                         </DropdownMenuItem>
                                         {profile?.role === "admin" && (
                                             <>
-                                                <DropdownMenuSeparator />
+                                                <DropdownMenuSeparator className="bg-white/[0.08]" />
                                                 <DropdownMenuItem asChild>
                                                     <Link href="/admin">
                                                         <Shield className="mr-2 h-4 w-4" />
@@ -221,7 +231,7 @@ export default function Navbar({ user, profile }: NavbarProps) {
                                                 </DropdownMenuItem>
                                             </>
                                         )}
-                                        <DropdownMenuSeparator />
+                                        <DropdownMenuSeparator className="bg-white/[0.08]" />
                                         <DropdownMenuItem
                                             onClick={handleLogout}
                                         >
@@ -232,18 +242,19 @@ export default function Navbar({ user, profile }: NavbarProps) {
                                 </DropdownMenu>
                             ) : (
                                 // Non-authenticated user buttons
-                                <div className="hidden md:flex items-center space-x-2">
-                                    <Button variant="ghost" asChild>
-                                        <Link href="/auth?tab=login">
-                                            Sign In
-                                        </Link>
-                                    </Button>
-                                    <Button asChild>
-                                        <Link href="/auth?tab=register">
-                                            <UserPlus className="mr-2 h-4 w-4" />
-                                            Join Now
-                                        </Link>
-                                    </Button>
+                                <div className="hidden md:flex items-center space-x-3">
+                                    <Link
+                                        href="/auth?tab=login"
+                                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                                    >
+                                        Sign In
+                                    </Link>
+                                    <Link
+                                        href="/auth?tab=register"
+                                        className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                                    >
+                                        Join Now
+                                    </Link>
                                 </div>
                             ))}
 
@@ -253,18 +264,18 @@ export default function Navbar({ user, profile }: NavbarProps) {
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="md:hidden"
+                                    className="md:hidden text-foreground"
                                 >
                                     <Menu className="h-5 w-5" />
                                     <span className="sr-only">Toggle menu</span>
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent>
+                            <SheetContent className="bg-[#0a0a0b] border-l border-white/[0.08]">
                                 <div className="grid gap-6 py-6 ml-5">
                                     {/* Mobile User Info */}
                                     {user && (
-                                        <div className="flex items-center space-x-2 pb-4 border-b">
-                                            <Avatar className="h-8 w-8">
+                                        <div className="flex items-center space-x-3 pb-4 border-b border-white/[0.08]">
+                                            <Avatar className="h-9 w-9 ring-2 ring-primary/30">
                                                 <AvatarImage
                                                     key={`mobile-${avatarKey}`}
                                                     src={
@@ -297,7 +308,7 @@ export default function Navbar({ user, profile }: NavbarProps) {
                                                 </AvatarFallback>
                                             </Avatar>
                                             <div>
-                                                <p className="text-sm font-medium">
+                                                <p className="text-sm font-medium text-foreground">
                                                     {profile?.name ||
                                                         user?.email?.split(
                                                             "@"
@@ -314,34 +325,44 @@ export default function Navbar({ user, profile }: NavbarProps) {
                                     )}
 
                                     {/* Mobile Navigation */}
-                                    {navigationItems.map((item) => (
-                                        <Link
-                                            key={item.href}
-                                            href={item.href}
-                                            className="text-foreground hover:text-primary transition-colors font-medium"
-                                        >
-                                            {item.label}
-                                        </Link>
-                                    ))}
+                                    {navigationItems.map((item) => {
+                                        const isActive =
+                                            item.href === "/"
+                                                ? pathname === "/"
+                                                : pathname.startsWith(item.href);
+                                        return (
+                                            <Link
+                                                key={item.href}
+                                                href={item.href}
+                                                className={`text-sm font-medium transition-colors ${
+                                                    isActive
+                                                        ? "text-foreground"
+                                                        : "text-muted-foreground hover:text-foreground"
+                                                }`}
+                                            >
+                                                {item.label}
+                                            </Link>
+                                        );
+                                    })}
 
                                     {/* Mobile Auth Actions */}
                                     {user ? (
                                         <>
                                             <Link
                                                 href="/profile"
-                                                className="text-foreground hover:text-primary transition-colors font-medium"
+                                                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                                             >
                                                 Profile
                                             </Link>
                                             <Link
                                                 href="/settings"
-                                                className="text-foreground hover:text-primary transition-colors font-medium"
+                                                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                                             >
                                                 Settings
                                             </Link>
                                             <Button
                                                 variant="outline"
-                                                className="w-[90%]"
+                                                className="w-[90%] border-white/[0.08] text-foreground hover:bg-white/[0.06]"
                                                 onClick={handleLogout}
                                             >
                                                 <LogOut className="mr-2 h-4 w-4" />
@@ -352,15 +373,16 @@ export default function Navbar({ user, profile }: NavbarProps) {
                                         <>
                                             <Link
                                                 href="/auth?tab=login"
-                                                className="text-foreground hover:text-primary transition-colors font-medium"
+                                                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                                             >
                                                 Sign In
                                             </Link>
-                                            <Button className="w-[90%]" asChild>
-                                                <Link href="/auth?tab=register">
-                                                    Join Now
-                                                </Link>
-                                            </Button>
+                                            <Link
+                                                href="/auth?tab=register"
+                                                className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors text-center w-[90%]"
+                                            >
+                                                Join Now
+                                            </Link>
                                         </>
                                     )}
                                 </div>

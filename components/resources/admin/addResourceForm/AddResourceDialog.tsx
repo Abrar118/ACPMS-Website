@@ -34,7 +34,6 @@ import {
 import {
   EResourceCategory,
   EResourceLevel,
-  EResourceStatus,
   EResourceType,
 } from "@/components/shared/enums";
 import MultipleSelector from "@/components/shared/multiselect";
@@ -189,31 +188,16 @@ export default function AddResourceDialog() {
             <div className="grid gap-3">
               <FormField
                 control={form.control}
-                name="status"
+                name="isPublished"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {Object.values(EResourceStatus).map((value) => {
-                          const label =
-                            Object.entries(EResourceStatus).find(
-                              ([, v]) => v === value
-                            )?.[0] || value;
-                          return (
-                            <SelectItem key={value} value={value}>
-                              {label.replace(/_/g, " ")}
-                            </SelectItem>
-                          );
-                        })}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
+                  <FormItem className="flex flex-row items-center gap-2">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormLabel>Published</FormLabel>
                   </FormItem>
                 )}
               />

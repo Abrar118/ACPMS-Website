@@ -1,0 +1,373 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserStatus {
+  pending
+  approved
+}
+
+enum RegistrationStatus {
+  pending
+  approved
+  rejected
+}
+
+enum TeamRole {
+  captain
+  member
+}
+
+enum PaymentStatus {
+  pending
+  verified
+  rejected
+}
+
+enum AnnouncementPriority {
+  low
+  normal
+  urgent
+}
+
+enum ContactStatus {
+  new_submission
+  read
+  replied
+  archived
+}
+
+model UserProfile {
+  id                 String    @id @default(uuid())
+  email              String
+  name               String
+  ssc_batch          String
+  role               String?
+  status             String?
+  executive_position String?
+  profile_image      String?
+  created_at         DateTime? @default(now())
+  updated_at         DateTime? @default(now())
+
+  events_created    Event[]    @relation("EventCreator")
+  resources_created Resource[] @relation("ResourceCreator")
+  magazines_created Magazine[] @relation("MagazineCreator")
+
+  member_profile         Member?             @relation("MemberUser")
+  blog_posts_created     BlogPost[]          @relation("BlogPostCreator")
+  announcements_created  Announcement[]      @relation("AnnouncementCreator")
+  gallery_albums_created GalleryAlbum[]      @relation("GalleryAlbumCreator")
+  payments_verified      Payment[]           @relation("PaymentVerifier")
+  contact_replies        ContactSubmission[] @relation("ContactReplier")
+
+  @@map("user_profiles")
+}
+
+model Event {
+  id                    String    @id @default(uuid())
+  title                 String
+  description           Json?
+  event_date            DateTime?
+  end_date              DateTime?
+  venue                 String?
+  registration_deadline DateTime?
+  is_published          Boolean   @default(false)
+  event_mode            String
+  event_type            String?
+  created_by            String?
+  poster_url            String?
+  tags                  String[]
+  created_at            DateTime? @default(now())
+  updated_at            DateTime? @default(now())
+
+  creator        UserProfile?  @relation("EventCreator", fields: [created_by], references: [id])
+  competitions   Competition[]
+  gallery_albums GalleryAlbum[]
+
+  @@map("events")
+}
+
+model Competition {
+  id            String   @id @default(uuid())
+  event_id      String
+  title         String
+  description   Json?
+  fee           Float    @default(0)
+  display_order Int
+  is_published  Boolean  @default(false)
+  is_team_event Boolean  @default(false)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @default(now())
+
+  event        Event                    @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  participants CompetitionParticipant[]
+  results      CompetitionResult[]
+  payments     Payment[]
+
+  @@map("competitions")
+}
+
+model Participant {
+  id                String   @id @default(uuid())
+  name              String
+  institution       String
+  class             Int
+  id_at_institution String
+  email             String?
+  phone             String?
+  note              String   @default("")
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now())
+
+  registrations    CompetitionParticipant[]
+  team_memberships TeamMember[]
+  results          CompetitionResult[]
+  payments         Payment[]
+
+  @@map("participants")
+}
+
+model CompetitionParticipant {
+  id             String   @id @default(uuid())
+  competition_id String
+  participant_id String
+  status         String
+  team_id        String?
+  created_at     DateTime @default(now())
+  updated_at     DateTime @default(now())
+
+  competition Competition @relation(fields: [competition_id], references: [id], onDelete: Cascade)
+  participant Participant @relation(fields: [participant_id], references: [id], onDelete: Cascade)
+  team        Team?       @relation(fields: [team_id], references: [id], onDelete: Cascade)
+
+  @@map("competitions_participants")
+}
+
+model Member {
+  id                String   @id @default(uuid())
+  name              String
+  designation       String
+  position          String?
+  session           String?
+  bio               String?
+  image_url         String?
+  email             String?
+  phone             String?
+  facebook_id_link  String?
+  instagram_id_link String?
+  linkedin_id_link  String?
+  user_id           String?  @unique
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now())
+
+  user UserProfile? @relation("MemberUser", fields: [user_id], references: [id], onDelete: SetNull)
+
+  @@map("members")
+}
+
+model Resource {
+  id            String    @id @default(uuid())
+  title         String
+  description   String?
+  category      String?
+  resource_type String
+  resource_url  String?
+  author        String?
+  is_featured   Boolean   @default(false)
+  is_archived   Boolean   @default(false)
+  is_published  Boolean   @default(false)
+  levels        String[]
+  tags          String[]
+  view_count    Int?      @default(0)
+  created_by    String?
+  created_at    DateTime? @default(now())
+  updated_at    DateTime? @default(now())
+
+  creator UserProfile? @relation("ResourceCreator", fields: [created_by], references: [id])
+
+  @@map("resources")
+}
+
+model Magazine {
+  id             String    @id @default(uuid())
+  title          String
+  summary        String?
+  volume         Int?
+  issue          Int?
+  pdf_url        String?
+  cover_image    String?
+  published_date DateTime?
+  is_published   Boolean   @default(false)
+  is_archived    Boolean?
+  language       String?
+  doi            String?
+  download_count Int?
+  access_level   String?
+  chief_patron   String?
+  tags           String[]
+  created_by     String?
+  created_at     DateTime? @default(now())
+  updated_at     DateTime? @default(now())
+
+  creator UserProfile? @relation("MagazineCreator", fields: [created_by], references: [id])
+
+  @@map("magazines")
+}
+
+model Team {
+  id          String   @id @default(uuid())
+  name        String
+  institution String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now())
+
+  members                  TeamMember[]
+  competition_participants CompetitionParticipant[]
+  results                  CompetitionResult[]
+
+  @@map("teams")
+}
+
+model TeamMember {
+  id             String   @id @default(uuid())
+  team_id        String
+  participant_id String
+  role           String   @default("member")
+  created_at     DateTime @default(now())
+
+  team        Team        @relation(fields: [team_id], references: [id], onDelete: Cascade)
+  participant Participant @relation(fields: [participant_id], references: [id], onDelete: Cascade)
+
+  @@unique([team_id, participant_id])
+  @@map("team_members")
+}
+
+model CompetitionResult {
+  id              String   @id @default(uuid())
+  competition_id  String
+  participant_id  String?
+  team_id         String?
+  score           Decimal?
+  rank            Int?
+  certificate_url String?
+  remarks         String?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @default(now())
+
+  competition Competition  @relation(fields: [competition_id], references: [id], onDelete: Cascade)
+  participant Participant?  @relation(fields: [participant_id], references: [id], onDelete: SetNull)
+  team        Team?         @relation(fields: [team_id], references: [id], onDelete: SetNull)
+
+  @@map("competition_results")
+}
+
+model Payment {
+  id               String    @id @default(uuid())
+  participant_id   String
+  competition_id   String?
+  amount           Decimal
+  payment_provider String?
+  transaction_id   String?
+  status           String    @default("pending")
+  verified_by      String?
+  verified_at      DateTime?
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @default(now())
+
+  participant Participant  @relation(fields: [participant_id], references: [id], onDelete: Cascade)
+  competition Competition? @relation(fields: [competition_id], references: [id], onDelete: SetNull)
+  verifier    UserProfile? @relation("PaymentVerifier", fields: [verified_by], references: [id], onDelete: SetNull)
+
+  @@map("payments")
+}
+
+model BlogPost {
+  id           String    @id @default(uuid())
+  title        String
+  slug         String    @unique
+  content      Json?
+  excerpt      String?
+  cover_image  String?
+  tags         String[]  @default([])
+  is_published Boolean   @default(false)
+  is_featured  Boolean   @default(false)
+  published_at DateTime?
+  view_count   Int       @default(0)
+  created_by   String?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @default(now())
+
+  creator UserProfile? @relation("BlogPostCreator", fields: [created_by], references: [id], onDelete: SetNull)
+
+  @@map("blog_posts")
+}
+
+model Announcement {
+  id         String    @id @default(uuid())
+  title      String
+  body       String
+  priority   String    @default("normal")
+  is_pinned  Boolean   @default(false)
+  is_active  Boolean   @default(true)
+  expires_at DateTime?
+  created_by String?
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now())
+
+  creator UserProfile? @relation("AnnouncementCreator", fields: [created_by], references: [id], onDelete: SetNull)
+
+  @@map("announcements")
+}
+
+model GalleryAlbum {
+  id            String   @id @default(uuid())
+  title         String
+  description   String?
+  event_id      String?
+  cover_image   String?
+  is_published  Boolean  @default(false)
+  display_order Int      @default(0)
+  created_by    String?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @default(now())
+
+  event   Event?        @relation(fields: [event_id], references: [id], onDelete: SetNull)
+  creator UserProfile?  @relation("GalleryAlbumCreator", fields: [created_by], references: [id], onDelete: SetNull)
+  images  GalleryImage[]
+
+  @@map("gallery_albums")
+}
+
+model GalleryImage {
+  id            String   @id @default(uuid())
+  album_id      String
+  image_url     String
+  caption       String?
+  display_order Int      @default(0)
+  created_at    DateTime @default(now())
+
+  album GalleryAlbum @relation(fields: [album_id], references: [id], onDelete: Cascade)
+
+  @@map("gallery_images")
+}
+
+model ContactSubmission {
+  id         String    @id @default(uuid())
+  name       String
+  email      String
+  subject    String
+  message    String
+  status     String    @default("new")
+  replied_by String?
+  replied_at DateTime?
+  created_at DateTime  @default(now())
+
+  replier UserProfile? @relation("ContactReplier", fields: [replied_by], references: [id], onDelete: SetNull)
+
+  @@map("contact_submissions")
+}

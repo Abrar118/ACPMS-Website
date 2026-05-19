@@ -1,124 +1,83 @@
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Facebook, Twitter, Instagram, Mail } from "lucide-react";
+import { Twitter, Facebook, Instagram } from "lucide-react";
+import Link from "next/link";
 
 export default function Footer() {
     return (
-        <footer className="bg-muted py-12 px-4">
-            <div className="max-w-6xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                    {/* Brand */}
-                    <div className="md:col-span-1">
-                        <h3 className="text-xl font-bold mb-4 text-primary">
-                            ACPS Club of Mathematics
-                        </h3>
-                        <p className="text-muted-foreground text-sm">
-                            Think Logical
+        <footer className="border-t border-white/[0.06] bg-white/[0.02]">
+            <div className="max-w-7xl mx-auto py-16 px-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+                    {/* Column 1 — Branding */}
+                    <div>
+                        <h3 className="text-xl font-bold text-foreground">ACPSCM</h3>
+                        <p className="text-sm text-muted-foreground mt-3 max-w-xs">
+                            Adamjee Cantonment Public School Club of Mathematics
                         </p>
                     </div>
 
-                    {/* Quick Links */}
+                    {/* Column 2 — Quick Links */}
                     <div>
-                        <h4 className="font-semibold mb-4 text-foreground">
+                        <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
                             Quick Links
                         </h4>
-                        <ul className="space-y-2 text-sm text-muted-foreground">
-                            <li>
-                                <a
-                                    href="/"
-                                    className="hover:text-foreground transition-colors"
-                                >
-                                    Home
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="/events"
-                                    className="hover:text-foreground transition-colors"
-                                >
-                                    Events
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="/resources"
-                                    className="hover:text-foreground transition-colors"
-                                >
-                                    Resources
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="/admin"
-                                    className="hover:text-foreground transition-colors"
-                                >
-                                    Admin
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    {/* Contact */}
-                    <div>
-                        <h4 className="font-semibold mb-4 text-foreground">
-                            Contact
-                        </h4>
-                        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                            <Mail className="h-4 w-4" />
-                            <span>contact@mathexplorers.org</span>
+                        <div className="space-y-3 flex flex-col">
+                            <Link href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Home</Link>
+                            <Link href="/events" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Events</Link>
+                            <Link href="/blog" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Blog</Link>
+                            <Link href="/resources" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Resources</Link>
+                            <Link href="/gallery" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Gallery</Link>
+                            <Link href="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">About Us</Link>
+                            <Link href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Contact</Link>
                         </div>
                     </div>
 
-                    {/* Newsletter & Social */}
+                    {/* Column 3 — Contact */}
                     <div>
-                        <h4 className="font-semibold mb-4 text-foreground">
-                            Stay Connected
+                        <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
+                            Contact
                         </h4>
-                        <div className="space-y-4">
-                            <div className="flex space-x-2">
-                                <Input
-                                    placeholder="Enter email"
-                                    className="text-sm"
-                                />
-                                <Button size="sm">Subscribe</Button>
-                            </div>
-                            <div className="flex space-x-4">
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8"
-                                    aria-label="Twitter"
-                                >
-                                    <Twitter className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8"
-                                    aria-label="Facebook"
-                                >
-                                    <Facebook className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8"
-                                    aria-label="Instagram"
-                                >
-                                    <Instagram className="h-4 w-4" />
-                                </Button>
-                            </div>
+                        <a
+                            href="mailto:contact@acpscm.com"
+                            className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                        >
+                            contact@acpscm.com
+                        </a>
+                    </div>
+
+                    {/* Column 4 — Social */}
+                    <div>
+                        <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
+                            Follow Us
+                        </h4>
+                        <div className="flex gap-3">
+                            <a
+                                href="#"
+                                aria-label="Twitter"
+                                className="w-9 h-9 rounded-lg border border-white/[0.08] bg-white/[0.03] flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-white/[0.15] transition-all"
+                            >
+                                <Twitter className="h-4 w-4" />
+                            </a>
+                            <a
+                                href="#"
+                                aria-label="Facebook"
+                                className="w-9 h-9 rounded-lg border border-white/[0.08] bg-white/[0.03] flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-white/[0.15] transition-all"
+                            >
+                                <Facebook className="h-4 w-4" />
+                            </a>
+                            <a
+                                href="#"
+                                aria-label="Instagram"
+                                className="w-9 h-9 rounded-lg border border-white/[0.08] bg-white/[0.03] flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-white/[0.15] transition-all"
+                            >
+                                <Instagram className="h-4 w-4" />
+                            </a>
                         </div>
                     </div>
                 </div>
 
-                <Separator className="my-8" />
-
-                {/* Copyright */}
-                <div className="text-center">
-                    <p className="text-sm text-muted-foreground">
-                        © 2025 ACPSCM. All rights reserved.
+                {/* Bottom bar */}
+                <div className="mt-12 pt-8 border-t border-white/[0.06]">
+                    <p className="text-sm text-muted-foreground text-center">
+                        © 2026 ACPSCM. All rights reserved.
                     </p>
                 </div>
             </div>

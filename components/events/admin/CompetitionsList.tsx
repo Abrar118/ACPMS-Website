@@ -42,7 +42,7 @@ import {
   GripVertical,
 } from "lucide-react";
 import { toast } from "sonner";
-import { type CompetitionRow } from "@/queries/competitions";
+import type { Competition } from "@/lib/db/competitions";
 import {
   toggleCompetitionStatusAction,
   deleteCompetitionAction,
@@ -53,7 +53,7 @@ import { JSONContent } from "@tiptap/react";
 import { MinimalTiptapEditor } from "@/components/ui/minimal-tiptap";
 
 interface CompetitionsListProps {
-  competitions: CompetitionRow[];
+  competitions: Competition[];
   eventId: string;
 }
 
@@ -65,9 +65,9 @@ function SortableCompetitionCard({
   isPending,
   isDragMode,
 }: {
-  competition: CompetitionRow;
+  competition: Competition;
   onToggleStatus: (competitionId: string, isPublished: boolean) => void;
-  onEdit: (competition: CompetitionRow) => void;
+  onEdit: (competition: Competition) => void;
   onDelete: (competitionId: string) => void;
   isPending: boolean;
   isDragMode: boolean;
@@ -197,7 +197,7 @@ export default function CompetitionsList({
 }: CompetitionsListProps) {
   const [isPending, startTransition] = useTransition();
   const [editingCompetition, setEditingCompetition] =
-    useState<CompetitionRow | null>(null);
+    useState<Competition | null>(null);
   const [isDragMode, setIsDragMode] = useState(false);
   const [orderedCompetitions, setOrderedCompetitions] = useState(
     competitions.sort((a, b) => a.display_order - b.display_order)

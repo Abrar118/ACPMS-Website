@@ -2,8 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import Footer from "@/components/home/Footer";
 import CategoryResourcesClient from "@/components/resources/CategoryResourcesClient";
 import { getCurrentUser } from "@/lib/auth-server";
-import { getResourcesByCategory } from "@/queries/resources";
-import createSupabaseServer from "@/utils/supabase/supabase-server";
+import { getResourcesByCategory } from "@/lib/db/resources";
 import { EResourceCategory } from "@/components/shared/enums";
 
 interface CategoryPageProps {
@@ -28,14 +27,8 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     notFound();
   }
 
-  const supabase = await createSupabaseServer();
-
   // Fetch resources for this category
-  const categoryResourcesResponse = await getResourcesByCategory(
-    supabase,
-    category
-  );
-  const categoryResources = categoryResourcesResponse.data || [];
+  const categoryResources = await getResourcesByCategory(category);
 
   // Get category display name
   const categoryKey = Object.keys(EResourceCategory).find(
@@ -47,7 +40,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   return (
     <main className="min-h-screen">
       <CategoryResourcesClient
-        resources={categoryResources}
+        resources={JSON.parse(JSON.stringify(categoryResources))}
         category={category}
         categoryName={categoryKey || category}
       />

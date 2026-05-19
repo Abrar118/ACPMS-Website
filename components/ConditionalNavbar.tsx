@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import Navbar from "@/components/shared/Navbar";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
-import type { UserProfile } from "@/queries/auth";
+import type { UserProfile } from "@/lib/db/users";
 
 interface ConditionalNavbarProps {
     user: SupabaseUser | null;

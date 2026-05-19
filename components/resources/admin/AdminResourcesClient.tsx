@@ -23,7 +23,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import AddResourceDialog from "@/components/resources/admin/addResourceForm/AddResourceDialog";
 import { EResourceCategory, EResourceType } from "@/components/shared/enums";
-import { type ResourceRow as TResourceRow } from "@/queries/resources";
+import type { Resource as TResourceRow } from "@/lib/db/resources";
 import { ResourceActions } from "@/components/resources/admin/ResourceActions";
 
 interface AdminResourcesClientProps {
@@ -122,9 +122,9 @@ function ResourceRow({ resource }: { resource: TResourceRow }) {
       <TableCell>{resource.view_count || 0}</TableCell>
       <TableCell>
         <Badge
-          variant={resource.status === "Published" ? "default" : "secondary"}
+          variant={resource.is_published ? "default" : "secondary"}
         >
-          {resource.status}
+          {resource.is_published ? "Published" : "Draft"}
         </Badge>
       </TableCell>
       <TableCell>
@@ -153,9 +153,7 @@ export default function AdminResourcesClient({ resources, error }: AdminResource
     return Array.from(new Set(resources.map(r => r.resource_type).filter((t): t is string => Boolean(t)))).sort();
   }, [resources]);
 
-  const availableStatuses = useMemo(() => {
-    return Array.from(new Set(resources.map(r => r.status).filter((s): s is string => Boolean(s)))).sort();
-  }, [resources]);
+  const availableStatuses = ["Published", "Draft"];
 
   // Filter resources based on search term and filters
   const filteredResources = useMemo(() => {
@@ -168,7 +166,9 @@ export default function AdminResourcesClient({ resources, error }: AdminResource
 
       const matchesCategory = selectedCategory === "all" || resource.category === selectedCategory;
       const matchesType = selectedType === "all" || resource.resource_type === selectedType;
-      const matchesStatus = selectedStatus === "all" || resource.status === selectedStatus;
+      const matchesStatus = selectedStatus === "all" ||
+        (selectedStatus === "Published" && resource.is_published) ||
+        (selectedStatus === "Draft" && !resource.is_published);
 
       return matchesSearch && matchesCategory && matchesType && matchesStatus;
     });

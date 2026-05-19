@@ -43,8 +43,9 @@ import {
   Clock,
   AlertCircle
 } from "lucide-react";
-import { type EventRow } from "@/queries/events";
-import { type CompetitionRow } from "@/queries/competitions";
+import type { Event } from "@/lib/db/events";
+import type { Competition } from "@/lib/db/competitions";
+import type { ParticipantWithRegistrations } from "@/lib/db/participants";
 import { 
   updateParticipantStatusAction, 
   updateAllParticipantStatusesAction 
@@ -52,34 +53,10 @@ import {
 import { toast } from "sonner";
 import { format } from "date-fns";
 
-interface ParticipantData {
-  participant: {
-    id: string;
-    name: string;
-    email: string | null;
-    phone: string | null;
-    institution: string;
-    class: number;
-    id_at_institution: string;
-    note: string;
-    transaction_id: string | null;
-    payment_provider: string | null;
-    created_at: string;
-  };
-  registrations: Array<{
-    id: string;
-    competition_id: string;
-    status: string;
-    created_at: string;
-    updated_at: string;
-    competition: CompetitionRow;
-  }>;
-}
-
 interface EventParticipantsClientProps {
-  event: EventRow;
-  competitions: CompetitionRow[];
-  participants: ParticipantData[];
+  event: Event;
+  competitions: Competition[];
+  participants: ParticipantWithRegistrations[];
   error?: string;
 }
 
@@ -468,19 +445,7 @@ export default function EventParticipantsClient({
 
                       {/* Payment */}
                       <TableCell>
-                        {participant.transaction_id ? (
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-1 text-sm">
-                              <CreditCard className="h-3 w-3" />
-                              {participant.payment_provider || "Unknown"}
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                              {participant.transaction_id}
-                            </p>
-                          </div>
-                        ) : (
-                          <span className="text-sm text-muted-foreground">No payment info</span>
-                        )}
+                        <span className="text-sm text-muted-foreground">See Payments tab</span>
                       </TableCell>
 
                       {/* Actions */}

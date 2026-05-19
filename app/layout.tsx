@@ -1,16 +1,19 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { ReactQueryClientProvider } from "@/components/ReactQueryClientProvider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
 import { ConditionalNavbar } from "@/components/ConditionalNavbar";
 import { getCurrentUser } from "@/lib/auth-server";
+import { LoadingScreen } from "@/components/ui/loading-screen";
+import AnnouncementBanner from "@/components/announcements/AnnouncementBanner";
+import { getActiveAnnouncements } from "@/lib/db/announcements";
 
-const poppins = Poppins({
+const inter = Inter({
     subsets: ["latin"],
-    variable: "--font-poppins",
-    weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+    variable: "--font-sans",
+    weight: ["300", "400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -23,26 +26,44 @@ export default async function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    // Get current user data server-side
-    const { user, profile } = await getCurrentUser();
+    const [{ user, profile }, announcements] = await Promise.all([
+        getCurrentUser(),
+        getActiveAnnouncements(),
+    ]);
+    const topAnnouncement = announcements.length > 0 ? announcements[0] : null;
 
     return (
         <ReactQueryClientProvider>
-            <html lang="en">
+            <html lang="en" suppressHydrationWarning>
                 <body
-                    className={`${poppins.variable} font-poppins antialiased`}
+                    className={`${inter.variable} font-sans antialiased`}
                 >
+                    <LoadingScreen />
                     <ThemeProvider
                         attribute="class"
                         defaultTheme="system"
                         enableSystem
                         disableTransitionOnChange
                     >
-                        <ConditionalNavbar user={user} profile={profile} />
+                        <AnnouncementBanner
+                            announcement={topAnnouncement ? JSON.parse(JSON.stringify(topAnnouncement)) : null}
+                        />
+                        <ConditionalNavbar user={user} profile={profile ? JSON.parse(JSON.stringify(profile)) : null} />
                         <main className="bg-background flex flex-col min-h-screen">
                             {children}
                         </main>
-                        <Toaster richColors position="top-right" />
+                        <Toaster
+                            richColors
+                            position="top-right"
+                            toastOptions={{
+                                style: {
+                                    background: "rgba(255, 255, 255, 0.03)",
+                                    backdropFilter: "blur(24px)",
+                                    border: "1px solid rgba(255, 255, 255, 0.08)",
+                                    color: "#f5f5f5",
+                                },
+                            }}
+                        />
                     </ThemeProvider>
                 </body>
             </html>
