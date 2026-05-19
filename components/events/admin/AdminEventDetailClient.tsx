@@ -15,6 +15,8 @@ import { Separator } from "@/components/ui/separator";
 import { Plus, Calendar, MapPin, Clock, User, Tag, FileText } from "lucide-react";
 import type { Event } from "@/lib/db/events";
 import type { Competition } from "@/lib/db/competitions";
+import type { ParticipantWithRegistrations } from "@/lib/db/participants";
+import type { PaymentWithDetails } from "@/lib/db/payments";
 import AddCompetitionDialog from "./AddCompetitionDialog";
 import CompetitionsList from "./CompetitionsList";
 import { format } from "date-fns";
@@ -24,6 +26,8 @@ import { JSONContent } from "@tiptap/react";
 interface AdminEventDetailClientProps {
   event: Event;
   competitions: Competition[];
+  participants?: ParticipantWithRegistrations[];
+  payments?: PaymentWithDetails[];
   error?: string;
 }
 
