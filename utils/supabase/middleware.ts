@@ -46,6 +46,7 @@ export async function updateSession(request: NextRequest) {
         "/blog",
         "/resources",
         "/gallery",
+        "/contact",
     ];
 
     const isPublic =

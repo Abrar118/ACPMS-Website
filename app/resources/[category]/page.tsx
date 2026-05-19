@@ -1,7 +1,6 @@
-import { redirect, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 import Footer from "@/components/home/Footer";
 import CategoryResourcesClient from "@/components/resources/CategoryResourcesClient";
-import { getCurrentUser } from "@/lib/auth-server";
 import { getResourcesByCategory } from "@/lib/db/resources";
 import { EResourceCategory } from "@/components/shared/enums";
 
@@ -12,14 +11,7 @@ interface CategoryPageProps {
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
-  // Await params before using
   const { category } = await params;
-
-  // Check if user is authenticated
-  const { user } = await getCurrentUser();
-  if (!user) {
-    redirect("/auth");
-  }
 
   // Validate category
   const validCategories = Object.values(EResourceCategory);
