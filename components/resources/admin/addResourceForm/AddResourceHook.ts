@@ -6,7 +6,7 @@ import {
 } from "./AddResourceHelper";
 import { z } from "zod";
 import { Dispatch, SetStateAction, useTransition } from "react";
-import { createResource } from "@/actions/resources";
+import { createResourceAction } from "@/actions/resources";
 import { toast } from "sonner";
 
 export type TAddResourceFormValues = z.infer<typeof addResourceSchema>;
@@ -25,7 +25,7 @@ export const useAddResourceForm = (
   const onSubmit = form.handleSubmit((data) => {
     startTransition(async () => {
       try {
-        const result = await createResource(data);
+        const result = await createResourceAction(data);
         
         if (result.success) {
           toast.success(result.message || "Resource created successfully");

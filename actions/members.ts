@@ -1,14 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import createSupabaseServer from "@/utils/supabase/supabase-server";
 import {
   createMember,
   updateMember,
   deleteMember,
-} from "@/queries/members";
+} from "@/lib/db/members";
 import { getCurrentUser, isAdminOrExecutive } from "@/lib/auth-server";
-import type { CreateMemberData, UpdateMemberData } from "@/queries/members";
+import type { CreateMemberData, UpdateMemberData } from "@/lib/db/members";
 
 type MemberActionResult = {
   success: boolean;
@@ -36,14 +35,8 @@ export async function createMemberAction(
       };
     }
 
-    const supabase = await createSupabaseServer();
-
     // Create the member
-    const result = await createMember(supabase, memberData);
-
-    if (result.error) {
-      return { success: false, error: result.error };
-    }
+    const member = await createMember(memberData);
 
     // Revalidate relevant pages
     revalidatePath("/admin/members", "page");
@@ -52,7 +45,7 @@ export async function createMemberAction(
     return {
       success: true,
       message: "Member created successfully",
-      data: result.data,
+      data: member,
     };
   } catch (error: any) {
     console.error("Error in createMemberAction:", error);
@@ -83,14 +76,8 @@ export async function updateMemberAction(
       };
     }
 
-    const supabase = await createSupabaseServer();
-
     // Update the member
-    const result = await updateMember(supabase, memberId, memberData);
-
-    if (result.error) {
-      return { success: false, error: result.error };
-    }
+    const member = await updateMember(memberId, memberData);
 
     // Revalidate relevant pages
     revalidatePath("/admin/members", "page");
@@ -99,7 +86,7 @@ export async function updateMemberAction(
     return {
       success: true,
       message: "Member updated successfully",
-      data: result.data,
+      data: member,
     };
   } catch (error: any) {
     console.error("Error in updateMemberAction:", error);
@@ -129,14 +116,8 @@ export async function deleteMemberAction(
       };
     }
 
-    const supabase = await createSupabaseServer();
-
     // Delete the member
-    const result = await deleteMember(supabase, memberId);
-
-    if (result.error) {
-      return { success: false, error: result.error };
-    }
+    await deleteMember(memberId);
 
     // Revalidate relevant pages
     revalidatePath("/admin/members", "page");

@@ -7,7 +7,7 @@ import type {
     SignUpWithPasswordCredentials,
 } from "@supabase/supabase-js";
 import createSupabaseServer from "@/utils/supabase/supabase-server";
-import { createUser } from "@/queries/auth";
+import { createUserProfile, getUserByEmail } from "@/lib/db/users";
 import { handleError } from "@/lib/utils";
 
 type AuthData = {
@@ -41,26 +41,21 @@ export async function login(authData: AuthData): Promise<AuthResult> {
         }
 
         // Check if user profile exists
-        const existingUser = await supabase
-            .from("user_profiles")
-            .select("*")
-            .eq("email", authData.email)
-            .limit(1)
-            .single();
+        const existingUser = await getUserByEmail(authData.email);
 
-        if (!existingUser.data) {
-            const response = await createUser(supabase, {
-                id: userData.user?.id,
-                email: authData.email,
-                name: authData.name || "",
-                ssc_batch: authData.ssc_batch || "",
-            });
-
-            if (response.error) {
+        if (!existingUser) {
+            try {
+                await createUserProfile({
+                    id: userData.user?.id ?? "",
+                    email: authData.email,
+                    name: authData.name || "",
+                    ssc_batch: authData.ssc_batch || "",
+                });
+            } catch (profileError) {
                 await supabase.auth.signOut();
                 return {
                     success: false,
-                    error: response.error || "Failed to create user profile",
+                    error: handleError(profileError) || "Failed to create user profile",
                 };
             }
         }

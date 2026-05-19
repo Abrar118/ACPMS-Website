@@ -1,14 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import createSupabaseServer from "@/utils/supabase/supabase-server";
 import {
-  createOneEvent,
+  createEvent,
   updateEvent,
   deleteEvent,
   toggleEventStatus,
   type CreateEventData,
-} from "@/queries/events";
+} from "@/lib/db/events";
 import { getCurrentUser, isAdminOrExecutive } from "@/lib/auth-server";
 
 type EventActionResult = {
@@ -37,14 +36,8 @@ export async function createEventAction(
       };
     }
 
-    const supabase = await createSupabaseServer();
-
     // Create the event
-    const result = await createOneEvent(supabase, user.id, eventData);
-
-    if (result.error) {
-      return { success: false, error: result.error };
-    }
+    const event = await createEvent(user.id, eventData);
 
     // Revalidate relevant pages
     revalidatePath("/admin/events", "page");
@@ -53,7 +46,7 @@ export async function createEventAction(
     return {
       success: true,
       message: "Event created successfully",
-      data: result.data,
+      data: event,
     };
   } catch (error: any) {
     console.error("Error creating event:", error);
@@ -84,14 +77,8 @@ export async function updateEventAction(
       };
     }
 
-    const supabase = await createSupabaseServer();
-
     // Update the event
-    const result = await updateEvent(supabase, eventId, eventData);
-
-    if (result.error) {
-      return { success: false, error: result.error };
-    }
+    const event = await updateEvent(eventId, eventData);
 
     // Revalidate relevant pages
     revalidatePath("/admin/events", "page");
@@ -100,7 +87,7 @@ export async function updateEventAction(
     return {
       success: true,
       message: "Event updated successfully",
-      data: result.data,
+      data: event,
     };
   } catch (error: any) {
     console.error("Error updating event:", error);
@@ -130,14 +117,8 @@ export async function deleteEventAction(
       };
     }
 
-    const supabase = await createSupabaseServer();
-
     // Delete the event
-    const result = await deleteEvent(supabase, eventId);
-
-    if (result.error) {
-      return { success: false, error: result.error };
-    }
+    await deleteEvent(eventId);
 
     // Revalidate relevant pages
     revalidatePath("/admin/events", "page");
@@ -176,14 +157,8 @@ export async function toggleEventStatusAction(
       };
     }
 
-    const supabase = await createSupabaseServer();
-
     // Update the event status
-    const result = await toggleEventStatus(supabase, eventId, isPublished);
-
-    if (result.error) {
-      return { success: false, error: result.error };
-    }
+    const event = await toggleEventStatus(eventId, isPublished);
 
     // Revalidate relevant pages
     revalidatePath("/admin/events", "page");
@@ -192,7 +167,7 @@ export async function toggleEventStatusAction(
     return {
       success: true,
       message: `Event ${isPublished ? "published" : "unpublished"} successfully`,
-      data: result.data,
+      data: event,
     };
   } catch (error: any) {
     console.error("Error updating event status:", error);

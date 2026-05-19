@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import createSupabaseServer from "@/utils/supabase/supabase-server";
 import {
   createCompetition,
   updateCompetition,
@@ -9,8 +8,7 @@ import {
   toggleCompetitionStatus,
   updateCompetitionOrder,
   type CreateCompetitionData,
-  type UpdateCompetitionData,
-} from "@/queries/competitions";
+} from "@/lib/db/competitions";
 import { getCurrentUser, isAdminOrExecutive } from "@/lib/auth-server";
 
 type CompetitionActionResult = {
@@ -39,14 +37,8 @@ export async function createCompetitionAction(
       };
     }
 
-    const supabase = await createSupabaseServer();
-
     // Create the competition
-    const result = await createCompetition(supabase, competitionData);
-
-    if (result.error) {
-      return { success: false, error: result.error };
-    }
+    const competition = await createCompetition(competitionData);
 
     // Revalidate relevant pages
     revalidatePath(`/admin/events/${competitionData.event_id}`, "page");
@@ -55,7 +47,7 @@ export async function createCompetitionAction(
     return {
       success: true,
       message: "Competition created successfully",
-      data: result.data,
+      data: competition,
     };
   } catch (error: any) {
     console.error("Error creating competition:", error);
@@ -68,7 +60,7 @@ export async function createCompetitionAction(
 
 export async function updateCompetitionAction(
   competitionId: string,
-  competitionData: UpdateCompetitionData
+  competitionData: Partial<Omit<CreateCompetitionData, "event_id">>
 ): Promise<CompetitionActionResult> {
   try {
     // Get current user and verify authentication
@@ -86,25 +78,19 @@ export async function updateCompetitionAction(
       };
     }
 
-    const supabase = await createSupabaseServer();
-
     // Update the competition
-    const result = await updateCompetition(supabase, competitionId, competitionData);
-
-    if (result.error) {
-      return { success: false, error: result.error };
-    }
+    const competition = await updateCompetition(competitionId, competitionData);
 
     // Revalidate relevant pages
-    if (result.data?.event_id) {
-      revalidatePath(`/admin/events/${result.data.event_id}`, "page");
+    if (competition?.event_id) {
+      revalidatePath(`/admin/events/${competition.event_id}`, "page");
     }
     revalidatePath("/admin/events", "page");
 
     return {
       success: true,
       message: "Competition updated successfully",
-      data: result.data,
+      data: competition,
     };
   } catch (error: any) {
     console.error("Error updating competition:", error);
@@ -135,14 +121,8 @@ export async function deleteCompetitionAction(
       };
     }
 
-    const supabase = await createSupabaseServer();
-
     // Delete the competition
-    const result = await deleteCompetition(supabase, competitionId);
-
-    if (result.error) {
-      return { success: false, error: result.error };
-    }
+    await deleteCompetition(competitionId);
 
     // Revalidate relevant pages
     revalidatePath(`/admin/events/${eventId}`, "page");
@@ -182,14 +162,8 @@ export async function toggleCompetitionStatusAction(
       };
     }
 
-    const supabase = await createSupabaseServer();
-
     // Update the competition status
-    const result = await toggleCompetitionStatus(supabase, competitionId, isPublished);
-
-    if (result.error) {
-      return { success: false, error: result.error };
-    }
+    const competition = await toggleCompetitionStatus(competitionId, isPublished);
 
     // Revalidate relevant pages
     revalidatePath(`/admin/events/${eventId}`, "page");
@@ -198,7 +172,7 @@ export async function toggleCompetitionStatusAction(
     return {
       success: true,
       message: `Competition ${isPublished ? "published" : "unpublished"} successfully`,
-      data: result.data,
+      data: competition,
     };
   } catch (error: any) {
     console.error("Error updating competition status:", error);
@@ -229,14 +203,8 @@ export async function updateCompetitionOrderAction(
       };
     }
 
-    const supabase = await createSupabaseServer();
-
     // Update the competition order
-    const result = await updateCompetitionOrder(supabase, competitions);
-
-    if (result.error) {
-      return { success: false, error: result.error };
-    }
+    await updateCompetitionOrder(competitions);
 
     // Revalidate relevant pages
     revalidatePath(`/admin/events/${eventId}`, "page");

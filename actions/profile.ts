@@ -6,7 +6,7 @@ import createSupabaseServer from "@/utils/supabase/supabase-server";
 import {
     updateUserProfile,
     type UpdateUserProfileData,
-} from "@/queries/profile";
+} from "@/lib/db/profile";
 
 type ProfileUpdateResult = {
     success: boolean;
@@ -31,11 +31,7 @@ export async function updateProfile(
             return { success: false, error: "Unauthorized" };
         }
 
-        const result = await updateUserProfile(supabase, userId, profileData);
-
-        if (result.error) {
-            return { success: false, error: result.error };
-        }
+        await updateUserProfile(userId, profileData);
 
         revalidatePath("/profile", "page");
         revalidatePath("/", "layout"); // Revalidate layout to update navbar
@@ -89,16 +85,15 @@ export async function uploadProfileImage(
             data: { publicUrl },
         } = supabase.storage.from("profile-images").getPublicUrl(fileName);
 
-        // Update user profile with new image URL
-        const updateResult = await updateUserProfile(supabase, userId, {
-            profile_image: publicUrl,
-        });
-
-        if (updateResult.error) {
+        // Update user profile with new image URL using Prisma
+        try {
+            await updateUserProfile(userId, {
+                profile_image: publicUrl,
+            });
+        } catch (updateError: any) {
             // Delete uploaded file if profile update fails
             await supabase.storage.from("profile-images").remove([fileName]);
-
-            return { success: false, error: updateResult.error };
+            return { success: false, error: updateError.message || "Failed to update profile" };
         }
 
         revalidatePath("/profile", "page");
