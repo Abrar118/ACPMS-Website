@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model UserProfile {
+  id                 String    @id @default(uuid())
+  email              String
+  name               String
+  ssc_batch          String
+  role               String?
+  status             String?
+  executive_position String?
+  profile_image      String?
+  created_at         DateTime? @default(now())
+  updated_at         DateTime? @default(now())
+
+  events_created    Event[]    @relation("EventCreator")
+  resources_created Resource[] @relation("ResourceCreator")
+  magazines_created Magazine[] @relation("MagazineCreator")
+
+  @@map("user_profiles")
+}
+
+model Event {
+  id                    String    @id @default(uuid())
+  title                 String
+  description           Json?
+  event_date            DateTime?
+  end_date              DateTime?
+  venue                 String?
+  registration_deadline DateTime?
+  is_published          Boolean   @default(false)
+  event_mode            String
+  event_type            String?
+  created_by            String?
+  poster_url            String?
+  tags                  String[]
+  created_at            DateTime? @default(now())
+  updated_at            DateTime? @default(now())
+
+  creator      UserProfile?  @relation("EventCreator", fields: [created_by], references: [id])
+  competitions Competition[]
+
+  @@map("events")
+}
+
+model Competition {
+  id            String   @id @default(uuid())
+  event_id      String
+  title         String
+  description   Json?
+  fee           Float    @default(0)
+  display_order Int
+  is_published  Boolean  @default(false)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @default(now())
+
+  event        Event                    @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  participants CompetitionParticipant[]
+
+  @@map("competitions")
+}
+
+model Participant {
+  id                String   @id @default(uuid())
+  name              String
+  institution       String
+  class             Int
+  id_at_institution String
+  email             String?
+  phone             String?
+  note              String   @default("")
+  transaction_id    String?
+  payment_provider  String?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now())
+
+  registrations CompetitionParticipant[]
+
+  @@map("participants")
+}
+
+model CompetitionParticipant {
+  id             String   @id @default(uuid())
+  competition_id String
+  participant_id String
+  status         String
+  created_at     DateTime @default(now())
+  updated_at     DateTime @default(now())
+
+  competition Competition @relation(fields: [competition_id], references: [id], onDelete: Cascade)
+  participant Participant @relation(fields: [participant_id], references: [id], onDelete: Cascade)
+
+  @@map("competitions_participants")
+}
+
+model Member {
+  id                String   @id @default(uuid())
+  name              String
+  designation       String
+  position          String?
+  session           String?
+  bio               String?
+  image_url         String?
+  email             String?
+  phone             String?
+  facebook_id_link  String?
+  instagram_id_link String?
+  linkedin_id_link  String?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now())
+
+  @@map("members")
+}
+
+model Resource {
+  id            String    @id @default(uuid())
+  title         String
+  description   String?
+  category      String?
+  resource_type String
+  resource_url  String?
+  author        String?
+  status        String    @default("Draft")
+  is_featured   Boolean   @default(false)
+  is_archived   Boolean   @default(false)
+  levels        String[]
+  tags          String[]
+  view_count    Int?      @default(0)
+  created_by    String?
+  created_at    DateTime? @default(now())
+  updated_at    DateTime? @default(now())
+
+  creator UserProfile? @relation("ResourceCreator", fields: [created_by], references: [id])
+
+  @@map("resources")
+}
+
+model Magazine {
+  id             String    @id @default(uuid())
+  title          String
+  summary        String?
+  volume         Int?
+  issue          Int?
+  pdf_url        String?
+  cover_image    String?
+  published_date DateTime?
+  is_published   Int?
+  is_archived    Boolean?
+  language       String?
+  doi            String?
+  download_count Int?
+  access_level   String?
+  chief_patron   String?
+  tags           String[]
+  created_by     String?
+  created_at     DateTime? @default(now())
+  updated_at     DateTime? @default(now())
+
+  creator UserProfile? @relation("MagazineCreator", fields: [created_by], references: [id])
+
+  @@map("magazines")
+}
