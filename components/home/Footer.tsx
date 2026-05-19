@@ -22,8 +22,11 @@ export default function Footer() {
                         <div className="space-y-3 flex flex-col">
                             <Link href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Home</Link>
                             <Link href="/events" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Events</Link>
+                            <Link href="/blog" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Blog</Link>
                             <Link href="/resources" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Resources</Link>
+                            <Link href="/gallery" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Gallery</Link>
                             <Link href="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">About Us</Link>
+                            <Link href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Contact</Link>
                         </div>
                     </div>
 

@@ -74,9 +74,11 @@ export default function Navbar({ user, profile }: NavbarProps) {
     const navigationItems = [
         { href: "/", label: "Home" },
         { href: "/events", label: "Events" },
-        // { href: "/magazine", label: "Magazine" },
+        { href: "/blog", label: "Blog" },
         { href: "/resources", label: "Resources" },
+        { href: "/gallery", label: "Gallery" },
         { href: "/about", label: "About" },
+        { href: "/contact", label: "Contact" },
         ...(profile?.role === "admin" || profile?.role === "executive"
             ? [{ href: "/admin", label: "Admin" }]
             : []),
