@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
 import { ConditionalNavbar } from "@/components/ConditionalNavbar";
 import { getCurrentUser } from "@/lib/auth-server";
+import { LoadingScreen } from "@/components/ui/loading-screen";
 
 const inter = Inter({
     subsets: ["latin"],
@@ -32,6 +33,7 @@ export default async function RootLayout({
                 <body
                     className={`${inter.variable} font-sans antialiased`}
                 >
+                    <LoadingScreen />
                     <ThemeProvider
                         attribute="class"
                         defaultTheme="dark"
