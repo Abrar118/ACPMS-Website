@@ -11,6 +11,7 @@ import Link from "next/link";
 import { MinimalTiptapEditor } from "@/components/ui/minimal-tiptap";
 import { JSONContent } from "@tiptap/react";
 import { motion } from "framer-motion";
+import { StickyNote, MiniNotebook } from "@/components/ui/peeking-card";
 
 interface HighlightsData {
   event: any;
@@ -58,8 +59,22 @@ export default function ClubHighlights({ highlights }: ClubHighlightsProps) {
   }
 
   return (
-    <section className="py-24 px-4">
-      <div className="max-w-7xl mx-auto">
+    <section className="relative py-24 px-4 overflow-hidden">
+      <StickyNote
+        text="Did you know? 111,111,111 × 111,111,111 = 12345678987654321"
+        className="top-10 -right-4"
+        rotate="4deg"
+        delay={0.3}
+        color="green"
+      />
+      <MiniNotebook
+        title="Reading List"
+        lines={["The Art of Problem Solving", "Mathematical Circles", "Problem Solving Strategies"]}
+        className="bottom-16 -left-6"
+        rotate="-3deg"
+        delay={0.5}
+      />
+      <div className="max-w-7xl mx-auto relative">
         <SectionHeader title="Club Highlights" />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16">

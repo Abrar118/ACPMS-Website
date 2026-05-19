@@ -150,13 +150,13 @@ export default function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1, ease }}
         >
-          <div className="inline-flex items-center rounded-full border border-border bg-secondary px-4 py-1.5 text-sm text-muted-foreground mb-6">
+          <p className="text-sm sm:text-base md:text-lg font-semibold tracking-[0.25em] uppercase text-muted-foreground">
             Adamjee Cantonment Public School
-          </div>
+          </p>
         </motion.div>
 
         <motion.h1
-          className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight bg-gradient-to-b from-foreground via-foreground to-foreground/40 bg-clip-text text-transparent"
+          className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight bg-gradient-to-b from-foreground via-foreground to-foreground/40 bg-clip-text text-transparent mt-3"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2, ease }}
@@ -166,14 +166,18 @@ export default function HeroSection() {
           Mathematics
         </motion.h1>
 
-        <motion.p
-          className="text-xl md:text-2xl text-muted-foreground mt-6 max-w-xl mx-auto"
+        <motion.div
+          className="mt-8 flex items-center justify-center gap-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4, ease }}
         >
-          Think Logical
-        </motion.p>
+          <div className="h-px w-12 bg-primary/50" />
+          <p className="text-xl md:text-2xl font-light italic tracking-wide text-foreground/70">
+            &ldquo;Think Logical&rdquo;
+          </p>
+          <div className="h-px w-12 bg-primary/50" />
+        </motion.div>
 
         <motion.div
           className="mt-10 flex gap-4 justify-center"
