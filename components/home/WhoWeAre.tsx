@@ -2,6 +2,7 @@
 
 import { SectionHeader } from "@/components/ui/section-header";
 import { AmbientGlow } from "@/components/ui/ambient-glow";
+import { MiniNotebook, FormulaCard } from "@/components/ui/peeking-card";
 import {
   Heart,
   Users,
@@ -121,6 +122,24 @@ export default function WhoWeAre() {
         position="bottom-left"
         color="rgba(220, 38, 38, 0.06)"
         className="hidden dark:block"
+      />
+      <MiniNotebook
+        title="BDMO Prep List"
+        lines={["1. Number Theory", "2. Combinatorics", "3. Geometry", "4. Algebra"]}
+        className="top-16 -right-6"
+        rotate="3deg"
+        delay={0.4}
+      />
+      <FormulaCard
+        title="Area of a Circle"
+        formula="A = πr²"
+        tags={[
+          { label: "Geometry", color: "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300" },
+          { label: "Class 7", color: "bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300" },
+        ]}
+        className="bottom-20 -left-4"
+        rotate="-3deg"
+        delay={0.6}
       />
 
       <div className="relative max-w-7xl mx-auto">

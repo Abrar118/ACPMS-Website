@@ -1,6 +1,7 @@
 "use client";
 
 import { SectionHeader } from "@/components/ui/section-header";
+import { FormulaCard, StickyNote } from "@/components/ui/peeking-card";
 import { Calculator, Trophy, Lightbulb, HeartHandshake } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -63,8 +64,26 @@ const ease = [0.16, 1, 0.3, 1] as const;
 
 export default function WhatWeDo() {
   return (
-    <section className="py-24 px-4">
-      <div className="max-w-7xl mx-auto">
+    <section className="relative py-24 px-4 overflow-hidden">
+      <StickyNote
+        text="Find all primes p such that p² + 2 is also prime"
+        subtext="— Olympiad warmup"
+        className="top-8 -right-4"
+        rotate="-5deg"
+        delay={0.3}
+        color="pink"
+      />
+      <FormulaCard
+        title="Binomial Theorem"
+        formula="(a+b)ⁿ = Σ C(n,k) aⁿ⁻ᵏbᵏ"
+        tags={[
+          { label: "Combinatorics", color: "bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300" },
+        ]}
+        className="bottom-12 -left-6"
+        rotate="4deg"
+        delay={0.5}
+      />
+      <div className="max-w-7xl mx-auto relative">
         <SectionHeader
           title="What We Do"
           subtitle="Four pillars that drive everything at ACPSCM"
